@@ -63,3 +63,4 @@ target/
 
 # Emacs
 *~
+/.dir-locals.el
