@@ -64,3 +64,6 @@ target/
 # Emacs
 *~
 /.dir-locals.el
+
+# db-build
+/.build-state
