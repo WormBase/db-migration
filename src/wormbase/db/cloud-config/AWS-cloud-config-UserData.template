@@ -1,0 +1,18 @@
+#cloud-config
+repo_update: true
+repo_upgrade: all
+
+packages:
+  - openssl-devel
+  - readline-devel
+  - java-1.8.0-openjdk-headless
+  - python34
+  - python34-pip
+  - python34-tools
+  - python34-libs
+  - python34-virtualenv
+
+runcmd:
+# hack to make the tace binary work on the latest Amazon AMI:
+#  Expects libreadline.so.5, which is not currently installable.
+- ln -s /lib64/libreadline.so.6 /lib64/libreadline.so.5
