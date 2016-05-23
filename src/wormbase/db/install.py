@@ -24,7 +24,7 @@ from .util import echo_info
 from .util import echo_sig
 from .util import echo_waiting
 from .util import option
-from .util import pkg_config
+from .util import get_deploy_versions
 
 from . import github
 
@@ -135,7 +135,7 @@ def pass_meta(func):
         tmpdir = _mk_temp_dir('-db-build-downloads')
         download_dir = os.path.join(tmpdir, f_name)
         install_dir = os.path.join(os.path.expanduser('~'), f_name)
-        version = pkg_config()[f_name]
+        version = get_deploy_versions()[f_name]
         for path in (download_dir, install_dir):
             if not os.path.isdir(path):
                 os.makedirs(path)

@@ -48,11 +48,11 @@ def _secho(message, **kw):
     return click.secho(message, **kw)
 
 
-def pkg_config():
+def get_deploy_versions(purpose='default'):
     path = resource_filename(__package__, 'cloud-config/versions.ini')
     with open(path) as fp:
         co = configobj.ConfigObj(infile=fp)
-    return dict(co)
+    return dict(co)[purpose]
 
 
 echo_info = functools.partial(_secho, fg='blue', bold=True)
