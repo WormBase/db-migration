@@ -64,6 +64,7 @@ target/
 # Emacs
 *~
 /.dir-locals.el
+flycheck_*.py
 
 # db-build
 /.build-state
