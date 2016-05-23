@@ -24,12 +24,15 @@ from .util import echo_info
 from .util import echo_sig
 from .util import echo_waiting
 from .util import option
+from .util import pkg_config
 
 from . import github
 
 logger = logging.getLogger(__name__)
 
-Meta = collections.namedtuple('Meta', ('download_dir', 'install_dir'))
+Meta = collections.namedtuple('Meta', ('download_dir',
+                                       'install_dir',
+                                       'version'))
 
 _temp_dirs = []
 
@@ -132,10 +135,13 @@ def pass_meta(func):
         tmpdir = _mk_temp_dir('-db-build-downloads')
         download_dir = os.path.join(tmpdir, f_name)
         install_dir = os.path.join(os.path.expanduser('~'), f_name)
+        version = pkg_config()[f_name]
         for path in (download_dir, install_dir):
             if not os.path.isdir(path):
                 os.makedirs(path)
-        ctx.obj = Meta(download_dir=download_dir, install_dir=install_dir)
+        ctx.obj = Meta(download_dir=download_dir,
+                       install_dir=install_dir,
+                       version=version)
         obj = ctx.find_object(Meta)
         return ctx.invoke(func, obj, *args[1:], **kw)
     return functools.update_wrapper(command_with_meta_info, func)
@@ -157,11 +163,9 @@ def install(ctx):
 @option('--file-selector-regexp',
         default='(INSTALL|.*\.tar\.gz)$',
         help='File selection regexp')
-@click.argument('release', metavar='<version>')
 @persists_env()
 @pass_meta
 def acedb_data(meta,
-               release,
                ftp_host,
                remote_path_template,
                file_selector_regexp):
@@ -170,9 +174,10 @@ def acedb_data(meta,
     format_path = remote_path_template.format
     md5sum = lambda data: hashlib.new('md5', data).hexdigest()
     file_selector = functools.partial(re.match, file_selector_regexp)
+    version = meta.version
     with _ftp(ftp_host) as ftp:
-        ftp.cwd(format_path(version=release))
-        chksums = _acedb_data_checksums(ftp, release)
+        ftp.cwd(format_path(version=version))
+        chksums = _acedb_data_checksums(ftp, version)
         filenames = filter(file_selector, ftp.nlst('.'))
         for filename in filenames:
             out_path = os.path.join(download_dir, filename)
@@ -204,16 +209,15 @@ def acedb_data(meta,
 
 @install.command()
 @option('-t', '--url-template',
-        # Tested with version=64.4.9.60
         default=('ftp://ftp.sanger.ac.uk/pub/acedb/MONTHLY/'
                  'ACEDB-binaryLINUX_{version}.tar.gz'),
         help='URL for 64bit version of ACeDB binaries')
-@click.argument('version', metavar='<version>')
 @persists_path()
 @pass_meta
-def acedb_binaries(meta, version, url_template):
+def acedb_binaries(meta, url_template):
     install_dir = meta.install_dir
     download_dir = meta.download_dir
+    version = meta.version
     url = url_template.format(version=version)
     pr = urllib.parse.urlparse(url)
     with _ftp(pr.netloc) as ftp:
@@ -233,11 +237,11 @@ def acedb_binaries(meta, version, url_template):
 @option('-t', '--url-template',
         default='https://my.datomic.com/downloads/free/{version}',
         help='URL template for Datomic Free version')
-@click.argument('version', metavar='<version>')
 @persists_env()
 @persists_path()
 @pass_meta
-def datomic_free(meta, version, url_template):
+def datomic_free(meta, url_template):
+    version = meta.version
     url = url_template.format(version=version)
     fullname = 'datomic-free_{version}'.format(version=version)
     local_filename = fullname + '.zip'
@@ -250,11 +254,11 @@ def datomic_free(meta, version, url_template):
 
 
 @install.command()
-@click.argument('tag', metavar='<git release tag>')
 @pass_meta
-def pseudoace(meta, tag):
+def pseudoace(meta):
     download_dir = meta.download_dir
     install_dir = meta.install_dir
+    tag = meta.version
     echo_waiting('Downloading pseudoace from github ... ')
     dl_path = github.download_release_binary(
         'WormBase/pseudoace',

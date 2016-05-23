@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import functools
 
+from pkg_resources import resource_filename
 import click
+import configobj
 import requests
 
 
@@ -44,6 +46,13 @@ def download(url, local_filename, chunk_size=1024 * 10):
 def _secho(message, **kw):
     message = '🐛 -> {}'.format(message)
     return click.secho(message, **kw)
+
+
+def pkg_config():
+    path = resource_filename(__package__, 'cloud-config/versions.ini')
+    with open(path) as fp:
+        co = configobj.ConfigObj(infile=fp)
+    return dict(co)
 
 
 echo_info = functools.partial(_secho, fg='blue', bold=True)
