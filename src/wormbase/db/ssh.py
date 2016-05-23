@@ -44,13 +44,16 @@ def read_stream(stream, block_size=2048, encoding='utf-8'):
 def run_command(ec2_instance, cmd, timeout=30):
     """Run a command over ssh."""
     out_buf = io.StringIO()
+    err_buf = io.StringIO()
     with connection(ec2_instance) as ssh:
         (stdin, stdout, stderr) = ssh.exec_command(cmd)
         stdin.close()
         out = read_stream(stdout)
         err = read_stream(stderr)
         if err:
-            raise RemoteCommandFailed(err)
+            for block in err:
+                err_buf.write(block)
+            raise RemoteCommandFailed(err_buf.getvalue())
         for block in out:
             out_buf.write(block)
     return out_buf
