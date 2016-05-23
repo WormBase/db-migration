@@ -334,7 +334,7 @@ def _ensure_config(ctx, session, role):
         default=IAM_DB_BUILD_ROLE,
         help='AWS Role that will be assumed to execute the build')
 @click.pass_context
-def cloud_ctrl(ctx, profile, assume_role):
+def tasks(ctx, profile, assume_role):
     ctx.obj['profile'] = profile
     session = _aws_session(ctx, profile_name=profile)
     iam = session.resource('iam')
@@ -354,7 +354,7 @@ def cloud_ctrl(ctx, profile, assume_role):
     ctx.obj['build-state'] = load_build_state()
 
 
-@cloud_ctrl.command(short_help='Configure pre-requisit IAM roles and policies')
+@tasks.command(short_help='Configure pre-requisit IAM roles and policies')
 @click.argument('assume_role_name')
 @option('--assume_role_policies',
         default=IAM_DB_BUILD_POLICIES,
@@ -382,7 +382,7 @@ def setup_iam(ctx, assume_role_name, assume_role_policies, group_name):
         click.secho('Good to go!', fg='green')
 
 
-@cloud_ctrl.command(short_help='Lists users allowed to perform the build')
+@tasks.command(short_help='Lists users allowed to perform the build')
 @option('--group-name',
         default=IAM_DB_BUILD_GROUP,
         help=('Name of the AWS IAM group '
@@ -408,7 +408,7 @@ def list_users(ctx, group_name, assume_role_name):
     click.echo(json.dumps(data, indent=True, sort_keys=True))
 
 
-@cloud_ctrl.command(short_help='Start the build process')
+@tasks.command(short_help='Start the build process')
 @option('--wb-db-build-version',
         default='0.1',
         help='The version of *this* python package')
@@ -484,7 +484,7 @@ def kick_off(ctx,
     return state
 
 
-@cloud_ctrl.command(short_help='Destroy ephemeral build resources')
+@tasks.command(short_help='Destroy ephemeral build resources')
 @click.pass_context
 @dumps_biuld_state
 def destroy(ctx):
@@ -500,7 +500,7 @@ def destroy(ctx):
     return state
 
 
-@cloud_ctrl.command(short_help='Describe the state of the build')
+@tasks.command(short_help='Describe the state of the build')
 @click.pass_context
 @dumps_biuld_state
 def show_state(ctx):
@@ -521,4 +521,4 @@ def show_state(ctx):
     return state
 
 
-cli = cloud_ctrl(obj={})
+cli = tasks(obj={})

@@ -95,7 +95,7 @@ def persists_path(shell_init_file='~/.bashrc'):
             msg = msg.format(text=new_line, user=getpass.getuser())
             echo_info(msg)
             return install_path
-        return functools.update_wrapper(cmd_proxy)
+        return functools.update_wrapper(cmd_proxy, func)
     return path_updater
 
 
@@ -119,7 +119,7 @@ def persists_env(shell_init_file='~/.bashrc'):
             msg = msg.format(msg, user=getpass.getuser())
             echo_info(msg)
             return rv
-        return functools.update_wrapper(cmd_proxy)
+        return functools.update_wrapper(cmd_proxy, func)
     return env_updater
 
 
