@@ -13,7 +13,11 @@ have been automatically added to `$PATH`.
 
 System requirements
 ===================
+ * libssl-dev
+ * libffi-dev
  * Python34+
+   * python3-dev
+   * python3-venv
  * Java version 8
  * readline developement libraies
    * libreadline.so.5 is needed for ACeDB "tace" binary.
