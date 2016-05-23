@@ -198,7 +198,7 @@ def dump_build_state(state):
         pickle.dump(state, fp)
 
 
-def dumps_biuld_state(func):
+def dumps_build_state(func):
     @functools.wraps(func)
     def cmd_proxy(ctx, *args, **kwargs):
         ctx.obj['build-state'] = load_build_state()
@@ -430,7 +430,7 @@ def list_users(ctx, group_name, assume_role_name):
 @click.argument('sdist_path', metavar='<sdist>')
 @click.argument('release', metavar='<WSXXX_release>')
 @click.pass_context
-@dumps_biuld_state
+@dumps_build_state
 def kick_off(ctx,
              sdist_path,
              release,
@@ -486,7 +486,7 @@ def kick_off(ctx,
 
 @tasks.command(short_help='Destroy ephemeral build resources')
 @click.pass_context
-@dumps_biuld_state
+@dumps_build_state
 def destroy(ctx):
     state = ctx.obj['build-state']
     session = ctx.obj['session']
@@ -502,7 +502,7 @@ def destroy(ctx):
 
 @tasks.command(short_help='Describe the state of the build')
 @click.pass_context
-@dumps_biuld_state
+@dumps_build_state
 def show_state(ctx):
     state = ctx.obj['build-state']
     if 'instance' not in state:
