@@ -431,14 +431,14 @@ def list_users(ctx, group_name, assume_role_name):
 @click.argument('release', metavar='<WSXXX_release>')
 @click.pass_context
 @dumps_build_state
-def kick_off(ctx,
-             sdist_path,
-             release,
-             wb_db_build_version,
-             ami,
-             monitoring,
-             instance_type,
-             dry_run):
+def init(ctx,
+         sdist_path,
+         release,
+         wb_db_build_version,
+         ami,
+         monitoring,
+         instance_type,
+         dry_run):
     """Start the build."""
     state = {}
     session = ctx.obj['session']
