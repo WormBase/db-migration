@@ -3,6 +3,7 @@ repo_update: true
 repo_upgrade: all
 
 packages:
+  - libffi-devel
   - openssl-devel
   - readline-devel
   - java-1.8.0-openjdk-headless
@@ -16,3 +17,4 @@ runcmd:
 # hack to make the tace binary work on the latest Amazon AMI:
 #  Expects libreadline.so.5, which is not currently installable.
 - ln -s /lib64/libreadline.so.6 /lib64/libreadline.so.5
+- yum groupinstall -y "Development Tools"

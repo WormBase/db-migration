@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import functools
+import subprocess
 
 from pkg_resources import resource_filename
 import click
@@ -53,6 +54,16 @@ def get_deploy_versions(purpose='default'):
     with open(path) as fp:
         co = configobj.ConfigObj(infile=fp)
     return dict(co)[purpose]
+
+def run_local_command(cmd, stdin=None, timeout=None):
+    proc = subprocess.Popen(cmd,
+                            shell=True,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+    (out, err) = proc.communicate(input=stdin, timeout=timeout)
+    if err:
+        raise Exception(err)
+    return out
 
 
 echo_info = functools.partial(_secho, fg='blue', bold=True)

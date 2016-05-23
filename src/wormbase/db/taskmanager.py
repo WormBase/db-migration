@@ -13,18 +13,20 @@ import time
 
 from botocore.exceptions import ClientError
 from botocore.exceptions import ProfileNotFound
+from pkg_resources import resource_filename
 from scp import SCPClient
 import boto3
 import click
 import configobj
-import paramiko
 
+from . import ssh
 from .util import echo_error
 from .util import echo_info
 from .util import echo_retry
 from .util import echo_sig
 from .util import echo_waiting
 from .util import option
+
 
 BUILD_STATE_PATH = os.path.join(os.getcwd(), '.build-state')
 
@@ -54,7 +56,8 @@ IAM_DB_BUILD_POLICIES = (
     'ec2-run-db-build-instance',
     'ec2-tagging',
     's3-datomic-backups-full-access',
-    'IAMReadOnlyAccess'
+    'IAMReadOnlyAccess',
+    'AmazonEC2RoleforSSM'
 )
 
 USER_DATA_TEMPLATE = """#cloud-config
@@ -78,6 +81,11 @@ runcmd:
 - ln -s /lib64/libreadline.so.6 /lib64/libreadline.so.5
 
 """
+
+USER_DATA_PATH = resource_filename(
+    __package__,
+    'cloud-config/AWS-cloud-config-UserData.template')
+
 
 EC2_INSTANCE_DEFAULTS = dict(
     ami='ami-8ff710e2',
@@ -131,18 +139,15 @@ def bootstrap(ec2_instance, package_version):
     path = os.path.join('dist', archive_filename)
     if not os.path.isfile(path):
         subprocess.check_call('python setup.py sdist', shell=True)
-    hostname = ec2_instance.public_dns_name
-    priv_key_path = os.path.join(os.getcwd(),
-                                 ec2_instance.key_pair.name)
-    ssh = paramiko.SSHClient()
-    ssh.load_system_host_keys()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(hostname,
-                key_filename=priv_key_path,
-                username='ec2-user',
-                timeout=60.0 * 3.5)  # Wait 3½ mins for sshd on ec2 instance
-    with SCPClient(ssh.get_transport()) as scp:
-        scp.put(path, archive_filename)
+    with ssh.connection(ec2_instance, timeout=60.0 * 3.5) as conn:
+        with SCPClient(conn.get_transport()) as scp:
+            scp.put(path, archive_filename)
+    run_cmd = functools.partial(ssh.run_command, ec2_instance)
+    run_cmd('python3 -m pip install --user ' + archive_filename)
+    run_cmd('wb-db-install acedb')
+    # ssh.run_command('wb-db-install acedb_data')
+    run_cmd('wb-db-install pseudoace')
+    run_cmd('wb-db-install datomic_free')
 
 
 def _make_asssume_role_policy(version='2012-10-17', **attrs):
@@ -383,7 +388,7 @@ def setup_iam(ctx, assume_role_name, assume_role_policies, group_name):
         echo_error(e)
         ctx.abort()
     else:
-        click.secho('Good to go!', fg='green')
+        echo_sig('Good to go!')
 
 
 @tasks.command(short_help='Lists users allowed to perform the build')
@@ -444,17 +449,12 @@ def init(ctx,
          instance_type,
          dry_run):
     """Start the build."""
-    state = {}
     session = ctx.obj['session']
+    state = {'started-by': session.profile_name}
     ec2 = session.resource('ec2')
-    key_pair = get_key_pair(ec2, release)
-    format_user_data = USER_DATA_TEMPLATE.format
-    sdist_filename = os.path.basename(sdist_path)
-    with open(sdist_path, 'rb') as fp:
-        data = base64.b64encode(fp.read())
-        sdist_content = data.decode('utf-8')
-    user_data = format_user_data(sdist_filename=sdist_filename,
-                                 sdist_content=sdist_content)
+    key_pair = get_key_pair(ec2, release)       
+    with open(USER_DATA_PATH) as fp:
+        user_data = fp.read()
     instance_options = dict(
         ImageId=ami,
         InstanceType=instance_type,
@@ -472,7 +472,9 @@ def init(ctx,
     instance.create_tags(Tags=[
         dict(Key='CreatedBy', Value=aws_userid)])
     state['instance'] = dict(id=instance.id,
-                             KeyPairName=key_pair.name)
+                             KeyPairName=key_pair.name,
+                             public_dns_name=instance.public_dns_name,
+                             public_ip_addr=instance.public_ip_address)
     echo_waiting('Waiting for instance to enter running state ... ')
     instance.wait_until_running()
     echo_sig('done')
@@ -488,18 +490,26 @@ def init(ctx,
     return state
 
 
-@tasks.command(short_help='Destroy ephemeral build resources')
+@tasks.command(short_help='Terminate ephemeral build resources')
 @click.pass_context
 @dumps_build_state
-def destroy(ctx):
+def terminate(ctx):
     state = ctx.obj['build-state']
     session = ctx.obj['session']
     ec2 = session.resource('ec2')
     instance_id = state['instance']['id']
     instances = ec2.instances.filter(InstanceIds=[instance_id])
     instance = next(iter(instances))
-    instance.terminate()
-    state['instance-state'] = instance.state
+    try:
+        instance.terminate()
+    except ClientError as client_error:
+        msg = ('Only {[started-by]} or an adminstrator '
+               'will be able to terminate the instance')
+        msg = msg.format(state)
+        click.secho(str(client_error), fg='red')
+        echo_error(msg)
+    finally:
+        state['instance-state'] = instance.state
     echo_info('Instance {.id!r} is {[Name]}'.format(instance, instance.state))
     return state
 
@@ -507,7 +517,7 @@ def destroy(ctx):
 @tasks.command(short_help='Describe the state of the build')
 @click.pass_context
 @dumps_build_state
-def show_state(ctx):
+def view_state(ctx):
     state = ctx.obj['build-state']
     if 'instance' not in state:
         echo_info('No instances have been started')

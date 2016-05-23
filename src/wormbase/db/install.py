@@ -214,7 +214,7 @@ def acedb_data(meta,
         help='URL for 64bit version of ACeDB binaries')
 @persists_path()
 @pass_meta
-def acedb_binaries(meta, url_template):
+def acedb(meta, url_template):
     install_dir = meta.install_dir
     download_dir = meta.download_dir
     version = meta.version
