@@ -187,6 +187,10 @@ def get_key_pair(ec2, release):
     except ClientError:
         key_pair = ec2.create_key_pair(KeyName=key_pair_name)
         key_pair_path = os.path.join(KEY_PAIR_PATH, key_pair_name)
+        # If the user has deleted the keypair locally, re-create
+        if not os.path.isfile(key_pair_path):
+            key_pair.delete()
+            return get_key_pair(ec2, release)
         with open(key_pair_path, 'wb') as fp:
             fp.write(key_pair.key_material.encode('ascii'))
         os.chmod(fp.name, 0o600)
