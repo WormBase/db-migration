@@ -1,3 +1,4 @@
 include *.rst
-recursive-exclude *~ *.pyc
-graft src
+include requirements.txt
+recursive-exclude src *~ *.pyc
+recursive-include src *.py *.cfg *.txt *.json *.yaml *.ini
