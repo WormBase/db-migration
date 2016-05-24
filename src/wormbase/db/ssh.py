@@ -1,7 +1,6 @@
 import contextlib
 import io
 import os
-import subprocess
 
 import paramiko
 
