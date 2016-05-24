@@ -60,28 +60,6 @@ IAM_DB_BUILD_POLICIES = (
     'AmazonEC2RoleforSSM'
 )
 
-USER_DATA_TEMPLATE = """#cloud-config
-repo_update: true
-repo_upgrade: all
-
-packages:
-  - openssl-devel
-  - readline-devel
-  - java-1.8.0-openjdk-headless
-  - python34
-
-runcmd:
-# until we have Python 3.5, need to get-pip
-- wget https://bootstrap.pypa.io/get-pip.py -O /tmp/get-pip.py
-- python3 /tmp/get-pip.py
-- python3 -m pip --upgrade pip
-
-# hack to make tace work. Expects libreadline.so.5, which is not
-# installable
-- ln -s /lib64/libreadline.so.6 /lib64/libreadline.so.5
-
-"""
-
 USER_DATA_PATH = resource_filename(
     __package__,
     'cloud-config/AWS-cloud-config-UserData.template')
