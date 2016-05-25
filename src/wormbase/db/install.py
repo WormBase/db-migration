@@ -161,10 +161,11 @@ def install(ctx):
         default='pub/databases/wormbase/releases/{version}/acedb',
         help='Path to the file(s) containing compressed database.')
 @option('--file-selector-regexp',
-        default='(INSTALL|.*\.tar\.gz)$',
+        default='.*\.tar\.gz$',
         help='File selection regexp')
-@persists_env()
 @pass_meta
+@installer
+@persists_env()
 def acedb_data(meta,
                ftp_host,
                remote_path_template,
