@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import base64
+import contextlib
 import functools
 import json
 import operator
 import os
-import pickle
 import pprint
+import shelve
 import socket
 import subprocess
 import sys
@@ -26,9 +27,16 @@ from .util import echo_retry
 from .util import echo_sig
 from .util import echo_waiting
 from .util import option
+from .util import distribution_name
 
+# TODO: use public ip address for ssh connections
+#       (resilience to temporary DNS failures)
 
-BUILD_STATE_PATH = os.path.join(os.getcwd(), '.build-state')
+# TODO:
+#  use click.pass_obj to pass session around instead of click.context
+#  or even the make_decorator thingo
+
+BUILD_STATE_PATH = os.path.join(os.getcwd(), '.db-build.db')
 
 IAM_ASSUME_ROLE_NAME = 'wb-build-db-assume'
 
@@ -37,8 +45,6 @@ IAM_ASSUME_POLICY_NAME = 'wb-build-db-assume'
 IAM_DB_BUILD_GROUP = 'wb-db-builders'
 
 IAM_DB_BUILD_ROLE = 'wb-build-db'
-
-KEY_PAIR_PATH = os.getcwd()
 
 LOCAL_ASSUME_ROLE_PROFILE = 'wb-db-builder'
 
@@ -71,6 +77,26 @@ EC2_INSTANCE_DEFAULTS = dict(
     monitoring=False,
     dry_run=False
 )
+
+
+def _archive_filename():
+    # XXX: Path to filename produced by: python setup.py sdist (for now)
+    # XXX: Best to download from github release.
+    pkg_fullname = distribution_name()
+    archive_filename = pkg_fullname + '.tar.gz'
+    return archive_filename
+
+
+@contextlib.contextmanager
+def latest_build_state(ctx):
+    bstate = ctx.obj['build-state']
+    bstate.sync()
+    c_bstate = bstate.get('current')
+    if c_bstate is None:
+        echo_error('No current instance to terminate.')
+        echo_info('Other instances may be running, use AWS console')
+        ctx.abort()
+    yield c_bstate
 
 
 def _wait_for_sshd(ec2_instance, max_timeout=60 * 6):
@@ -108,24 +134,13 @@ def bootstrap(ec2_instance, package_version):
 
     This also requires the system package 'python3-dev'.
     """
-    shell_cmd = functools.partial(subprocess.Popen, shell=True)
-    proc = shell_cmd('python setup.py --fullname', stdout=subprocess.PIPE)
-    pkg_fullname = proc.communicate()[0].decode('utf-8').rstrip()
-    # Path to filename produced by: python setup.py sdist (for now)
-    # Best to download from github release.
-    archive_filename = pkg_fullname + '.tar.gz'
+    archive_filename = _archive_filename()
     path = os.path.join('dist', archive_filename)
     if not os.path.isfile(path):
         subprocess.check_call('python setup.py sdist', shell=True)
     with ssh.connection(ec2_instance, timeout=60.0 * 3.5) as conn:
         with SCPClient(conn.get_transport()) as scp:
             scp.put(path, archive_filename)
-    run_cmd = functools.partial(ssh.run_command, ec2_instance)
-    run_cmd('python3 -m pip install --user ' + archive_filename)
-    run_cmd('wb-db-install acedb')
-    # ssh.run_command('wb-db-install acedb_data')
-    run_cmd('wb-db-install pseudoace')
-    run_cmd('wb-db-install datomic_free')
 
 
 def _make_asssume_role_policy(version='2012-10-17', **attrs):
@@ -160,47 +175,6 @@ def _aws_session(ctx, profile_name):
         echo_error(str(pnf))
         ctx.abort()
     return session
-
-
-def get_key_pair(ec2, release):
-    key_pair_name = 'db-build-{}-keypair'.format(release)
-    try:
-        key_pair = ec2.KeyPair(key_pair_name)
-        key_pair.load()
-    except ClientError:
-        key_pair = ec2.create_key_pair(KeyName=key_pair_name)
-        key_pair_path = os.path.join(KEY_PAIR_PATH, key_pair_name)
-        # If the user has deleted the keypair locally, re-create
-        if not os.path.isfile(key_pair_path):
-            key_pair.delete()
-            return get_key_pair(ec2, release)
-        with open(key_pair_path, 'wb') as fp:
-            fp.write(key_pair.key_material.encode('ascii'))
-        os.chmod(fp.name, 0o600)
-    return key_pair
-
-
-def dump_build_state(state):
-    with open(BUILD_STATE_PATH, 'wb') as fp:
-        pickle.dump(state, fp)
-
-
-def dumps_build_state(func):
-    @functools.wraps(func)
-    def cmd_proxy(ctx, *args, **kwargs):
-        ctx.obj['build-state'] = load_build_state()
-        state = func(ctx, *args, **kwargs)
-        dump_build_state(state)
-    return cmd_proxy
-
-
-def load_build_state():
-    try:
-        with open(BUILD_STATE_PATH, 'rb') as fp:
-            state = pickle.load(fp)
-    except IOError:
-        state = {}
-    return state
 
 
 def _report_status(instance):
@@ -338,7 +312,7 @@ def tasks(ctx, profile, assume_role):
         else:
             ctx.obj['assumed_role'] = ar_profile['role_arn']
     ctx.obj['session'] = session
-    ctx.obj['build-state'] = load_build_state()
+    ctx.obj['build-state'] = shelve.open(BUILD_STATE_PATH)
 
 
 @tasks.command(short_help='Configure pre-requisit IAM roles and policies')
@@ -414,23 +388,26 @@ def list_users(ctx, group_name, assume_role_name):
 @option('--instance-type',
         default=EC2_INSTANCE_DEFAULTS['instance_type'],
         help='AWS EC2 Instance Type ')
+@option('--keypair-name',
+        default='wb-db-build',
+        help='Name of EC2 KeyPair.')
 @click.argument('sdist_path', metavar='<sdist>')
-@click.argument('release', metavar='<WSXXX_release>')
+@click.argument('ws_data_release', metavar='<WSXXX data release>')
 @click.pass_context
-@dumps_build_state
 def init(ctx,
          sdist_path,
-         release,
+         ws_data_release,
          wb_db_build_version,
          ami,
          monitoring,
          instance_type,
+         keypair_name,
          dry_run):
     """Start the build."""
     session = ctx.obj['session']
-    state = {'started-by': session.profile_name}
+    state = ctx.obj['build-state']
     ec2 = session.resource('ec2')
-    key_pair = get_key_pair(ec2, release)       
+    key_pair = ssh.recycle_key_pair(ec2, keypair_name)
     with open(USER_DATA_PATH) as fp:
         user_data = fp.read()
     instance_options = dict(
@@ -443,16 +420,18 @@ def init(ctx,
         Monitoring=dict(Enabled=monitoring),
         DryRun=dry_run)
     aws_userid = _aws_userid(session)
-    state['release'] = release
-    state['instance-options'] = instance_options
     instances = ec2.create_instances(**instance_options)
     instance = next(iter(instances))
     instance.create_tags(Tags=[
         dict(Key='CreatedBy', Value=aws_userid)])
-    state['instance'] = dict(id=instance.id,
-                             KeyPairName=key_pair.name,
-                             public_dns_name=instance.public_dns_name,
-                             public_ip_addr=instance.public_ip_address)
+    state[instance.id] = dict(id=instance.id,
+                              init_options=instance_options,
+                              KeyPairName=key_pair.name,
+                              public_dns_name=instance.public_dns_name,
+                              public_ip_addr=instance.public_ip_address,
+                              started_by=session.profile_name,
+                              ws_data_release=ws_data_release)
+    state['current'] = state[instance.id]
     echo_waiting('Waiting for instance to enter running state ... ')
     instance.wait_until_running()
     echo_sig('done')
@@ -470,47 +449,58 @@ def init(ctx,
 
 @tasks.command(short_help='Terminate ephemeral build resources')
 @click.pass_context
-@dumps_build_state
 def terminate(ctx):
-    state = ctx.obj['build-state']
-    session = ctx.obj['session']
-    ec2 = session.resource('ec2')
-    instance_id = state['instance']['id']
-    instances = ec2.instances.filter(InstanceIds=[instance_id])
-    instance = next(iter(instances))
-    try:
-        instance.terminate()
-    except ClientError as client_error:
-        msg = ('Only {[started-by]} or an adminstrator '
-               'will be able to terminate the instance')
-        msg = msg.format(state)
-        click.secho(str(client_error), fg='red')
-        echo_error(msg)
-    finally:
-        state['instance-state'] = instance.state
-    echo_info('Instance {.id!r} is {[Name]}'.format(instance, instance.state))
-    return state
+    with latest_build_state(ctx) as state:
+        session = ctx.obj['session']
+        ec2 = session.resource('ec2')
+        instance_id = state['id']
+        instances = ec2.instances.filter(InstanceIds=[instance_id])
+        instance = next(iter(instances))
+        try:
+            instance.terminate()
+        except ClientError as client_error:
+            msg = ('Only {[started-by]} or an adminstrator '
+                   'will be able to terminate the instance')
+            msg = msg.format(state)
+            click.secho(str(client_error), fg='red')
+            echo_error(msg)
+        finally:
+            state['instance-state'] = instance.state
+        msg = 'Instance {.id!r} is {[Name]}'
+        echo_info(msg.format(instance, instance.state))
 
 
 @tasks.command(short_help='Describe the state of the build')
 @click.pass_context
-@dumps_build_state
 def view_state(ctx):
-    state = ctx.obj['build-state']
-    if 'instance' not in state:
-        echo_info('No instances have been started')
-        return
+    with latest_build_state(ctx) as state:
+        session = ctx.obj['session']
+        ec2 = session.resource('ec2')
+        instance = ec2.Instance(state['id'])
+        try:
+            instance.load()
+            instance_state = dict(instance.state)
+        except (ClientError, AttributeError):
+            instance_state = dict(Name='terminated?', code='<unknown>')
+        state['instance-state'] = instance_state
+        echo_info(pprint.pformat(state))
+
+
+@tasks.command(short_help='Installs custom software for the build')
+@click.pass_context
+def install_software(ctx):
+    # archive_filename = _archive_filename()
     session = ctx.obj['session']
     ec2 = session.resource('ec2')
-    instance = ec2.Instance(state['instance']['id'])
-    try:
-        instance.load()
-        instance_state = dict(instance.state)
-    except (ClientError, AttributeError):
-        instance_state = dict(Name='terminated?', code='<unknown>')
-    state['instance-state'] = instance_state
-    echo_info(pprint.pformat(state))
-    return state
+    with latest_build_state(ctx) as state:
+        ec2_instance = ec2.Instance(state['id'])
+        run_cmd = functools.partial(ssh.run_command, ec2_instance)
+        # run_cmd('python3 -m pip install --user ' + archive_filename)
+        run_cmd('echo "PATH=\"${PATH}:${HOME}/.local/bin" >> ~/.bashrc')
+        run_cmd('PATH="${PATH}:~/.local/bin" wb-db-install acedb && echo $PWD')
+        # ssh.run_command('wb-db-install acedb_data')
+        # run_cmd('wb-db-install pseudoace')
+        # run_cmd('wb-db-install datomic_free')
 
 
 cli = tasks(obj={})

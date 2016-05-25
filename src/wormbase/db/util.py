@@ -8,6 +8,13 @@ import configobj
 import requests
 
 
+def distribution_name():
+    shell_cmd = functools.partial(subprocess.Popen, shell=True)
+    proc = shell_cmd('python setup.py --fullname', stdout=subprocess.PIPE)
+    pkg_fullname = proc.communicate()[0].decode('utf-8').rstrip()
+    return pkg_fullname
+
+
 def option(*args, **kw):
     """Factory function for click.option that makes help text more useful.
 
@@ -54,6 +61,7 @@ def get_deploy_versions(purpose='default'):
     with open(path) as fp:
         co = configobj.ConfigObj(infile=fp)
     return dict(co)[purpose]
+
 
 def run_local_command(cmd, stdin=None, timeout=None):
     proc = subprocess.Popen(cmd,

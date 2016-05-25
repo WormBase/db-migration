@@ -1,33 +1,53 @@
-import contextlib
+import functools
 import io
 import os
 
 import paramiko
+from botocore.exceptions import ClientError
+
+
+keypair_directory = functools.partial(os.path.expanduser, '~/.ssh')
 
 
 class RemoteCommandFailed(Exception):
     """Running the remote command failed."""
 
 
-@contextlib.contextmanager
-def connection(ec2_instance,
-               timeout=30,
-               username='ec2-user',
-               private_key_path=None):
+def recycle_key_pair(ec2, key_pair_name):
+    try:
+        key_pair = ec2.KeyPair(key_pair_name)
+        key_pair.load()
+    except ClientError:
+        # KeyPair not present in EC2
+        pass
+    else:
+        key_pair.delete()
+    key_pair = ec2.create_key_pair(KeyName=key_pair_name)
+    key_filename = '{}.pem'.format(key_pair_name)
+    key_pair_path = os.path.join(keypair_directory(), key_filename)
+    try:
+        os.remove(key_pair_path)
+    except OSError:
+        pass
+    # If the user has deleted the keypair locally, re-create
+    with open(key_pair_path, 'wb') as fp:
+        fp.write(key_pair.key_material.encode('ascii'))
+        os.chmod(fp.name, 0o600)
+    return key_pair
+
+
+def connection(ec2_instance, timeout=30, username='ec2-user'):
     hostname = ec2_instance.public_dns_name
-    if private_key_path is None:
-        # Use the instance private key
-        private_key_path = os.path.join(os.getcwd(),
-                                        ec2_instance.key_pair.name)
+    keypair_filename = ec2_instance.key_pair.name + '.pem'
+    key_filename = os.path.join(keypair_directory(), keypair_filename)
     ssh = paramiko.SSHClient()
     ssh.load_system_host_keys()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(hostname,
-                key_filename=private_key_path,
+                key_filename=key_filename,
                 username=username,
-                timeout=timeout)  
-    yield ssh
-    ssh.close()
+                timeout=timeout)
+    return ssh
 
 
 def read_stream(stream, block_size=2048, encoding='utf-8'):
@@ -40,19 +60,30 @@ def read_stream(stream, block_size=2048, encoding='utf-8'):
         yield data
 
 
-def run_command(ec2_instance, cmd, timeout=30):
+def run_command(ec2_instance, cmd,
+                ssh_conn=None, timeout=30, ignore_err=False):
     """Run a command over ssh."""
     out_buf = io.StringIO()
     err_buf = io.StringIO()
-    with connection(ec2_instance) as ssh:
-        (stdin, stdout, stderr) = ssh.exec_command(cmd)
+    if ssh_conn is None:
+        ssh_conn = connection(ec2_instance)
+    with ssh_conn:
+        print('Running command: ' + cmd)
+        (stdin, stdout, stderr) = ssh_conn.exec_command(cmd,
+                                                        timeout=timeout,
+                                                        get_pty=True)
         stdin.close()
         out = read_stream(stdout)
         err = read_stream(stderr)
-        if err:
-            for block in err:
-                err_buf.write(block)
-            raise RemoteCommandFailed(err_buf.getvalue())
+        for block in err:
+            err_buf.write(block)
+        err_text = err_buf.getvalue()
+        if err_text:
+            print('Got error text: ' + err_text)
+            raise RemoteCommandFailed(err_text)
+        print('Reading command output ... ', end='')
         for block in out:
             out_buf.write(block)
+        print('done')
+        print(out_buf.getvalue())
     return out_buf
