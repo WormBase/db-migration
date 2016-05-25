@@ -132,6 +132,12 @@ def pass_meta(func):
     return functools.update_wrapper(command_with_meta_info, func)
 
 
+def installer(func):
+    def cmd_proxy(*args, **kw):
+        return functools.partial(func, *args, **kw)
+    return functools.update_wrapper(cmd_proxy, func)
+
+
 @click.group()
 @click.pass_context
 def install(ctx):
