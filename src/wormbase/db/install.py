@@ -20,9 +20,6 @@ import zipfile
 import click
 
 from .util import download
-from .util import echo_info
-from .util import echo_sig
-from .util import echo_waiting
 from .util import option
 from .util import get_deploy_versions
 
@@ -69,6 +66,16 @@ def _acedb_data_checksums(ftp, release):
     return chksums
 
 
+def _make_executable(path):
+    os.chmod(path, 0o775)
+    bin_dirname = os.path.expanduser('~/.local/bin')
+    bin_filename = os.path.basename(path)
+    bin_path = os.path.join(bin_dirname, bin_filename)
+    if os.path.islink(bin_path):
+        os.unlink(bin_path)
+    os.symlink(path, bin_path)
+
+
 @atexit.register
 def _clean_temp_dirs():
     for path in _temp_dirs:
@@ -83,25 +90,6 @@ def _ftp(host):
     ftp.quit()
 
 
-def persists_path(shell_init_file='~/.bashrc'):
-    """Decorator for a `install` command.
-
-    The decorated function should return a path to be appended
-    to the current users ${PATH} specified in the user's shell profile.
-    """
-    def path_updater(func):
-        def cmd_proxy(*args, **kw):
-            install_path = func(*args, **kw)
-            new_line = 'export PATH="${PATH}:%s' % install_path
-            _append_line(new_line, filename=shell_init_file)
-            msg = 'Added {text!r} to $PATH for {user}'
-            msg = msg.format(text=new_line, user=getpass.getuser())
-            echo_info(msg)
-            return install_path
-        return functools.update_wrapper(cmd_proxy, func)
-    return path_updater
-
-
 def persists_env(shell_init_file='~/.bashrc'):
     """Decorator for a `install` command.
 
@@ -114,13 +102,10 @@ def persists_env(shell_init_file='~/.bashrc'):
             env_before = set(os.environ.items())
             rv = func(*args, **kw)
             env_after = set(os.environ.items())
-            env_vars = dict(env_before - env_after)
+            env_vars = dict(env_after - env_before)
             for (env_var, val) in sorted(env_vars.items()):
                 new_line = 'export {var}="{val}"'.format(var=env_var, val=val)
                 _append_line(new_line, filename=shell_init_file)
-            msg = 'Updated environemnt for {user}'
-            msg = msg.format(msg, user=getpass.getuser())
-            echo_info(msg)
             return rv
         return functools.update_wrapper(cmd_proxy, func)
     return env_updater
@@ -179,7 +164,8 @@ def acedb_data(meta,
     with _ftp(ftp_host) as ftp:
         ftp.cwd(format_path(version=version))
         chksums = _acedb_data_checksums(ftp, version)
-        filenames = filter(file_selector, ftp.nlst('.'))
+        filenames = list(filter(file_selector, ftp.nlst('.')))[:1]
+        print('Processing {} acedb tar files'.format(len(filenames)))
         for filename in filenames:
             out_path = os.path.join(download_dir, filename)
             try:
@@ -192,19 +178,17 @@ def acedb_data(meta,
                         continue
             except IOError:
                 pass
-            msg = 'Saving {} to {} ... '.format(filename, out_path)
+            msg = 'Saving {} to {}'.format(filename, out_path)
             logger.info(msg)
-            echo_waiting(msg)
             with open(filename, 'wb') as fp:
                 ftp.retrbinary('RETR ' + filename, fp.write)
-            os.chmod(os.path.join(download_dir, 'INSTALL'), 0o775)
-            echo_sig('done')
+            with tarfile.open(fp.name) as tf:
+                tf.extractall(path=meta.install_dir)
     # Enable the Dump command
     passwd_path = os.path.join(meta.install_dir, 'wspec', 'passwd.wrm')
     os.chmod(passwd_path, 0o644)
     with open(passwd_path, 'a') as fp:
         fp.write(getpass.getuser() + os.linesep)
-    subprocess.check_call('./INSTALL', cwd=meta.install_dir, shell=True)
     os.environ['ACEDB_DATABASE'] = meta.install_dir
 
 
@@ -213,8 +197,8 @@ def acedb_data(meta,
         default=('ftp://ftp.sanger.ac.uk/pub/acedb/MONTHLY/'
                  'ACEDB-binaryLINUX_{version}.tar.gz'),
         help='URL for 64bit version of ACeDB binaries')
-@persists_path()
 @pass_meta
+@installer
 def acedb(meta, url_template):
     install_dir = meta.install_dir
     download_dir = meta.download_dir
@@ -226,46 +210,53 @@ def acedb(meta, url_template):
         filename = os.path.basename(pr.path)
         local_filename = os.path.join(download_dir, os.path.basename(pr.path))
         with open(local_filename, 'wb') as fp:
-            echo_waiting('Downloading {} ... '.format(filename))
+            logger.info('Downloading {}'.format(filename))
             ftp.retrbinary('RETR ' + filename, fp.write)
-            echo_sig('done')
     with tarfile.open(local_filename) as tf:
         tf.extract('./tace', path=install_dir)
-    return install_dir
+    _make_executable(os.path.join(install_dir, 'tace'))
 
 
 @install.command()
 @option('-t', '--url-template',
         default='https://my.datomic.com/downloads/free/{version}',
         help='URL template for Datomic Free version')
-@persists_env()
-@persists_path()
 @pass_meta
+@installer
+@persists_env()
 def datomic_free(meta, url_template):
     version = meta.version
     url = url_template.format(version=version)
-    fullname = 'datomic-free_{version}'.format(version=version)
+    fullname = 'datomic-free-{version}'.format(version=version)
     local_filename = fullname + '.zip'
     download_path = os.path.join(meta.download_dir, local_filename)
     with zipfile.ZipFile(download(url, download_path)) as zf:
         zf.extractall(meta.install_dir)
     datomic_home = os.path.join(meta.install_dir, fullname)
     os.environ['DATOMIC_HOME'] = datomic_home
-    return os.path.join(datomic_home, 'bin')
+    bin_dir = os.path.join(datomic_home, 'bin')
+    for filename in os.listdir(bin_dir):
+        bin_path = os.path.join(bin_dir, filename)
+        _make_executable(bin_path)
+    os.chdir(datomic_home)
+    subprocess.check_call(['bin/maven-install'],
+                          shell=True,
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE)
 
 
-@install.command()
+@install.command('pseudoace')
 @pass_meta
+@installer
+@persists_env()
 def pseudoace(meta):
     download_dir = meta.download_dir
     install_dir = meta.install_dir
     tag = meta.version
-    echo_waiting('Downloading pseudoace from github ... ')
     dl_path = github.download_release_binary(
         'WormBase/pseudoace',
         tag,
         to_directory=download_dir)
-    echo_sig('done')
     tempdir = tempfile.mkdtemp()
     with tarfile.open(dl_path) as tf:
         tf.extractall(path=tempdir)
@@ -275,6 +266,7 @@ def pseudoace(meta):
     os.rename(tmp_src_path, src_path)
     os.rmdir(install_dir)
     shutil.move(src_path, install_dir)
+    os.environ['PSEUDOACE_HOME'] = install_dir
 
 
 cli = install(obj={})

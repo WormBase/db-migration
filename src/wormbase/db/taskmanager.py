@@ -29,12 +29,8 @@ from .util import echo_waiting
 from .util import option
 from .util import distribution_name
 
-# TODO: use public ip address for ssh connections
+# TODO: use public ip address for ssh connections?
 #       (resilience to temporary DNS failures)
-
-# TODO:
-#  use click.pass_obj to pass session around instead of click.context
-#  or even the make_decorator thingo
 
 BUILD_STATE_PATH = os.path.join(os.getcwd(), '.db-build.db')
 
@@ -484,23 +480,6 @@ def view_state(ctx):
             instance_state = dict(Name='terminated?', code='<unknown>')
         state['instance-state'] = instance_state
         echo_info(pprint.pformat(state))
-
-
-@tasks.command(short_help='Installs custom software for the build')
-@click.pass_context
-def install_software(ctx):
-    # archive_filename = _archive_filename()
-    session = ctx.obj['session']
-    ec2 = session.resource('ec2')
-    with latest_build_state(ctx) as state:
-        ec2_instance = ec2.Instance(state['id'])
-        run_cmd = functools.partial(ssh.run_command, ec2_instance)
-        # run_cmd('python3 -m pip install --user ' + archive_filename)
-        run_cmd('echo "PATH=\"${PATH}:${HOME}/.local/bin" >> ~/.bashrc')
-        run_cmd('PATH="${PATH}:~/.local/bin" wb-db-install acedb && echo $PWD')
-        # ssh.run_command('wb-db-install acedb_data')
-        # run_cmd('wb-db-install pseudoace')
-        # run_cmd('wb-db-install datomic_free')
 
 
 cli = tasks(obj={})

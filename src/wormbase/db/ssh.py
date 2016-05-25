@@ -68,7 +68,6 @@ def run_command(ec2_instance, cmd,
     if ssh_conn is None:
         ssh_conn = connection(ec2_instance)
     with ssh_conn:
-        print('Running command: ' + cmd)
         (stdin, stdout, stderr) = ssh_conn.exec_command(cmd,
                                                         timeout=timeout,
                                                         get_pty=True)
@@ -81,9 +80,6 @@ def run_command(ec2_instance, cmd,
         if err_text:
             print('Got error text: ' + err_text)
             raise RemoteCommandFailed(err_text)
-        print('Reading command output ... ', end='')
         for block in out:
             out_buf.write(block)
-        print('done')
-        print(out_buf.getvalue())
     return out_buf
