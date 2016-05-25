@@ -18,3 +18,6 @@ runcmd:
 #  Expects libreadline.so.5, which is not currently installable.
 - ln -s /lib64/libreadline.so.6 /lib64/libreadline.so.5
 - yum groupinstall -y "Development Tools"
+- pip3 install upgrade pip
+- yum update -y
+
