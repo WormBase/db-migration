@@ -50,7 +50,7 @@ def _append_line(text, filename, backup=True):
         lines = list(fp)
     if text not in set(map(str.rstrip, lines)):
         lines.append(text)
-        lines.append(os.linsep)
+        lines.append(os.linesep)
     if backup:
         os.rename(path, path + '.{}.bakup'.format(time.time()))
     with open(path, 'w') as fp:
