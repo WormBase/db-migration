@@ -174,14 +174,14 @@ def bootstrap(ec2_instance, package_version):
             # XXX: log command output
 
 
-def _make_asssume_role_policy(version='2012-10-17', **attrs):
+def make_asssume_role_policy(version='2012-10-17', **attrs):
     attrs.setdefault('Effect', 'Allow')
     attrs.setdefault('Action', 'sts:AssumeRole')
     pol_stmt = dict(attrs)
     return dict(Version=version, Statement=[pol_stmt])
 
 
-def _aws_userid(session):
+def aws_userid(session):
     """Return a role-id:role_session_name as per AWS documentation.
 
     See table entry under:
@@ -199,7 +199,7 @@ def _aws_userid(session):
     return format_aws_userid(role=role, conf=conf)
 
 
-def _aws_session(ctx, profile_name):
+def aws_session(ctx, profile_name):
     try:
         session = boto3.Session(profile_name=profile_name)
     except ProfileNotFound as pnf:
@@ -208,7 +208,7 @@ def _aws_session(ctx, profile_name):
     return session
 
 
-def _report_status(instance):
+def report_status(instance):
     echo_info('Instance Id: '
               '{0.instance_id}'.format(instance))
     echo_info('Instance Type: '
@@ -249,7 +249,7 @@ def _ensure_role(session, iam, assume_role_name, role_policies, group):
     role = role_map.get(assume_role_name)
 
     user_arns = list(user.arn for user in group.users.all())
-    arp_doc = _make_asssume_role_policy(Principal=dict(AWS=user_arns))
+    arp_doc = make_asssume_role_policy(Principal=dict(AWS=user_arns))
     if role is None:
         role = iam.create_role(
             RoleName=assume_role_name,
@@ -269,7 +269,7 @@ def _ensure_assume_role_policy(session, iam, role, policy_name):
                for pol in iam.policies.filter(Scope='Local').all()}
     pol = pol_map.get(policy_name)
     if pol is None:
-        policy_doc = _make_asssume_role_policy(Resource=role.arn)
+        policy_doc = make_asssume_role_policy(Resource=role.arn)
         iam.create_policy(
             PolicyName=policy_name,
             Path='/',
@@ -308,7 +308,7 @@ def _ensure_config(ctx, session, role):
     if any(changes):
         config.write()
     try:
-        session = _aws_session(ctx, assume_role_profile_name)
+        session = aws_session(ctx, assume_role_profile_name)
         session.resource('iam')
         profile_name = assume_role_profile_name
     except ClientError:
@@ -328,7 +328,7 @@ def _ensure_config(ctx, session, role):
 @click.pass_context
 def tasks(ctx, profile, assume_role):
     ctx.obj['profile'] = profile
-    session = _aws_session(ctx, profile_name=profile)
+    session = aws_session(ctx, profile_name=profile)
     iam = session.resource('iam')
     role = iam.Role(assume_role)
     role.load()
@@ -337,7 +337,7 @@ def tasks(ctx, profile, assume_role):
         profiles = session._session.full_config['profiles']
         ar_profile = profiles[ar_profile_name]
         try:
-            session = _aws_session(ctx, profile_name)
+            session = aws_session(ctx, profile_name)
         except ClientError:
             pass
         else:
@@ -450,11 +450,11 @@ def init(ctx,
         UserData=base64.b64encode(user_data.encode('utf-8')),
         Monitoring=dict(Enabled=monitoring),
         DryRun=dry_run)
-    aws_userid = _aws_userid(session)
+    created_by = aws_userid(session)
     instances = ec2.create_instances(**instance_options)
     instance = next(iter(instances))
     instance.create_tags(Tags=[
-        dict(Key='CreatedBy', Value=aws_userid)])
+        dict(Key='CreatedBy', Value=created_by)])
     state[instance.id] = dict(id=instance.id,
                               init_options=instance_options,
                               KeyPairName=key_pair.name,
@@ -470,7 +470,7 @@ def init(ctx,
     echo_waiting('Bootstrapping instance with wormbase.db')
     bootstrap(instance, wb_db_build_version)
     echo_sig('done')
-    _report_status(instance)
+    report_status(instance)
 
     # XXX: DEBUG
     msg = 'ssh -i {0.key_pair.name} -l ec2-user {0.public_dns_name}'
