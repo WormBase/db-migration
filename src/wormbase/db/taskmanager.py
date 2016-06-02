@@ -9,7 +9,6 @@ import pprint
 import re
 import shelve
 import socket
-import subprocess
 import sys
 import time
 
@@ -27,6 +26,7 @@ from .util import echo_info
 from .util import echo_retry
 from .util import echo_sig
 from .util import echo_waiting
+from .util import local
 from .util import option
 from .util import distribution_name
 
@@ -144,10 +144,7 @@ def bootstrap(ec2_instance, package_version):
     finished_regex = re.compile(r'Cloud-init.*finished')
     archive_filename = get_archive_filename()
     path = os.path.join('dist', archive_filename)
-    subprocess.check_call('python setup.py sdist',
-                          stdout=subprocess.PIPE,
-                          stderr=subprocess.PIPE,
-                          shell=True)
+    local('python setup.py sdist')
 
     # Wait for cloud-init/config process to finish
     while True:
