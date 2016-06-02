@@ -105,7 +105,7 @@ def _wait_for_sshd(ec2_instance, max_timeout=60 * 6):
         s.settimeout(20)
         try:
             s.connect((ec2_instance.public_dns_name, 22))
-            echo_info('connected')
+            echo_sig('connected')
             break
         except Exception:
             time.sleep(20)
