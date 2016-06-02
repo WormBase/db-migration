@@ -52,7 +52,8 @@ def _make_executable(path, assister, mode=0o775):
     assister.info('Created symlink from %s to %s', path, bin_path)
 
 
-@atexit.register
+# Uncomment to have download directories purge after installation.
+# @atexit.register
 def _clean_temp_dirs():
     for path in _temp_dirs:
         shutil.rmtree(path)
