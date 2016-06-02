@@ -24,3 +24,6 @@ runcmd:
 - sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
 - yum install -y apache-maven
 
+
+output : { all : '| tee -a /var/log/cloud-init-output.log' }
+
