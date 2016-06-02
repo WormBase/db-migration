@@ -96,27 +96,4 @@ def exec_command(conn, cmd, timeout=None, get_pty=True, cmd_input=None):
         raise RemoteCommandFailed(err_text)
     for block in out:
         out_buf.write(block)
-    return out_buf
-
-        
-def run_command(ec2_instance, cmd, ssh_conn=None, timeout=30):
-    """Run a command over ssh."""
-    out_buf = io.StringIO()
-    err_buf = io.StringIO()
-    if ssh_conn is None:
-        ssh_conn = connection(ec2_instance)
-    with ssh_conn:
-        (stdin, stdout, stderr) = ssh_conn.exec_command(cmd,
-                                                        timeout=timeout,
-                                                        get_pty=True)
-        stdin.close()
-        out = read_stream(stdout)
-        err = read_stream(stderr)
-        for block in err:
-            err_buf.write(block)
-        err_text = err_buf.getvalue()
-        if err_text:
-            raise RemoteCommandFailed(err_text)
-        for block in out:
-            out_buf.write(block)
-    return out_buf
+    return out_buf.getvalue()
