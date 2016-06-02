@@ -98,7 +98,6 @@ def run_command(ec2_instance, cmd, ssh_conn=None, timeout=30):
             err_buf.write(block)
         err_text = err_buf.getvalue()
         if err_text:
-            print('Got error text: ' + err_text)
             raise RemoteCommandFailed(err_text)
         for block in out:
             out_buf.write(block)
