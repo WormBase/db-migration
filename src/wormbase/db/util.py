@@ -32,6 +32,8 @@ class LocalCommandError(Exception):
 
 
 def run_local_command(cmd, stdin=None, timeout=None, shell=True):
+    if isinstance(cmd, (list, tuple)) and shell:
+        cmd = ' '.join(cmd)
     proc = subprocess.Popen(cmd,
                             shell=shell,
                             stdout=subprocess.PIPE,
@@ -43,7 +45,7 @@ def run_local_command(cmd, stdin=None, timeout=None, shell=True):
 
 
 def distribution_name():
-    return run_local_command(['python', 'setup.py', '--fullname']).rstrip()
+    return run_local_command('python setup.py --fullname').rstrip()
 
 
 def option(*args, **kw):

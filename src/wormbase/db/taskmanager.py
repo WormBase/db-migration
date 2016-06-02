@@ -6,6 +6,7 @@ import json
 import operator
 import os
 import pprint
+import re
 import shelve
 import socket
 import subprocess
@@ -132,15 +133,40 @@ def bootstrap(ec2_instance, package_version):
 
     This also requires the system package 'python3-dev'.
     """
+    finished_regex = re.compile(r'Cloud-init.*finished')
     archive_filename = _archive_filename()
     path = os.path.join('dist', archive_filename)
-    if not os.path.isfile(path):
-        subprocess.check_call('python setup.py sdist', shell=True)
-    with ssh.connection(ec2_instance, timeout=60.0 * 3.5) as conn:
+    subprocess.check_call('python setup.py sdist',
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE,
+                          shell=True)
+
+    # Wait for cloud-init/config process to finish
+    while True:
+        with ssh.connection(ec2_instance) as conn:
+            out = ssh.exec_command(
+                conn,
+                'tail -n1 /var/log/cloud-init-output.log')
+        last_line = out.getvalue().rstrip()
+        if finished_regex.match(last_line) is not None:
+            break
+        time.sleep(30)
+
+    # Upload the tar file
+    with ssh.connection(ec2_instance) as conn:
         with SCPClient(conn.get_transport()) as scp:
             scp.put(path, archive_filename)
-    with ssh.connection(ec2_instance, timeout=480) as conn:
-        ssh.run_command('pip3 install --user ' + archive_filename)
+
+    # Now the wormbase-db-build package dependencies are available
+    # and installation can proceed
+    wbdb_install_cmd = 'python3 -m pip install --user '
+    wbdb_install_cmd += archive_filename
+    pip_install_cmds = ['python3 -m pip install --user --upgrade pip',
+                        wbdb_install_cmd,]
+    with ssh.connection(ec2_instance) as conn:
+        for cmd in pip_install_cmds:
+            buf = ssh.exec_command(conn, cmd)
+            print(buf.getvalue())
 
 
 def _make_asssume_role_policy(version='2012-10-17', **attrs):
@@ -436,7 +462,9 @@ def init(ctx,
     instance.wait_until_running()
     echo_sig('done')
     _wait_for_sshd(instance)
+    echo_waiting('Bootstrapping instance with wormbase.db')
     bootstrap(instance, wb_db_build_version)
+    echo_sig('done')
     _report_status(instance)
 
     # XXX: DEBUG
@@ -470,15 +498,20 @@ def terminate(ctx):
         echo_info(msg.format(instance, instance.state))
 
 
+def _load_ec2_instance_from_state(ctx, state):
+    session = ctx.obj['session']
+    ec2 = session.resource('ec2')
+    instance = ec2.Instance(state['id'])
+    instance.load()
+    return instance
+
+
 @tasks.command(short_help='Describe the state of the build')
 @click.pass_context
 def view_state(ctx):
     with latest_build_state(ctx) as state:
-        session = ctx.obj['session']
-        ec2 = session.resource('ec2')
-        instance = ec2.Instance(state['id'])
         try:
-            instance.load()
+            instance = _load_ec2_instance_from_state(ctx, state)
             instance_state = dict(instance.state)
         except (ClientError, AttributeError):
             instance_state = dict(Name='terminated?', code='<unknown>')
