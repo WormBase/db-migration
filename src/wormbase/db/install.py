@@ -128,7 +128,7 @@ def pipeline(installers, log_filename, log_level):
         installer()
 
 
-@build.command('acedb-data')
+@build.command()
 @option('--ftp-host',
         default='ftp.ebi.ac.uk',
         help='FTP hostname for ACeDB data.')
@@ -204,7 +204,7 @@ def acedb(assister, url_template):
     _make_executable(os.path.join(install_dir, 'tace'), assister)
 
 
-@build.command('datomic-free')
+@build.command()
 @option('-t', '--url-template',
         default='https://my.datomic.com/downloads/free/{version}',
         help='URL template for Datomic Free version')
