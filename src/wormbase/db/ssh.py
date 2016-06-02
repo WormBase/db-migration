@@ -6,14 +6,18 @@ import paramiko
 from botocore.exceptions import ClientError
 
 
+# Function to get the ssh key directory for a given user.
+# Defined as a function to allow change of user at point of invocation,
+# (as opposed to the process owner)
 keypair_directory = functools.partial(os.path.expanduser, '~/.ssh')
 
 
 class RemoteCommandFailed(Exception):
-    """Running the remote command failed."""
+    """Running the SSH command failed."""
 
 
 def recycle_key_pair(ec2, key_pair_name):
+    """Recycle the key-pair used to access the instance."""
     try:
         key_pair = ec2.KeyPair(key_pair_name)
         key_pair.load()
