@@ -36,7 +36,7 @@ def recycle_key_pair(ec2, key_pair_name):
     return key_pair
 
 
-def connection(ec2_instance, timeout=30, username='ec2-user'):
+def connection(ec2_instance, timeout=180, username='ec2-user'):
     hostname = ec2_instance.public_dns_name
     keypair_filename = ec2_instance.key_pair.name + '.pem'
     key_filename = os.path.join(keypair_directory(), keypair_filename)
