@@ -41,6 +41,7 @@ def recycle_key_pair(ec2, key_pair_name):
 
 
 def connection(ec2_instance, timeout=180, username='ec2-user'):
+    """Create an SSH connection to an AWS EC2 instance."""
     hostname = ec2_instance.public_dns_name
     keypair_filename = ec2_instance.key_pair.name + '.pem'
     key_filename = os.path.join(keypair_directory(), keypair_filename)
@@ -55,6 +56,10 @@ def connection(ec2_instance, timeout=180, username='ec2-user'):
 
 
 def read_stream(stream, block_size=2048, encoding='utf-8'):
+    """Generate `block_size` blocks of data from a stream until consumed.
+
+    Decodes read data with `encoding`.
+    """
     while True:
         data = stream.read(block_size)
         if not data:
@@ -65,11 +70,20 @@ def read_stream(stream, block_size=2048, encoding='utf-8'):
 
 
 def exec_command(conn, cmd, timeout=None, get_pty=True, cmd_input=None):
+    """Execute `cmd` against SSH connection `conn`.
+
+    The remaindder of the keyword arguments are as those for:
+       parmiko.SSHConnection.exec_command
+
+    :rtype: str
+    :returns: The (successful) command output.
+    :raises: RemoteCommandFailed if stderr was not empty.
+    """
     out_buf = io.StringIO()
     err_buf = io.StringIO()
     (stdin, stdout, stderr) = conn.exec_command(cmd,
                                                 timeout=timeout,
-                                                get_pty=True)
+                                                get_pty=get_pty)
     if cmd_input:
         stdin.write(cmd_input)
     stdin.close()
