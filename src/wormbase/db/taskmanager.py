@@ -76,27 +76,15 @@ EC2_INSTANCE_DEFAULTS = dict(
 )
 
 
-def _archive_filename():
-    # XXX: Path to filename produced by: python setup.py sdist (for now)
-    # XXX: Best to download from github release.
-    pkg_fullname = distribution_name()
-    archive_filename = pkg_fullname + '.tar.gz'
-    return archive_filename
+def load_ec2_instance_from_state(ctx, state):
+    session = ctx.obj['session']
+    ec2 = session.resource('ec2')
+    instance = ec2.Instance(state['id'])
+    instance.load()
+    return instance
 
 
-@contextlib.contextmanager
-def latest_build_state(ctx):
-    bstate = ctx.obj['build-state']
-    bstate.sync()
-    c_bstate = bstate.get('current')
-    if c_bstate is None:
-        echo_error('No current instance to terminate.')
-        echo_info('Other instances may be running, use AWS console')
-        ctx.abort()
-    yield c_bstate
-
-
-def _wait_for_sshd(ec2_instance, max_timeout=60 * 6):
+def wait_for_sshd(ec2_instance, max_timeout=60 * 6):
     waited = 0
     wait_msg = 'Waiting for connectivity to instance {.id}... '
     wait_msg = wait_msg.format(ec2_instance)
@@ -122,6 +110,26 @@ def _wait_for_sshd(ec2_instance, max_timeout=60 * 6):
     time.sleep(1)
 
 
+@contextlib.contextmanager
+def latest_build_state(ctx):
+    bstate = ctx.obj['build-state']
+    bstate.sync()
+    c_bstate = bstate.get('current')
+    if c_bstate is None:
+        echo_error('No current instance to terminate.')
+        echo_info('Other instances may be running, use AWS console')
+        ctx.abort()
+    yield c_bstate
+
+
+def get_archive_filename():
+    # XXX: Path to filename produced by: python setup.py sdist (for now)
+    # XXX: Best to download from github release.
+    pkg_fullname = distribution_name()
+    archive_filename = pkg_fullname + '.tar.gz'
+    return archive_filename
+
+
 def bootstrap(ec2_instance, package_version):
     """Deploy this package to the AWS instance.
 
@@ -134,7 +142,7 @@ def bootstrap(ec2_instance, package_version):
     This also requires the system package 'python3-dev'.
     """
     finished_regex = re.compile(r'Cloud-init.*finished')
-    archive_filename = _archive_filename()
+    archive_filename = get_archive_filename()
     path = os.path.join('dist', archive_filename)
     subprocess.check_call('python setup.py sdist',
                           stdout=subprocess.PIPE,
@@ -147,7 +155,7 @@ def bootstrap(ec2_instance, package_version):
             out = ssh.exec_command(
                 conn,
                 'tail -n1 /var/log/cloud-init-output.log')
-        last_line = out.getvalue().rstrip()
+        last_line = out.rstrip()
         if finished_regex.match(last_line) is not None:
             break
         time.sleep(30)
@@ -165,8 +173,8 @@ def bootstrap(ec2_instance, package_version):
                         wbdb_install_cmd,]
     with ssh.connection(ec2_instance) as conn:
         for cmd in pip_install_cmds:
-            buf = ssh.exec_command(conn, cmd)
-            print(buf.getvalue())
+            out = ssh.exec_command(conn, cmd)
+            # XXX: log command output
 
 
 def _make_asssume_role_policy(version='2012-10-17', **attrs):
@@ -461,7 +469,7 @@ def init(ctx,
     echo_waiting('Waiting for instance to enter running state ... ')
     instance.wait_until_running()
     echo_sig('done')
-    _wait_for_sshd(instance)
+    wait_for_sshd(instance)
     echo_waiting('Bootstrapping instance with wormbase.db')
     bootstrap(instance, wb_db_build_version)
     echo_sig('done')
@@ -498,20 +506,12 @@ def terminate(ctx):
         echo_info(msg.format(instance, instance.state))
 
 
-def _load_ec2_instance_from_state(ctx, state):
-    session = ctx.obj['session']
-    ec2 = session.resource('ec2')
-    instance = ec2.Instance(state['id'])
-    instance.load()
-    return instance
-
-
 @tasks.command(short_help='Describe the state of the build')
 @click.pass_context
 def view_state(ctx):
     with latest_build_state(ctx) as state:
         try:
-            instance = _load_ec2_instance_from_state(ctx, state)
+            instance = load_ec2_instance_from_state(ctx, state)
             instance_state = dict(instance.state)
         except (ClientError, AttributeError):
             instance_state = dict(Name='terminated?', code='<unknown>')
