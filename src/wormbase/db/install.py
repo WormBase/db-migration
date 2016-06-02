@@ -4,28 +4,25 @@ import contextlib
 import ftplib
 import functools
 import getpass
-import hashlib
-import io
-import logging
 import os
 import re
 import shutil
-import subprocess
+import stat
 import tarfile
 import tempfile
-import time
 import urllib.parse
 import zipfile
 
 import click
 
-from .util import download
-from .util import option
-from .util import get_deploy_versions
-
+from . import build
 from . import github
-
-logger = logging.getLogger(__name__)
+from .util import CommandAssist
+from .util import download
+from .util import get_deploy_versions
+from .util import option
+from .util import pass_command_assist
+from .util import run_local_command
 
 Meta = collections.namedtuple('Meta', ('download_dir',
                                        'install_dir',
@@ -41,39 +38,18 @@ def _mk_temp_dir(purpose):
     return tempdir
 
 
-def _append_line(text, filename, backup=True):
-    path = os.path.expanduser(filename)
-    with open(path) as fp:
-        lines = list(fp)
-    if text not in set(map(str.rstrip, lines)):
-        lines.append(text)
-        lines.append(os.linesep)
-    if backup:
-        os.rename(path, path + '.{}.bakup'.format(time.time()))
-    with open(path, 'w') as fp:
-        for line in lines:
-            fp.write(line)
-
-
-def _acedb_data_checksums(ftp, release):
-    chksums = {}
-    buf = io.BytesIO()
-    ftp.retrbinary('RETR md5sum.{}'.format(release), buf.write)
-    for line in buf.getvalue().splitlines():
-        (chksum, path) = line.split()
-        path = os.path.basename(path).decode('ascii')
-        chksums[path] = chksum.decode('ascii')
-    return chksums
-
-
-def _make_executable(path):
-    os.chmod(path, 0o775)
+def _make_executable(path, assister, mode=0o775):
+    assister.info('Setting permissions on %s to %s',
+                path,
+                stat.filemode(mode))
+    os.chmod(path, mode)
     bin_dirname = os.path.expanduser('~/.local/bin')
     bin_filename = os.path.basename(path)
     bin_path = os.path.join(bin_dirname, bin_filename)
     if os.path.islink(bin_path):
         os.unlink(bin_path)
     os.symlink(path, bin_path)
+    assister.info('Created symlink from %s to %s', path, bin_path)
 
 
 @atexit.register
@@ -103,19 +79,28 @@ def persists_env(shell_init_file='~/.bashrc'):
             rv = func(*args, **kw)
             env_after = set(os.environ.items())
             env_vars = dict(env_after - env_before)
-            for (env_var, val) in sorted(env_vars.items()):
-                new_line = 'export {var}="{val}"'.format(var=env_var, val=val)
-                _append_line(new_line, filename=shell_init_file)
+            if env_vars:
+                path = os.path.expanduser(shell_init_file)
+                with open(path, 'a') as fp:
+                    for (env_var, val) in sorted(env_vars.items()):
+                        new_line = 'export {var}="{val}"'
+                        new_line = new_line.format(var=env_var, val=val)
+                        fp.write(os.linesep.join([new_line]))
             return rv
         return functools.update_wrapper(cmd_proxy, func)
     return env_updater
 
 
-def pass_meta(func):
-    """Decorator for automating specification of meta-data to sub-commands.
+def installer(func):
+    """Decorate a click command as an ``installer``.
+
+    Adds installer information to the click context object which
+    is in turn passed to the decoratee command function.
+
+    Wraps the command function in a function for result chaining.
     """
     @click.pass_context
-    def command_with_meta_info(ctx, *args, **kw):
+    def cmd_proxy(ctx, *args, **kw):
         f_name = func.__name__
         tmpdir = _mk_temp_dir('-db-build-downloads')
         download_dir = os.path.join(tmpdir, f_name)
@@ -124,27 +109,25 @@ def pass_meta(func):
         for path in (download_dir, install_dir):
             if not os.path.isdir(path):
                 os.makedirs(path)
-        ctx.obj = Meta(download_dir=download_dir,
-                       install_dir=install_dir,
-                       version=version)
-        obj = ctx.find_object(Meta)
+        obj = ctx.find_object(CommandAssist)
+        obj.meta.update(Meta(download_dir=download_dir,
+                             install_dir=install_dir,
+                             version=version)._asdict())
         return ctx.invoke(func, obj, *args[1:], **kw)
-    return functools.update_wrapper(command_with_meta_info, func)
+
+    def command_proxy(*args, **kw):
+        return functools.partial(cmd_proxy, *args, **kw)
+
+    return functools.update_wrapper(command_proxy, func)
 
 
-def installer(func):
-    def cmd_proxy(*args, **kw):
-        return functools.partial(func, *args, **kw)
-    return functools.update_wrapper(cmd_proxy, func)
+@build.resultcallback()
+def pipeline(installers, log_filename, log_level):
+    for installer in installers:
+        installer()
 
 
-@click.group()
-@click.pass_context
-def install(ctx):
-    pass
-
-
-@install.command()
+@build.command('acedb-data')
 @option('--ftp-host',
         default='ftp.ebi.ac.uk',
         help='FTP hostname for ACeDB data.')
@@ -154,61 +137,58 @@ def install(ctx):
 @option('--file-selector-regexp',
         default='.*\.tar\.gz$',
         help='File selection regexp')
-@pass_meta
-@installer
 @persists_env()
-def acedb_data(meta,
+@pass_command_assist
+@installer
+def acedb_data(assister,
                ftp_host,
                remote_path_template,
                file_selector_regexp):
-    download_dir = meta.install_dir
-    os.chdir(download_dir)
+    meta = assister.meta
+    download_dir = meta['download_dir']
+    install_dir = meta['install_dir']
     format_path = remote_path_template.format
-    md5sum = lambda data: hashlib.new('md5', data).hexdigest()
     file_selector = functools.partial(re.match, file_selector_regexp)
-    version = meta.version
+    version = meta['version']
+    assister.info('Connecting to %s', ftp_host)
     with _ftp(ftp_host) as ftp:
         ftp.cwd(format_path(version=version))
-        chksums = _acedb_data_checksums(ftp, version)
-        filenames = list(filter(file_selector, ftp.nlst('.')))[:1]
-        print('Processing {} acedb tar files'.format(len(filenames)))
+        filenames = filter(file_selector, ftp.nlst('.'))
         for filename in filenames:
             out_path = os.path.join(download_dir, filename)
-            try:
-                with open(out_path, 'rb') as fp:
-                    chksum = chksums.get(filename, '')
-                    if chksum == md5sum(fp.read()):
-                        click.echo('')
-                        msg = 'Skipping existing file: {} (md5:{})'
-                        logger.info(msg.format(filename, chksum))
-                        continue
-            except IOError:
-                pass
             msg = 'Saving {} to {}'.format(filename, out_path)
-            logger.info(msg)
-            with open(filename, 'wb') as fp:
+            assister.info(msg)
+            with open(out_path, 'wb') as fp:
                 ftp.retrbinary('RETR ' + filename, fp.write)
             with tarfile.open(fp.name) as tf:
-                tf.extractall(path=meta.install_dir)
+                assister.info('Extracting %s to %s', fp.name, install_dir)
+                tf.extractall(path=install_dir)
     # Enable the Dump command
-    passwd_path = os.path.join(meta.install_dir, 'wspec', 'passwd.wrm')
-    os.chmod(passwd_path, 0o644)
+    passwd_path = os.path.join(install_dir, 'wspec', 'passwd.wrm')
+    mode = 0o644
+    assister.info('Changing permissions of %s to %s',
+                  passwd_path,
+                  stat.filemode(mode))
+    os.chmod(passwd_path, mode)
+    username = getpass.getuser()
     with open(passwd_path, 'a') as fp:
-        fp.write(getpass.getuser() + os.linesep)
-    os.environ['ACEDB_DATABASE'] = meta.install_dir
+        assister.info('Adding %s to %s', username, passwd_path)
+        fp.write(username + os.linesep)
+    os.environ['ACEDB_DATABASE'] = install_dir
 
 
-@install.command()
+@build.command()
 @option('-t', '--url-template',
         default=('ftp://ftp.sanger.ac.uk/pub/acedb/MONTHLY/'
                  'ACEDB-binaryLINUX_{version}.tar.gz'),
-        help='URL for 64bit version of ACeDB binaries')
-@pass_meta
+        help='URL for versioned ACeDB binaries')
+@pass_command_assist
 @installer
-def acedb(meta, url_template):
-    install_dir = meta.install_dir
-    download_dir = meta.download_dir
-    version = meta.version
+def acedb(assister, url_template):
+    meta = assister.meta
+    install_dir = meta['install_dir']
+    download_dir = meta['download_dir']
+    version = meta['version']
     url = url_template.format(version=version)
     pr = urllib.parse.urlparse(url)
     with _ftp(pr.netloc) as ftp:
@@ -216,49 +196,53 @@ def acedb(meta, url_template):
         filename = os.path.basename(pr.path)
         local_filename = os.path.join(download_dir, os.path.basename(pr.path))
         with open(local_filename, 'wb') as fp:
-            logger.info('Downloading {}'.format(filename))
+            assister.info('Downloading {}'.format(filename))
             ftp.retrbinary('RETR ' + filename, fp.write)
     with tarfile.open(local_filename) as tf:
         tf.extract('./tace', path=install_dir)
-    _make_executable(os.path.join(install_dir, 'tace'))
+    _make_executable(os.path.join(install_dir, 'tace'), assister)
 
 
-@install.command()
+@build.command('datomic-free')
 @option('-t', '--url-template',
         default='https://my.datomic.com/downloads/free/{version}',
         help='URL template for Datomic Free version')
-@pass_meta
-@installer
 @persists_env()
-def datomic_free(meta, url_template):
-    version = meta.version
+@pass_command_assist
+@installer
+def datomic_free(assister, url_template):
+    meta = assister.meta
+    install_dir = meta['install_dir']
+    version = meta['version']
     url = url_template.format(version=version)
     fullname = 'datomic-free-{version}'.format(version=version)
     local_filename = fullname + '.zip'
-    download_path = os.path.join(meta.download_dir, local_filename)
+    download_path = os.path.join(meta['download_dir'], local_filename)
     with zipfile.ZipFile(download(url, download_path)) as zf:
-        zf.extractall(meta.install_dir)
-    datomic_home = os.path.join(meta.install_dir, fullname)
+        zf.extractall(install_dir)
+    assister.info('Installed %s into %s', fullname, meta['install_dir'])
+    datomic_home = os.path.join(install_dir, fullname)
     os.environ['DATOMIC_HOME'] = datomic_home
     bin_dir = os.path.join(datomic_home, 'bin')
     for filename in os.listdir(bin_dir):
         bin_path = os.path.join(bin_dir, filename)
-        _make_executable(bin_path)
+        _make_executable(bin_path, assister)
     os.chdir(datomic_home)
-    subprocess.check_call(['bin/maven-install'],
-                          shell=True,
-                          stdout=subprocess.PIPE,
-                          stderr=subprocess.PIPE)
+    mvn_install_out = run_local_command(['bin/maven-install'])
+    assister.info('Installed datomic_free via maven')
+    assister.debug(mvn_install_out)
 
 
-@install.command('pseudoace')
-@pass_meta
-@installer
+@build.command()
 @persists_env()
-def pseudoace(meta):
-    download_dir = meta.download_dir
-    install_dir = meta.install_dir
-    tag = meta.version
+@pass_command_assist
+@installer
+def pseudoace(assister):
+    meta = assister.meta
+    download_dir = meta['download_dir']
+    install_dir = meta['install_dir']
+    tag = meta['version']
+    assister.info('Downloading pseudoace release %s from github', tag)
     dl_path = github.download_release_binary(
         'WormBase/pseudoace',
         tag,
@@ -273,6 +257,7 @@ def pseudoace(meta):
     os.rmdir(install_dir)
     shutil.move(src_path, install_dir)
     os.environ['PSEUDOACE_HOME'] = install_dir
+    assister.info('Extracted pseudoace-%s to %s', tag, install_dir)
 
 
-cli = install(obj={})
+cli = build()

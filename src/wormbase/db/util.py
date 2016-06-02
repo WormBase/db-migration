@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import functools
+import logging
 import subprocess
 
 from pkg_resources import resource_filename
@@ -8,11 +9,41 @@ import configobj
 import requests
 
 
+class CommandAssist:
+
+    def __init__(self, namespace, log_level=logging.INFO):
+        self._log_level = log_level
+        self._logger_name = namespace
+        self._logger = logging.getLogger(self._logger_name)
+        self._logger.setLevel(log_level)
+        self.meta = {}
+
+    def __getattr__(self, name):
+        if not name.startswith('_'):
+            return getattr(self._logger, name)
+        raise AttributeError(name)
+
+
+pass_command_assist = click.make_pass_decorator(CommandAssist)
+
+
+class LocalCommandError(Exception):
+    """Raised for commands that produce output on stderr."""
+
+
+def run_local_command(cmd, stdin=None, timeout=None, shell=True):
+    proc = subprocess.Popen(cmd,
+                            shell=shell,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+    (out, err) = proc.communicate(input=stdin, timeout=timeout)
+    if err:
+        raise LocalCommandError(err)
+    return out.decode('utf-8')
+
+
 def distribution_name():
-    shell_cmd = functools.partial(subprocess.Popen, shell=True)
-    proc = shell_cmd('python setup.py --fullname', stdout=subprocess.PIPE)
-    pkg_fullname = proc.communicate()[0].decode('utf-8').rstrip()
-    return pkg_fullname
+    return run_local_command(['python', 'setup.py', '--fullname']).rstrip()
 
 
 def option(*args, **kw):
@@ -25,6 +56,8 @@ def option(*args, **kw):
     default = kw.get('default')
     if default is not None:
         s_default = str(default)
+    else:
+        s_default = ''
     help_text = kw.get('help')
     if all((s_default, help_text, s_default not in help_text)):
         kw['help'] = help_text + ' Default: ' + s_default
@@ -61,17 +94,6 @@ def get_deploy_versions(purpose='default'):
     with open(path) as fp:
         co = configobj.ConfigObj(infile=fp)
     return dict(co)[purpose]
-
-
-def run_local_command(cmd, stdin=None, timeout=None):
-    proc = subprocess.Popen(cmd,
-                            shell=True,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
-    (out, err) = proc.communicate(input=stdin, timeout=timeout)
-    if err:
-        raise Exception(err)
-    return out
 
 
 echo_info = functools.partial(_secho, fg='blue', bold=True)

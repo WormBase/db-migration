@@ -137,6 +137,8 @@ def bootstrap(ec2_instance, package_version):
     with ssh.connection(ec2_instance, timeout=60.0 * 3.5) as conn:
         with SCPClient(conn.get_transport()) as scp:
             scp.put(path, archive_filename)
+    with ssh.connection(ec2_instance, timeout=480) as conn:
+        ssh.run_command('pip3 install --user ' + archive_filename)
 
 
 def _make_asssume_role_policy(version='2012-10-17', **attrs):
