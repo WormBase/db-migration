@@ -117,6 +117,8 @@ def _wait_for_sshd(ec2_instance, max_timeout=60 * 6):
             raise socket.timeout(msg)
         else:
             echo_retry('not yet, retrying')
+    # To be sure...
+    time.sleep(1)
 
 
 def bootstrap(ec2_instance, package_version):
