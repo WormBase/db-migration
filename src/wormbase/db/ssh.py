@@ -56,12 +56,32 @@ def read_stream(stream, block_size=2048, encoding='utf-8'):
         if not data:
             break
         if encoding is not None:
-            data = data.decode(encoding)
+            data = data.decode(encoding, errors='replace')
         yield data
 
 
-def run_command(ec2_instance, cmd,
-                ssh_conn=None, timeout=30, ignore_err=False):
+def exec_command(conn, cmd, timeout=None, get_pty=True, cmd_input=None):
+    out_buf = io.StringIO()
+    err_buf = io.StringIO()
+    (stdin, stdout, stderr) = conn.exec_command(cmd,
+                                                timeout=timeout,
+                                                get_pty=True)
+    if cmd_input:
+        stdin.write(cmd_input)
+    stdin.close()
+    out = read_stream(stdout)
+    err = read_stream(stderr)
+    for block in err:
+        err_buf.write(block)
+    err_text = err_buf.getvalue()
+    if err_text:
+        raise RemoteCommandFailed(err_text)
+    for block in out:
+        out_buf.write(block)
+    return out_buf
+
+        
+def run_command(ec2_instance, cmd, ssh_conn=None, timeout=30):
     """Run a command over ssh."""
     out_buf = io.StringIO()
     err_buf = io.StringIO()
