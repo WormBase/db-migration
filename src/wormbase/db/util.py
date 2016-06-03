@@ -71,7 +71,7 @@ log_filename_option = functools.partial(
     '-l',
     '--log-filename',
     default=None,
-    help='Logs to a specified filename (stdout/stderr by default.')
+    help='Logs to a specified filename')
 
 log_level_option = functools.partial(
     option,
