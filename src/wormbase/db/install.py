@@ -1,9 +1,9 @@
-import atexit
 import collections
 import contextlib
 import ftplib
 import functools
 import getpass
+import logging
 import os
 import re
 import shutil
@@ -51,13 +51,6 @@ def _make_executable(path, assister, mode=0o775):
         os.unlink(bin_path)
     os.symlink(path, bin_path)
     assister.info('Created symlink from %s to %s', path, bin_path)
-
-
-# Uncomment to have download directories purge after installation.
-# @atexit.register
-def _clean_temp_dirs():
-    for path in _temp_dirs:
-        shutil.rmtree(path)
 
 
 @contextlib.contextmanager
