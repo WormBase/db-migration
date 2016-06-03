@@ -29,14 +29,6 @@ Meta = collections.namedtuple('Meta', ('download_dir',
                                        'install_dir',
                                        'version'))
 
-_temp_dirs = []
-
-
-def _mk_temp_dir(purpose):
-    tempdir = tempfile.mkdtemp(suffix=purpose)
-    global _temp_dirs
-    _temp_dirs.append(tempdir)
-    return tempdir
 
 
 def _make_executable(path, assister, mode=0o775):
@@ -97,7 +89,7 @@ def installer(func):
     @click.pass_context
     def cmd_proxy(ctx, *args, **kw):
         f_name = func.__name__
-        tmpdir = _mk_temp_dir('-db-build-downloads')
+        tmpdir = tempfile.mkdtemp(suffix='-db-build-downloads')
         download_dir = os.path.join(tmpdir, f_name)
         install_dir = os.path.join(os.path.expanduser('~'), f_name)
         version = get_deploy_versions()[f_name]
