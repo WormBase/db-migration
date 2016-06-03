@@ -222,7 +222,7 @@ def report_status(instance):
               instance.launch_time.isoformat(' '))
 
 
-def _ensure_group(session, iam, group_name, group_policies):
+def ensure_group(session, iam, group_name, group_policies):
     """Group must have the IAMReadOnlyAccess policy attached."""
     group = iam.Group(group_name)
     try:
@@ -244,7 +244,7 @@ def _ensure_group(session, iam, group_name, group_policies):
     return group
 
 
-def _ensure_role(session, iam, assume_role_name, role_policies, group):
+def ensure_role(session, iam, assume_role_name, role_policies, group):
     role_map = {role.name: role for role in iam.roles.all()}
     role = role_map.get(assume_role_name)
 
@@ -264,7 +264,7 @@ def _ensure_role(session, iam, assume_role_name, role_policies, group):
     return role
 
 
-def _ensure_assume_role_policy(session, iam, role, policy_name):
+def ensure_assume_role_policy(session, iam, role, policy_name):
     pol_map = {pol.policy_name: pol
                for pol in iam.policies.filter(Scope='Local').all()}
     pol = pol_map.get(policy_name)
@@ -280,7 +280,7 @@ def _ensure_assume_role_policy(session, iam, role, policy_name):
     return pol
 
 
-def _ensure_set(config, section, opt, new_value):
+def ensure_set(config, section, opt, new_value):
     val = config.get(section, opt)
     if val != new_value:
         opts = config[section]
@@ -289,7 +289,7 @@ def _ensure_set(config, section, opt, new_value):
     return False
 
 
-def _ensure_config(ctx, session, role):
+def ensure_config(ctx, session, role):
     assume_role_profile_name = '{.name}-assumer'.format(role)
     p_session = session._session
     config_file = p_session.get_config_variable('config_file')
@@ -298,13 +298,13 @@ def _ensure_config(ctx, session, role):
     section = 'profile ' + assume_role_profile_name
     if section not in set(config):
         config.setdefault(section, {})
-    ensure_set = functools.partial(_ensure_set, config, section)
+    ensure_set_val = functools.partial(ensure_set, config, section)
     changes = []
     for (prop, val) in [('region', session.region_name),
                         ('role_arn', role.arn),
                         ('source_profile', session.profile_name),
                         ('role_session_name', '{.name}-assumed'.format(role))]:
-        changes.append(ensure_set(prop, val))
+        changes.append(ensure_set_val(prop, val))
     if any(changes):
         config.write()
     try:
@@ -326,13 +326,14 @@ def _ensure_config(ctx, session, role):
         default=IAM_DB_BUILD_ROLE,
         help='AWS Role that will be assumed to execute the build')
 @click.pass_context
-def tasks(ctx, profile, assume_role):
+def tasks(ctx, log_filename, log_level, profile, assume_role):
+    logging.basicConfig(filename=log_filename)
     ctx.obj['profile'] = profile
     session = aws_session(ctx, profile_name=profile)
     iam = session.resource('iam')
     role = iam.Role(assume_role)
     role.load()
-    (profile_name, ar_profile_name) = _ensure_config(ctx, session, role)
+    (profile_name, ar_profile_name) = ensure_config(ctx, session, role)
     if ar_profile_name is not None:
         profiles = session._session.full_config['profiles']
         ar_profile = profiles[ar_profile_name]
@@ -360,13 +361,13 @@ def setup_iam(ctx, assume_role_name, assume_role_policies, group_name):
     iam = session.resource('iam')
     assume_role_policy_name = assume_role_name + '-assume'
     try:
-        group = _ensure_group(session, iam, group_name)
-        role = _ensure_role(session,
-                            iam,
-                            assume_role_name,
-                            assume_role_policies,
-                            group)
-        _ensure_assume_role_policy(session, iam, role, assume_role_policy_name)
+        group = ensure_group(session, iam, group_name)
+        role = ensure_role(session,
+                           iam,
+                           assume_role_name,
+                           assume_role_policies,
+                           group)
+        ensure_assume_role_policy(session, iam, role, assume_role_policy_name)
     except Exception as e:
         echo_error(e)
         ctx.abort()
