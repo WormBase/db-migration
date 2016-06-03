@@ -21,14 +21,16 @@ import click
 import configobj
 
 from . import ssh
+from .util import distribution_name
 from .util import echo_error
 from .util import echo_info
 from .util import echo_retry
 from .util import echo_sig
 from .util import echo_waiting
 from .util import local
+from .util import log_filename_option
+from .util import log_level_option
 from .util import option
-from .util import distribution_name
 
 # TODO: use public ip address for ssh connections?
 #       (resilience to temporary DNS failures)
@@ -319,6 +321,8 @@ def ensure_config(ctx, session, role):
 
 
 @click.group()
+@log_filename_option()
+@log_level_option()
 @option('--profile',
         default='default',
         help='AWS profile')

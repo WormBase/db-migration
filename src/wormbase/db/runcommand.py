@@ -1,28 +1,27 @@
+import logging
 import os
 
 import click
 
-from . import build
-from .install import pass_meta
-from .util import CommandLogger
+from .util import CommandAssist
+from .util import pass_command_assist
 from .util import get_deploy_versions
+from .util import local
+from .util import log_level_option
+from .util import log_filename_option
 from .util import option
-from .util import run_local_command
 
 
-@build.group()
+@click.group()
+@log_filename_option()
+@log_level_option()
 @click.pass_context
 def run(ctx, log_filename, log_level):
-    ctx.obj = CommandLogger(log_level=log_level)
+    logging.basicConfig(filename=log_filename)
+    ctx.obj = CommandAssist(__name__, log_level=log_level)
 
 
-@run.resultcallback()
-def pipeline(steps):
-    for step in steps:
-        step()
-
-
-@run.command
+@run.command()
 @option('-d',
         '--acedb-dump-dir',
         help='ACeDB dump directory (ace files)')

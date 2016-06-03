@@ -15,14 +15,15 @@ import zipfile
 
 import click
 
-from . import build
 from . import github
 from .util import CommandAssist
 from .util import download
 from .util import get_deploy_versions
+from .util import local
+from .util import log_level_option
+from .util import log_filename_option
 from .util import option
 from .util import pass_command_assist
-from .util import run_local_command
 
 Meta = collections.namedtuple('Meta', ('download_dir',
                                        'install_dir',
@@ -120,6 +121,15 @@ def installer(func):
         return functools.partial(cmd_proxy, *args, **kw)
 
     return functools.update_wrapper(command_proxy, func)
+
+
+@click.group(chain=True, invoke_without_command=True)
+@log_filename_option()
+@log_level_option()
+@click.pass_context
+def build(ctx, log_filename, log_level):
+    logging.basicConfig(filename=log_filename)
+    ctx.obj = CommandAssist(__package__)
 
 
 @build.resultcallback()

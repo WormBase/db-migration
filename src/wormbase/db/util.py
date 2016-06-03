@@ -66,6 +66,21 @@ def option(*args, **kw):
     return click.option(*args, **kw)
 
 
+log_filename_option = functools.partial(
+    option,
+    '-l',
+    '--log-filename',
+    default=None,
+    help='Logs to a specified filename (stdout/stderr by default.')
+
+log_level_option = functools.partial(
+    option,
+    '--log-level',
+    default='INFO',
+    type=click.Choice(choices=('DEBUG', 'INFO', 'WARNING', 'ERROR')),
+    help='Logging level.')
+
+
 def download(url, local_filename, chunk_size=1024 * 10):
     """Download `url` into `local_filename'.
 
