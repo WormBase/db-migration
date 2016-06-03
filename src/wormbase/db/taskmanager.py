@@ -166,14 +166,19 @@ def bootstrap(ec2_instance, package_version):
 
     # Now the wormbase-db-build package dependencies are available
     # and installation can proceed
-    wbdb_install_cmd = 'python3 -m pip install --user '
-    wbdb_install_cmd += archive_filename
-    pip_install_cmds = ['python3 -m pip install --user --upgrade pip',
+    pip_install = 'python3 -m pip install --user '
+    wbdb_install_cmd = pip_install + archive_filename
+    pip_install_cmds = [pip_install + ' --upgrade pip',
                         wbdb_install_cmd,]
+    logger = logging.getLogger(__name__)
     with ssh.connection(ec2_instance) as conn:
         for cmd in pip_install_cmds:
-            out = ssh.exec_command(conn, cmd)
-            # XXX: log command output
+            try:
+                out = ssh.exec_command(conn, cmd)
+            except Exception:
+                logger.exception()
+            else:
+                logger.info(out)
 
 
 def make_asssume_role_policy(version='2012-10-17', **attrs):

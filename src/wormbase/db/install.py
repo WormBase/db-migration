@@ -232,7 +232,7 @@ def datomic_free(assister, url_template):
         bin_path = os.path.join(bin_dir, filename)
         _make_executable(bin_path, assister)
     os.chdir(datomic_home)
-    mvn_install_out = run_local_command(['bin/maven-install'])
+    mvn_install_out = local('bin/maven-install')
     assister.info('Installed datomic_free via maven')
     assister.debug(mvn_install_out)
 
