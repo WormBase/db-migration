@@ -169,7 +169,7 @@ def bootstrap(ec2_instance, package_version):
     pip_install = 'python3 -m pip install --user '
     wbdb_install_cmd = pip_install + archive_filename
     pip_install_cmds = [pip_install + ' --upgrade pip',
-                        wbdb_install_cmd,]
+                        wbdb_install_cmd]
     logger = logging.getLogger(__name__)
     with ssh.connection(ec2_instance) as conn:
         for cmd in pip_install_cmds:
