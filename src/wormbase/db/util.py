@@ -98,5 +98,5 @@ echo_retry = functools.partial(click.secho, fg='cyan')
 echo_error = functools.partial(_secho,
                                err=True,
                                fg='yellow',
-                                bg='red',
+                               bg='red',
                                bold=True)
