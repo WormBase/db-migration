@@ -1,30 +1,11 @@
 # -*- coding: utf-8 -*-
 import functools
-import logging
 import subprocess
 
 from pkg_resources import resource_filename
 import click
 import configobj
 import requests
-
-
-class CommandAssist:
-
-    def __init__(self, namespace, log_level=logging.INFO):
-        self._log_level = log_level
-        self._logger_name = namespace
-        self._logger = logging.getLogger(self._logger_name)
-        self._logger.setLevel(log_level)
-        self.meta = {}
-
-    def __getattr__(self, name):
-        if not name.startswith('_'):
-            return getattr(self._logger, name)
-        raise AttributeError(name)
-
-
-pass_command_assist = click.make_pass_decorator(CommandAssist)
 
 
 class LocalCommandError(Exception):
@@ -60,18 +41,11 @@ def option(*args, **kw):
         s_default = str(default)
     else:
         s_default = ''
-    help_text = kw.get('help')
+    help_text = kw.get('help', '')
     if all((s_default, help_text, s_default not in help_text)):
         kw['help'] = help_text + ' Default: ' + s_default
     return click.option(*args, **kw)
 
-
-log_filename_option = functools.partial(
-    option,
-    '-l',
-    '--log-filename',
-    default=None,
-    help='Logs to a specified filename')
 
 log_level_option = functools.partial(
     option,
@@ -124,5 +98,5 @@ echo_retry = functools.partial(click.secho, fg='cyan')
 echo_error = functools.partial(_secho,
                                err=True,
                                fg='yellow',
-                               bg='red',
+                                bg='red',
                                bold=True)

@@ -27,8 +27,8 @@ setup(
     entry_points={
         'console_scripts': [
             'wb-db-build=wormbase.db.taskmanager:cli',
-            'wb-db-install=wormbase.db.install:cli'
-            # 'wb-fetch-github-release = wormbase.db.github:download_release_binary'
+            'wb-db-install=wormbase.db.install:cli',
+            'wb-db-run=wormbase.db.runcommand:cli'
         ],
     },
     zip_safe=False,
