@@ -1,14 +1,67 @@
-==============================
- Hacking on the db-build tool
-==============================
+===========
+Development
+===========
 
 System requirements
 ===================
 This code was developed against Python3.5 on ubuntu, and has been verified
 to work with Python3.4 on Amazon Linux (AWS AMI).
 
-Development
-===========
+Development tool-chain
+----------------------
+
+yum (Amazon AMI, RedHat, Centos)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+   sudo yum groupinstall -y "Development Tools"
+
+apt (Debian, Ubuntu, Mint)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+   sudo apt-get install -y build-essential
+
+
+Packages
+--------
+The following package list is for yum based systems (AWS linux, RedHat et al),
+using Python 3.4:
+
+Python3.4 (Amazon AMI)
+----------------------
+
+.. code-block:: bash
+
+   sudo yum install -y
+		libffi-devel \
+		openssl-devel \
+		readline-devel \
+		java-1.8.0-openjdk-headless \
+		python34 \
+		python34-pip \
+		python34-tools \
+		python34-libs \
+		python34-virtualenv
+
+Python3.5 (ubuntu)
+------------------
+
+.. code-block:: bash
+
+   sudo apt-get install -y \
+		libffi-dev \
+		libssl-dev \
+		libreadline-dev \
+		python3-dev \
+		python3-pip \
+		python3-venv \
+		openjdk-8-jdk-headless
+
+Installation
+============
 
 Setup
 -----
@@ -75,5 +128,3 @@ Is written in reStructuredText_ as is common in most Python projects.
 .. _reStructuredText: http://www.sphinx-doc.org/en/stable/rest.html
 .. _flake8: http://flake8.readthedocs.io/en/latest/config.html
 .. _`standard Python coding style`: https://www.python.org/dev/peps/pep-0008/
-
-

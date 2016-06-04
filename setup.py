@@ -44,4 +44,11 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Topic :: Software Development :: Libraries :: Python Modules :: Tools',
     ],
+    extras_require={
+        'dev': [
+            'Sphinx',
+            # 'sphinx_bootstrap_theme',
+            'sphinx_rtd_theme'
+        ]
+    }
 )
