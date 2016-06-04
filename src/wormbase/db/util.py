@@ -12,17 +12,34 @@ class LocalCommandError(Exception):
     """Raised for commands that produce output on stderr."""
 
 
-def local(cmd, stdin=None, timeout=None, shell=True):
+def local(cmd, stdin=None, timeout=None, shell=True, output_decoding='utf-8'):
+    """Run a command locally.
+
+    :param cmd: The command to execute.
+    :type cmd: str
+    :param stdin: Optional text to pipe as input to `cmd`.
+    :type stdin: str
+    :param timeout: Optional number of seconds to wait for `cmd` to execute.
+    :param timeout: int
+    :param shell: Whether or not to execute `cmd` in a shell (Default: True)
+    :type shell: boolean
+    :param output_decoding: The encoding to decode the binary result of `cmd`.
+                            Default: utf-8.
+    :type output_decoding: str
+    :returns: The result of the command
+    :raises: LocalCommandError if result code was non-zero.
+    """
     if isinstance(cmd, (list, tuple)) and shell:
         cmd = ' '.join(cmd)
     proc = subprocess.Popen(cmd,
                             shell=shell,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
+    import pdb; pdb.set_trace()
     (out, err) = proc.communicate(input=stdin, timeout=timeout)
-    if err:
+    if proc.returncode != 0:
         raise LocalCommandError(err)
-    return out.decode('utf-8')
+    return out.decode(output_decoding)
 
 
 def distribution_name():
