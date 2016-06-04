@@ -3,7 +3,6 @@ import contextlib
 import ftplib
 import functools
 import getpass
-import logging
 import os
 import re
 import shutil
@@ -16,12 +15,15 @@ import zipfile
 import click
 
 from . import github
+from .logging import get_logger
+from .logging import setup_logging
 from .util import download
 from .util import get_deploy_versions
 from .util import local
 from .util import log_level_option
 from .util import option
 
+logger = get_logger(__name__)
 
 Meta = collections.namedtuple('Meta', ('download_dir',
                                        'install_dir',
@@ -29,7 +31,7 @@ Meta = collections.namedtuple('Meta', ('download_dir',
 
 
 def _make_executable(path, logger, mode=0o775):
-    logger.info('Setting permissions on %s to %s',
+    logger.info('Setting permissions on {} to {}',
                 path,
                 stat.filemode(mode))
     os.chmod(path, mode)
@@ -39,7 +41,7 @@ def _make_executable(path, logger, mode=0o775):
     if os.path.islink(bin_path):
         os.unlink(bin_path)
     os.symlink(path, bin_path)
-    logger.info('Created symlink from %s to %s', path, bin_path)
+    logger.debug('Created symlink from {} to {}', path, bin_path)
 
 
 @contextlib.contextmanager
@@ -70,6 +72,7 @@ def persists_env(shell_init_file='~/.bashrc'):
                         new_line = 'export {var}="{val}"'
                         new_line = new_line.format(var=env_var, val=val)
                         fp.write(os.linesep.join([new_line]))
+                        fp.write(os.linesep)
             return rv
         return functools.update_wrapper(cmd_proxy, func)
     return env_updater
@@ -103,12 +106,11 @@ def installer(func):
     return functools.update_wrapper(command_proxy, func)
 
 
-@click.group(chain=True, invoke_without_command=True)
-@log_level_option()
+@click.group(chain=True, invoke_without_command=False)
+@log_level_option(default='INFO')
 @click.pass_context
 def build(ctx, log_level):
-    log_filename = os.path.expanduser('~/wb-db-install.log')
-    logging.basicConfig(filename=log_filename, level=log_level)
+    setup_logging(log_level=log_level)
 
 
 @build.resultcallback()
@@ -133,35 +135,33 @@ def acedb_data(meta,
                ftp_host,
                remote_path_template,
                file_selector_regexp):
-    logger = logging.getLogger(__name__)
     download_dir = meta.download_dir
     install_dir = meta.install_dir
     format_path = remote_path_template.format
     file_selector = functools.partial(re.match, file_selector_regexp)
-    version = meta['version']
-    logger.info('Connecting to %s', ftp_host)
+    version = meta.version
+    logger.info('Connecting to {}', ftp_host)
     with _ftp(ftp_host) as ftp:
         ftp.cwd(format_path(version=version))
         filenames = filter(file_selector, ftp.nlst('.'))
         for filename in filenames:
             out_path = os.path.join(download_dir, filename)
-            msg = 'Saving {} to {}'.format(filename, out_path)
-            logger.info(msg)
+            logger.info('Saving {} to {}', filename, out_path)
             with open(out_path, 'wb') as fp:
                 ftp.retrbinary('RETR ' + filename, fp.write)
             with tarfile.open(fp.name) as tf:
-                logger.info('Extracting %s to %s', fp.name, install_dir)
+                logger.info('Extracting {} to {}', fp.name, install_dir)
                 tf.extractall(path=install_dir)
     # Enable the Dump command
     passwd_path = os.path.join(install_dir, 'wspec', 'passwd.wrm')
     mode = 0o644
-    logger.info('Changing permissions of %s to %s',
+    logger.info('Changing permissions of {} to {}',
                 passwd_path,
                 stat.filemode(mode))
     os.chmod(passwd_path, mode)
     username = getpass.getuser()
     with open(passwd_path, 'a') as fp:
-        logger.info('Adding %s to %s', username, passwd_path)
+        logger.info('Adding {} to {}', username, passwd_path)
         fp.write(username + os.linesep)
     os.environ['ACEDB_DATABASE'] = install_dir
 
@@ -173,10 +173,9 @@ def acedb_data(meta,
         help='URL for versioned ACeDB binaries')
 @installer
 def acedb(meta, url_template):
-    logger = logging.getLogger(__name__)
-    install_dir = meta['install_dir']
-    download_dir = meta['download_dir']
-    version = meta['version']
+    install_dir = meta.install_dir
+    download_dir = meta.download_dir
+    version = meta.version
     url = url_template.format(version=version)
     pr = urllib.parse.urlparse(url)
     with _ftp(pr.netloc) as ftp:
@@ -184,7 +183,7 @@ def acedb(meta, url_template):
         filename = os.path.basename(pr.path)
         local_filename = os.path.join(download_dir, os.path.basename(pr.path))
         with open(local_filename, 'wb') as fp:
-            logger.info('Downloading {}'.format(filename))
+            logger.info('Downloading {}', filename)
             ftp.retrbinary('RETR ' + filename, fp.write)
     with tarfile.open(local_filename) as tf:
         tf.extract('./tace', path=install_dir)
@@ -198,25 +197,28 @@ def acedb(meta, url_template):
 @persists_env()
 @installer
 def datomic_free(meta, url_template):
-    logger = logging.getLogger(__name__)
     install_dir = meta.install_dir
     version = meta.version
     url = url_template.format(version=version)
     fullname = 'datomic-free-{version}'.format(version=version)
     local_filename = fullname + '.zip'
     download_path = os.path.join(meta.download_dir, local_filename)
+    logger.info('Downloading and extracting {} to {}', fullname, install_dir)
     with zipfile.ZipFile(download(url, download_path)) as zf:
         zf.extractall(install_dir)
-    logger.info('Installed %s into %s', fullname, meta.install_dir)
+    logger.info('Installed {} into {}', fullname, install_dir)
     datomic_home = os.path.join(install_dir, fullname)
+    logger.info('Setting environment variable DATOMIC_HOME={}', datomic_home)
     os.environ['DATOMIC_HOME'] = datomic_home
     bin_dir = os.path.join(datomic_home, 'bin')
     for filename in os.listdir(bin_dir):
         bin_path = os.path.join(bin_dir, filename)
         _make_executable(bin_path, logger)
     os.chdir(datomic_home)
-    mvn_install_out = local('bin/maven-install')
-    logger.info('Installed datomic_free via maven')
+    mvn_install = os.path.join('bin', 'maven-install')
+    logger.info('Installing datomic via {}', os.path.abspath(mvn_install))
+    mvn_install_out = local(mvn_install)
+    logger.info('Installed datomic_free')
     logger.debug(mvn_install_out)
 
 
@@ -224,11 +226,10 @@ def datomic_free(meta, url_template):
 @persists_env()
 @installer
 def pseudoace(meta):
-    logger = logging.getLogger(__name__)
     download_dir = meta.download_dir
     install_dir = meta.install_dir
     tag = meta.version
-    logger.info('Downloading pseudoace release %s from github', tag)
+    logger.info('Downloading pseudoace release {} from github', tag)
     dl_path = github.download_release_binary(
         'WormBase/pseudoace',
         tag,
@@ -240,10 +241,11 @@ def pseudoace(meta):
     tmp_src_path = os.path.join(tempdir, fullname)
     src_path = tmp_src_path.rstrip('-' + tag)
     os.rename(tmp_src_path, src_path)
-    os.rmdir(install_dir)
+    assert install_dir.startswith(os.path.expanduser('~'))
+    shutil.rmtree(install_dir)
     shutil.move(src_path, install_dir)
     os.environ['PSEUDOACE_HOME'] = install_dir
-    logger.info('Extracted pseudoace-%s to %s', tag, install_dir)
+    logger.info('Extracted pseudoace-{} to {}', tag, install_dir)
 
 
 cli = build()

@@ -8,6 +8,26 @@ import configobj
 import requests
 
 
+def _secho(message, **kw):
+    message = '🐛 -> {}'.format(message)
+    return click.secho(message, **kw)
+
+
+echo_info = functools.partial(_secho, fg='blue', bold=True)
+
+echo_sig = functools.partial(click.secho, fg='green', bold=True)
+
+echo_waiting = functools.partial(_secho, nl=False)
+
+echo_retry = functools.partial(click.secho, fg='cyan')
+
+echo_error = functools.partial(_secho,
+                               err=True,
+                               fg='yellow',
+                               bg='red',
+                               bold=True)
+
+
 class LocalCommandError(Exception):
     """Raised for commands that produce output on stderr."""
 
@@ -35,7 +55,6 @@ def local(cmd, stdin=None, timeout=None, shell=True, output_decoding='utf-8'):
                             shell=shell,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
-    import pdb; pdb.set_trace()
     (out, err) = proc.communicate(input=stdin, timeout=timeout)
     if proc.returncode != 0:
         raise LocalCommandError(err)
@@ -67,7 +86,6 @@ def option(*args, **kw):
 log_level_option = functools.partial(
     option,
     '--log-level',
-    default='INFO',
     type=click.Choice(choices=('DEBUG', 'INFO', 'WARNING', 'ERROR')),
     help='Logging level.')
 
@@ -92,28 +110,8 @@ def download(url, local_filename, chunk_size=1024 * 10):
     return fp.name
 
 
-def _secho(message, **kw):
-    message = '🐛 -> {}'.format(message)
-    return click.secho(message, **kw)
-
-
 def get_deploy_versions(purpose='default'):
     path = resource_filename(__package__, 'cloud-config/versions.ini')
     with open(path) as fp:
         co = configobj.ConfigObj(infile=fp)
     return dict(co)[purpose]
-
-
-echo_info = functools.partial(_secho, fg='blue', bold=True)
-
-echo_sig = functools.partial(click.secho, fg='green', bold=True)
-
-echo_waiting = functools.partial(_secho, nl=False)
-
-echo_retry = functools.partial(click.secho, fg='cyan')
-
-echo_error = functools.partial(_secho,
-                               err=True,
-                               fg='yellow',
-                               bg='red',
-                               bold=True)

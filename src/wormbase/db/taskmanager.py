@@ -3,7 +3,6 @@ import base64
 import contextlib
 import functools
 import json
-import logging
 import operator
 import os
 import pprint
@@ -22,6 +21,8 @@ import click
 import configobj
 
 from . import ssh
+from .logging import get_logger
+from .logging import setup_logging
 from .util import distribution_name
 from .util import echo_error
 from .util import echo_info
@@ -31,6 +32,7 @@ from .util import echo_waiting
 from .util import local
 from .util import log_level_option
 from .util import option
+
 
 # TODO: use public ip address for ssh connections?
 #       (resilience to temporary DNS failures)
@@ -77,6 +79,8 @@ EC2_INSTANCE_DEFAULTS = dict(
     dry_run=False
 )
 
+logger = get_logger(__name__)
+
 
 def load_ec2_instance_from_state(ctx, state):
     session = ctx.obj['session']
@@ -104,7 +108,6 @@ def wait_for_sshd(ec2_instance, max_timeout=60 * 6):
         if waited >= max_timeout:
             msg = 'Failed to connect via ssh to {.public_dns_name}'
             msg = msg.format(ec2_instance)
-            echo_error('Gave up after waiting {} seconds'.format(waited))
             raise socket.timeout(msg)
         else:
             echo_retry('not yet, retrying')
@@ -116,12 +119,18 @@ def wait_for_sshd(ec2_instance, max_timeout=60 * 6):
 def latest_build_state(ctx):
     bstate = ctx.obj['build-state']
     bstate.sync()
-    c_bstate = bstate.get('current')
-    if c_bstate is None:
+    curr_bstate = bstate.get('current')
+    if curr_bstate is None:
         echo_error('No current instance to terminate.')
         echo_info('Other instances may be running, use AWS console')
         ctx.abort()
-    yield c_bstate
+    try:
+        instance = load_ec2_instance_from_state(ctx, curr_bstate)
+        instance_state = dict(instance.state)
+    except (ClientError, AttributeError):
+        instance_state = dict(Name='terminated?', code='<unknown>')
+    curr_bstate['instance-state'] = instance_state
+    yield (instance, curr_bstate)
 
 
 def get_archive_filename():
@@ -170,7 +179,6 @@ def bootstrap(ec2_instance, package_version):
     wbdb_install_cmd = pip_install + archive_filename
     pip_install_cmds = [pip_install + ' --upgrade pip',
                         wbdb_install_cmd]
-    logger = logging.getLogger(__name__)
     with ssh.connection(ec2_instance) as conn:
         for cmd in pip_install_cmds:
             try:
@@ -210,23 +218,26 @@ def aws_session(ctx, profile_name):
     try:
         session = boto3.Session(profile_name=profile_name)
     except ProfileNotFound as pnf:
-        echo_error(str(pnf))
+        logger.error(str(pnf))
         ctx.abort()
     return session
 
 
 def report_status(instance):
-    echo_info('Instance Id: '
-              '{0.instance_id}'.format(instance))
-    echo_info('Instance Type: '
-              '{0.instance_type}'.format(instance))
-    echo_info('Instance Public DNS name: '
-              '{0.public_dns_name}'.format(instance))
-    echo_info('Instance Public IP Address: '
-              '{0.public_ip_address}'.format(instance))
-    echo_info('Tags: {}'.format(instance.tags))
-    echo_info('Launched at: ' +
-              instance.launch_time.isoformat(' '))
+    if instance.meta.data is None:
+        logger.info('No instance status to report.')
+        return
+    instance_state = instance.state.get('Name')
+    is_active = instance_state != 'terminated'
+    status = instance_state if is_active else 'terminated'
+    logger.info('Instance Id: ' '{}', instance.id)
+    logger.info('Tags: {}', instance.tags)
+    logger.info('Launched at: ' + instance.launch_time.isoformat(' '))
+    logger.info('Status: {}', status)
+    if is_active:
+        logger.info('Instance Type: {}', instance.instance_type)
+        logger.info('Instance Public DNS name: {}', instance.public_dns_name)
+        logger.info('Instance Public IP Address: {}', instance.public_ip_address)
 
 
 def ensure_group(session, iam, group_name, group_policies):
@@ -235,7 +246,7 @@ def ensure_group(session, iam, group_name, group_policies):
     try:
         group.load()
     except ClientError:
-        echo_error(
+        logger.error(
             'AWS IAM Group {!r} does not exist.'.format(group_name))
         # XXX: Use click's exit() method
         sys.exit(1)
@@ -326,7 +337,7 @@ def ensure_config(ctx, session, role):
 
 
 @click.group()
-@log_level_option()
+@log_level_option(default='INFO')
 @option('--profile',
         default='default',
         help='AWS profile')
@@ -335,8 +346,7 @@ def ensure_config(ctx, session, role):
         help='AWS Role that will be assumed to execute the build')
 @click.pass_context
 def tasks(ctx, log_level, profile, assume_role):
-    log_filename = os.path.expanduser('~/wb-db-build.log')
-    logging.basicConfig(filename=log_filename, level=log_level)
+    setup_logging(log_level=log_level)
     ctx.obj['profile'] = profile
     session = aws_session(ctx, profile_name=profile)
     iam = session.resource('iam')
@@ -484,7 +494,7 @@ def init(ctx,
 
     # XXX: DEBUG
     msg = 'ssh -i {0.key_pair.name} -l ec2-user {0.public_dns_name}'
-    echo_info(msg.format(instance))
+    logger.info(msg.format(instance))
 
     state['instance-state'] = dict(instance.state)
     return state
@@ -493,12 +503,7 @@ def init(ctx,
 @tasks.command(short_help='Terminate ephemeral build resources')
 @click.pass_context
 def terminate(ctx):
-    with latest_build_state(ctx) as state:
-        session = ctx.obj['session']
-        ec2 = session.resource('ec2')
-        instance_id = state['id']
-        instances = ec2.instances.filter(InstanceIds=[instance_id])
-        instance = next(iter(instances))
+    with latest_build_state(ctx) as (instance, state):
         try:
             instance.terminate()
         except ClientError as client_error:
@@ -516,14 +521,15 @@ def terminate(ctx):
 @tasks.command(short_help='Describe the state of the build')
 @click.pass_context
 def view_state(ctx):
-    with latest_build_state(ctx) as state:
-        try:
-            instance = load_ec2_instance_from_state(ctx, state)
-            instance_state = dict(instance.state)
-        except (ClientError, AttributeError):
-            instance_state = dict(Name='terminated?', code='<unknown>')
-        state['instance-state'] = instance_state
+    with latest_build_state(ctx) as (_, state):
         echo_info(pprint.pformat(state))
+
+
+@tasks.command(short_help='Describes the status of the build instance.')
+@click.pass_context
+def status(ctx):
+    with latest_build_state(ctx) as (instance, _):
+        report_status(instance)
 
 
 cli = tasks(obj={})
