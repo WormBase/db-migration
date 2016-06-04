@@ -3,6 +3,7 @@ import base64
 import contextlib
 import functools
 import json
+import logging
 import operator
 import os
 import pprint
@@ -28,7 +29,6 @@ from .util import echo_retry
 from .util import echo_sig
 from .util import echo_waiting
 from .util import local
-from .util import log_filename_option
 from .util import log_level_option
 from .util import option
 
@@ -326,7 +326,6 @@ def ensure_config(ctx, session, role):
 
 
 @click.group()
-@log_filename_option()
 @log_level_option()
 @option('--profile',
         default='default',
@@ -335,8 +334,9 @@ def ensure_config(ctx, session, role):
         default=IAM_DB_BUILD_ROLE,
         help='AWS Role that will be assumed to execute the build')
 @click.pass_context
-def tasks(ctx, log_filename, log_level, profile, assume_role):
-    logging.basicConfig(filename=log_filename)
+def tasks(ctx, log_level, profile, assume_role):
+    log_filename = os.path.expanduser('~/wb-db-build.log')
+    logging.basicConfig(filename=log_filename, level=log_level)
     ctx.obj['profile'] = profile
     session = aws_session(ctx, profile_name=profile)
     iam = session.resource('iam')
