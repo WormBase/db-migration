@@ -12,6 +12,8 @@ packages:
   - python34-tools
   - python34-libs
   - python34-virtualenv
+  - screen
+  - tmux
 
 runcmd:
 # hack to make the tace binary work on the latest Amazon AMI:
