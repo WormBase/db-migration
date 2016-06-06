@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import functools
+import gzip
+import itertools
+import os
 import subprocess
 
 from pkg_resources import resource_filename
@@ -32,13 +35,13 @@ class LocalCommandError(Exception):
     """Raised for commands that produce output on stderr."""
 
 
-def local(cmd, stdin=None, timeout=None, shell=True, output_decoding='utf-8'):
+def local(cmd, input=None, timeout=None, shell=True, output_decoding='utf-8'):
     """Run a command locally.
 
     :param cmd: The command to execute.
     :type cmd: str
-    :param stdin: Optional text to pipe as input to `cmd`.
-    :type stdin: str
+    :param input: Optional text to pipe as input to `cmd`.
+    :type input: str
     :param timeout: Optional number of seconds to wait for `cmd` to execute.
     :param timeout: int
     :param shell: Whether or not to execute `cmd` in a shell (Default: True)
@@ -51,11 +54,16 @@ def local(cmd, stdin=None, timeout=None, shell=True, output_decoding='utf-8'):
     """
     if isinstance(cmd, (list, tuple)) and shell:
         cmd = ' '.join(cmd)
+    if input:
+        input_stream = input.encode(output_decoding)
+    else:
+        input_stream = None
     proc = subprocess.Popen(cmd,
                             shell=shell,
+                            stdin=subprocess.PIPE,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
-    (out, err) = proc.communicate(input=stdin, timeout=timeout)
+    (out, err) = proc.communicate(input=input_stream, timeout=timeout)
     if proc.returncode != 0:
         raise LocalCommandError(err)
     return out.decode(output_decoding)
@@ -115,3 +123,24 @@ def get_deploy_versions(purpose='default'):
     with open(path) as fp:
         co = configobj.ConfigObj(infile=fp)
     return dict(co)[purpose]
+
+
+def partition(iterable, n, fillvalue=None):
+    args = [iter(iterable)] * n
+    for seq in itertools.zip_longest(*args, fillvalue=fillvalue):
+        yield filter(os.path.isfile, seq)
+
+
+def sort_edn_log(path):
+    out_path = path.replace('.gz', '.sort.gz')
+    try:
+        with gzip.open(path) as fp:
+            lines = fp.readlines()
+        lines.sort()
+        with gzip.open(out_path, 'wb') as fp:
+            fp.write(gzip.compress(b''.join(lines)))
+        return True
+    finally:
+        if os.path.isfile(out_path):
+            os.remove(path)
+    return False
