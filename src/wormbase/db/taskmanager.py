@@ -73,8 +73,9 @@ USER_DATA_PATH = resource_filename(
 
 
 EC2_INSTANCE_DEFAULTS = dict(
-    ami='ami-8ff710e2',
-    instance_type='t1.micro',
+    # ami='ami-8ff710e2', <- SOURCE AMI
+    ami='ami-7766991a', # <- image of source
+    instance_type='c3.4xlarge',
     monitoring=False,
     dry_run=False
 )
