@@ -45,7 +45,8 @@ def acedb_dump(ctx, dump_dir, tace_dump_options, db_directory=None):
     os.makedirs(dump_dir, exist_ok=True)
     dump_cmd = ' '.join(['Dump', tace_dump_options, dump_dir])
     logger.info('Dumping ACeDB files to {}', dump_dir)
-    local('tace ' + db_directory, stdin=dump_cmd)
+    local('tace ' + db_directory, input=dump_cmd)
+    local('gzip {}/*.ace'.format(dump_dir))
     logger.info('Dumped ACeDB files to {}', dump_dir)
 
 
