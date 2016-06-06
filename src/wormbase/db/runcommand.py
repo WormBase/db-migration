@@ -1,4 +1,4 @@
-import functools
+import glob
 import multiprocessing
 import os
 import time
@@ -16,11 +16,13 @@ from .util import get_deploy_versions
 from .util import local
 from .util import log_level_option
 from .util import option
+from .util import sort_edn_log
 
 
 logger = get_logger(__name__, verbose=True)
 
-eu = os.path.expanduser
+userpath = os.path.expanduser
+
 
 @click.group()
 @log_level_option()
@@ -80,7 +82,7 @@ def configure_transactor(logger, conf_target_path, datomic_dist_dir):
 
 
 def prepare_target_db(logger,
-                      psuedoace_jar_path,
+                      pseudoace_jar_path,
                       transactor_url,
                       edn_logs_dir,
                       acedb_dump_dir,
@@ -92,7 +94,7 @@ def prepare_target_db(logger,
            '--verbose '
            'prepare-import')
     cmd = cmd.format(java=java,
-                     jar_path=psuedoace_jar_path,
+                     jar_path=pseudoace_jar_path,
                      transactor_url=transactor_url,
                      acedump_dir=acedb_dump_dir,
                      edn_logs_dir=edn_logs_dir)
@@ -105,7 +107,7 @@ def dist_path(name):
     version = get_deploy_versions()[name]
     path = '~/{name}/{name}-{version}'.format(name=name,
                                               version=version)
-    return os.path.expanduser(path)
+    return userpath(path)
 
 
 @run.command()
@@ -116,29 +118,35 @@ def setup(ctx, java_cmd):
     local(['wb-db-install'] + list(versions))
     data_release = versions['acedb_data']
     datomic_free_path = dist_path('datomic_free')
-    acedb_dump_dir = eu('~/acedb_dump')
-    edn_logs_dir = eu('~/edn_logs')
-    circus_ini_path = eu('~/circus.ini')
-    psuedoace_jar_path = dist_path('psuedoace') + '.jar'
+    acedb_data_dir = userpath('~/acedb_data')
+    acedb_dump_dir = userpath('~/acedb_dump')
+    edn_logs_dir = userpath('~/edn_logs')
+    circus_ini_path = userpath('~/circus.ini')
+    pseudoace_jar_path = dist_path('pseudoace') + '.jar'
     transactor_url = 'datomic:free://localhost:4334/' + data_release
-    ctx.invoke(acedb_dump, dump_dir=acedb_dump_dir)
+    ctx.invoke(acedb_dump, dump_dir=acedb_dump_dir, db_directory=acedb_data_dir)
     configure_transactor(circus_ini_path, datomic_free_path)
-    prepare_target_db(psuedoace_jar_path,
+    prepare_target_db(pseudoace_jar_path,
                       transactor_url,
                       edn_logs_dir,
                       acedb_dump_dir,
                       java=java_cmd)
 
 
-@run.command()
-def sort_edn_logs():
+def sort_edn_log_shell(path):
+    logger.info('Sorting {}', path)
     pseudoace_path = dist_path('pseudoace')
-    script_path = os.path.join(pseudoace_path, 'sort_edn_log.sh')
-    edn_logs_dir = eu('~/edn_logs')
-    fn = functools.partial(local, script_path)
-    n_cpus = multiprocessing.cpu_count()
-    pool = multiprocessing.Pool(n_cpus)
-    pool.map(fn, os.listdir(edn_logs_dir))
+    script = os.path.join(pseudoace_path, 'sort_edn_log.sh')
+    cmd = ' '.join((script, path))
+    logger.info('Command: {}', cmd)
+    return local(cmd)
+
+
+@run.command('sort-edn-logs')
+def sort_edn_logs():
+    gzipped_edn_logfiles = glob.glob(userpath('~/edn-logs/*.edn.gz'))
+    with multiprocessing.Pool() as pool:
+        pool.map(sort_edn_log, gzipped_edn_logfiles, 10)
 
 
 cli = run()
