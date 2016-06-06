@@ -123,7 +123,9 @@ def setup(ctx, java_cmd):
     circus_ini_path = userpath('~/circus.ini')
     pseudoace_jar_path = dist_path('pseudoace') + '.jar'
     transactor_url = 'datomic:free://localhost:4334/' + data_release
-    ctx.invoke(acedb_dump, dump_dir=acedb_dump_dir, db_directory=acedb_data_dir)
+    ctx.invoke(acedb_dump,
+               dump_dir=acedb_dump_dir,
+               db_directory=acedb_data_dir)
     configure_transactor(circus_ini_path, datomic_free_path)
     prepare_target_db(pseudoace_jar_path,
                       transactor_url,

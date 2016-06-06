@@ -3,7 +3,6 @@ import base64
 import contextlib
 import functools
 import json
-import logging
 import operator
 import os
 import pprint
@@ -75,7 +74,7 @@ USER_DATA_PATH = resource_filename(
 
 EC2_INSTANCE_DEFAULTS = dict(
     # ami='ami-8ff710e2', <- SOURCE AMI
-    ami='ami-7766991a', # <- image of source
+    ami='ami-7766991a',  # <- image of source
     instance_type='c3.4xlarge',
     monitoring=False,
     dry_run=False
@@ -239,7 +238,8 @@ def report_status(instance):
     if is_active:
         logger.info('Instance Type: {}', instance.instance_type)
         logger.info('Instance Public DNS name: {}', instance.public_dns_name)
-        logger.info('Instance Public IP Address: {}', instance.public_ip_address)
+        logger.info('Instance Public IP Address: {}',
+                    instance.public_ip_address)
 
 
 def ensure_group(session, iam, group_name, group_policies):
