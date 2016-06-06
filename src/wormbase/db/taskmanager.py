@@ -475,7 +475,8 @@ def init(ctx,
     instances = ec2.create_instances(**instance_options)
     instance = next(iter(instances))
     instance.create_tags(Tags=[
-        dict(Key='CreatedBy', Value=created_by)])
+        dict(Key='CreatedBy', Value=created_by),
+        dict(Key='Name', Value='wb-db-build-experimental')])
     state[instance.id] = dict(id=instance.id,
                               init_options=instance_options,
                               KeyPairName=key_pair.name,
