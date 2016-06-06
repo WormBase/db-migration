@@ -3,7 +3,6 @@ import multiprocessing
 import os
 import time
 
-
 import click
 from configobj import ConfigObj
 from pkg_resources import resource_filename

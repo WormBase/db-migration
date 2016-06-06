@@ -3,6 +3,7 @@ import base64
 import contextlib
 import functools
 import json
+import logging
 import operator
 import os
 import pprint

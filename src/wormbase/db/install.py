@@ -23,6 +23,7 @@ from .util import local
 from .util import log_level_option
 from .util import option
 
+
 logger = get_logger(__name__)
 
 Meta = collections.namedtuple('Meta', ('download_dir',
