@@ -187,7 +187,7 @@ def bootstrap(ec2_instance, package_version):
             except Exception:
                 logger.exception()
             else:
-                logger.info(out)
+                logger.debug(out)
 
 
 def make_asssume_role_policy(version='2012-10-17', **attrs):
