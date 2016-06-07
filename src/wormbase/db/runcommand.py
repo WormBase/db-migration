@@ -1,3 +1,4 @@
+import functools
 import glob
 import multiprocessing
 import os
@@ -9,8 +10,6 @@ from pkg_resources import resource_filename
 
 from .logging import get_logger
 from .logging import setup_logging
-from .util import echo_sig
-from .util import echo_waiting
 from .util import get_deploy_versions
 from .util import local
 from .util import log_level_option
@@ -21,6 +20,8 @@ from .util import sort_edn_log
 logger = get_logger(__name__, verbose=True)
 
 userpath = os.path.expanduser
+
+pkgpath = functools.partial(resource_filename, __package__)
 
 
 @click.group()
@@ -52,14 +53,11 @@ def acedb_dump(ctx, dump_dir, tace_dump_options, db_directory=None):
 
 
 def configure_transactor(logger, conf_target_path, datomic_dist_dir):
-    path = resource_filename(
-        __package__,
+    path = pkgpath(
         'cloud-config/circus-datomic-free-transactor.ini.template')
-    transactor_properties_path = resource_filename(
-        __package__,
+    transactor_properties_path = pkgpath(
         'cloud-config/datomic-free-transactor.ini')
-    logger_config = resource_filename(
-        __package__,
+    logger_config = pkgpath(
         'cloud-config/circus-logging-config.yaml')
     with open(path) as infile:
         conf = ConfigObj(infile=infile)
@@ -73,10 +71,8 @@ def configure_transactor(logger, conf_target_path, datomic_dist_dir):
     with open(conf_target_path, 'wb') as outfile:
         conf.write(outfile=outfile)
     logger.info('Starting datomic transactor via circusd')
-    echo_waiting('Waiting for transactor to start ... ')
     local('circusd --daemon ' + conf_target_path)
-    time.sleep(3)
-    echo_sig('done')
+    time.sleep(2)
     logger.info('Started datomic transactor')
 
 
