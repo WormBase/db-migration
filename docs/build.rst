@@ -48,7 +48,7 @@ Build procedure
 
    .. code-block:: bash
 
-      # Create a new tmux session for peforming the build.
+      # Create a new tmux session for performing the build.
       tmux new-session -s wb-db-build
 
    Install all required software and data (ACeDB, datomic, pseudoace),
