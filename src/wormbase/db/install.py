@@ -15,8 +15,8 @@ import zipfile
 import click
 
 from . import github
-from .logging import get_logger
-from .logging import setup_logging
+from .log import get_logger
+from .log import setup_logging
 from .util import download
 from .util import get_deploy_versions
 from .util import install_path

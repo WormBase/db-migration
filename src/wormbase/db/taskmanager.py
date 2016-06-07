@@ -21,8 +21,8 @@ import click
 import configobj
 
 from . import ssh
-from .logging import get_logger
-from .logging import setup_logging
+from .log import get_logger
+from .log import setup_logging
 from .util import distribution_name
 from .util import echo_error
 from .util import echo_info

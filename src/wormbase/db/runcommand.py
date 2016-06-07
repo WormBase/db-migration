@@ -6,8 +6,8 @@ import time
 import click
 from configobj import ConfigObj
 
-from .logging import get_logger
-from .logging import setup_logging
+from .log import get_logger
+from .log import setup_logging
 from .util import get_deploy_versions
 from .util import install_path
 from .util import local
