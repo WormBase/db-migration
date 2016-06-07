@@ -473,7 +473,8 @@ def init(ctx,
     instance = next(iter(instances))
     instance.create_tags(Tags=[
         dict(Key='CreatedBy', Value=created_by),
-        dict(Key='Name', Value='wb-db-build-experimental')])
+        dict(Key='Name', Value='wb-db-build-experimental'),
+        dict(Key='Role', Value=EC2_INSTANCE_ROLE)])
     state[instance.id] = dict(id=instance.id,
                               init_options=instance_options,
                               KeyPairName=key_pair.name,
