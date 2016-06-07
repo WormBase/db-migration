@@ -25,7 +25,10 @@ runcmd:
 - wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
 - sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
 - yum install -y apache-maven
-
+- mkfs.ext4 /dev/xvdb
+- mkdir /datastore
+- mount -t ext4 /dev/xvdb /datastore
+- mkdir /datastore/wormbase
+- chown ec2-user /datastore/wormbase
 
 output : { all : '| tee -a /var/log/cloud-init-output.log' }
-

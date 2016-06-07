@@ -1,4 +1,3 @@
-import functools
 import glob
 import multiprocessing
 import os
@@ -6,22 +5,19 @@ import time
 
 import click
 from configobj import ConfigObj
-from pkg_resources import resource_filename
 
 from .logging import get_logger
 from .logging import setup_logging
 from .util import get_deploy_versions
+from .util import install_path
 from .util import local
 from .util import log_level_option
 from .util import option
+from .util import pkgpath
 from .util import sort_edn_log
 
 
 logger = get_logger(__name__, verbose=True)
-
-userpath = os.path.expanduser
-
-pkgpath = functools.partial(resource_filename, __package__)
 
 
 @click.group()
@@ -100,9 +96,8 @@ def prepare_target_db(logger,
 
 def dist_path(name):
     version = get_deploy_versions()[name]
-    path = '~/{name}/{name}-{version}'.format(name=name,
-                                              version=version)
-    return userpath(path)
+    fqname = '{name}-{version}'.format(name=name, version=version)
+    return install_path(name, fqname)
 
 
 @run.command()
@@ -113,10 +108,10 @@ def setup(ctx, java_cmd):
     local(['wb-db-install'] + list(versions))
     data_release = versions['acedb_data']
     datomic_free_path = dist_path('datomic_free')
-    acedb_data_dir = userpath('~/acedb_data')
-    acedb_dump_dir = userpath('~/acedb_dump')
-    edn_logs_dir = userpath('~/edn_logs')
-    circus_ini_path = userpath('~/circus.ini')
+    acedb_data_dir = install_path('acedb_data')
+    acedb_dump_dir = install_path('acedb_dump')
+    edn_logs_dir = install_path('edn_logs')
+    circus_ini_path = install_path('circus.ini')
     pseudoace_jar_path = dist_path('pseudoace') + '.jar'
     transactor_url = 'datomic:free://localhost:4334/' + data_release
     ctx.invoke(acedb_dump,
@@ -141,7 +136,7 @@ def sort_edn_log_shell(path):
 
 @run.command('sort-edn-logs')
 def sort_edn_logs():
-    gzipped_edn_logfiles = glob.glob(userpath('~/edn-logs/*.edn.gz'))
+    gzipped_edn_logfiles = glob.glob(install_path('edn-logs', '*.edn.gz'))
     with multiprocessing.Pool() as pool:
         pool.map(sort_edn_log, gzipped_edn_logfiles, 10)
 

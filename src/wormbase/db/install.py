@@ -19,6 +19,7 @@ from .logging import get_logger
 from .logging import setup_logging
 from .util import download
 from .util import get_deploy_versions
+from .util import install_path
 from .util import local
 from .util import log_level_option
 from .util import option
@@ -92,7 +93,7 @@ def installer(func):
         f_name = func.__name__
         tmpdir = tempfile.mkdtemp(suffix='-db-build-downloads')
         download_dir = os.path.join(tmpdir, f_name)
-        install_dir = os.path.join(os.path.expanduser('~'), f_name)
+        install_dir = install_path(f_name)
         version = get_deploy_versions()[f_name]
         for path in (download_dir, install_dir):
             os.makedirs(path, exist_ok=True)
@@ -242,7 +243,6 @@ def pseudoace(meta):
     tmp_src_path = os.path.join(tempdir, fullname)
     src_path = tmp_src_path.rstrip('-' + tag)
     os.rename(tmp_src_path, src_path)
-    assert install_dir.startswith(os.path.expanduser('~'))
     shutil.rmtree(install_dir)
     shutil.move(src_path, install_dir)
     os.environ['PSEUDOACE_HOME'] = install_dir

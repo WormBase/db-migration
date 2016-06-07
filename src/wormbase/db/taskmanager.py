@@ -59,7 +59,7 @@ IAM_DB_BUILD_POLICIES = (
     'ec2-run-db-build-instance',
     'ec2-tagging',
     's3-datomic-backups-full-access',
-    'IAMReadOnlyAccess',
+    'IAMReadOnlyAccess,'
     'AmazonEC2RoleforSSM'
 )
 
@@ -68,8 +68,9 @@ USER_DATA_PATH = resource_filename(
     'cloud-config/AWS-cloud-config-UserData.template')
 
 EC2_INSTANCE_DEFAULTS = dict(
-    ami='ami-0dc73e60',  # <-- image of default Amazon AMI (2016)
-    instance_type='c3.4xlarge',
+    # Based on image of default Amazon AMI (ami-f5f41398, 2016)
+    ami='ami-1517ee78',
+    instance_type='r3.4xlarge',
     monitoring=False,
     dry_run=False
 )

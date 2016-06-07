@@ -30,6 +30,10 @@ echo_error = functools.partial(_secho,
                                bg='red',
                                bold=True)
 
+pkgpath = functools.partial(resource_filename, __package__)
+
+install_path = functools.partial(os.path.join, '/datastore', 'wormbase')
+
 
 class LocalCommandError(Exception):
     """Raised for commands that produce output on stderr."""
