@@ -37,7 +37,11 @@ Build procedure
 
 .. _build-step-3:
 
-3. Run commands on the instance to perform the actual build-steps
+3. Connect to the instance using ssh and Run commands to perform the build.
+
+   .. note::
+      The ssh command(s) required to connect should have been printed
+      by the command in step 2 above.
 
    Use the `ssh-add` and `ssh` commands printed from step 1, then issue
    the following commands in either `screen` or `tmux`.
