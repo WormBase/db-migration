@@ -33,10 +33,6 @@ from .util import local
 from .util import log_level_option
 from .util import option
 
-
-# TODO: use public ip address for ssh connections?
-#       (resilience to temporary DNS failures)
-
 BUILD_STATE_PATH = os.path.join(os.getcwd(), '.db-build.db')
 
 IAM_ASSUME_ROLE_NAME = 'wb-build-db-assume'
@@ -71,14 +67,14 @@ USER_DATA_PATH = resource_filename(
     __package__,
     'cloud-config/AWS-cloud-config-UserData.template')
 
-
 EC2_INSTANCE_DEFAULTS = dict(
-    # ami='ami-8ff710e2', <- SOURCE AMI
-    ami='ami-7766991a',  # <- image of source
+    ami='ami-0dc73e60',  # <-- image of default Amazon AMI (2016)
     instance_type='c3.4xlarge',
     monitoring=False,
     dry_run=False
 )
+
+EC2_INSTANCE_ROLE = 'development'
 
 logger = get_logger(__name__)
 
