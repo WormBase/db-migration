@@ -93,5 +93,5 @@ Build procedure
 
       wb-db-run backup-db
 
-   Exit the `tmux` or `screen` session used to
-   perform :ref:`Step 3 <build-step-3>` and :ref:`Step 4 <build-step-4>`.
+   Exit the `tmux` or `screen` session used to perform
+   :ref:`Step 3 <build-step-3>` and :ref:`Step 4 <build-step-4>`.
