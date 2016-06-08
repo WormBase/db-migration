@@ -38,3 +38,6 @@ Glossary
    tmux
       A newer program used to preserve sessions on remote hosts with
       less irritating key bindings.
+
+   pseudoace
+      The name of the software package used to migrate to the Datomic database.

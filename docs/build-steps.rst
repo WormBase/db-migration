@@ -3,7 +3,7 @@
 
 Build Steps
 ===========
-
+The following steps should be executed in order.
 
 .. _build-step-1:
 
@@ -28,20 +28,27 @@ Build Steps
 2. Connect to the EC2 instance using ssh, run build commands
 
    .. note::
-      The ssh command(s) required to connect should have been printed
-      by the command in step 2 above.
+	The commands below will emit their current progress to the console,
+	and will also print out the location of a log file for more detailed
+	output.
+
 
    Use the `ssh-add` and `ssh` commands printed from step 1, then issue
    the following commands in either `screen` or `tmux`.
 
    .. code-block:: bash
 
-      # Create a new tmux session for performing the build.
-      tmux new-session -s wb-db-build
+      # Create a new tmux session for watching logs, detach immediately
+      tmux new-session -s wb-db-run-logs \; detach
 
-   Install all required software and data (ACeDB, datomic, pseudoace),
-   Dump `.ace` files from the current `ACeDB` data release, create a
-   new Datomic database and converts all .ace files into EDN format:
+      # Create a new tmux session for issuing commands
+      tmux new-session -s wb-db-run \; detach
+
+
+   Install all required software and data (:term:`ACeDB`,
+   :term:`Datomic`, :term:`pseudoace`),
+   Dump `.ace` files from the current :term:`ACeDB` data release, create a
+   new :term:`Datomic` database and converts all .ace files into EDN format:
 
    .. code-block:: bash
 
@@ -73,20 +80,23 @@ Build Steps
       wb-db-run qa-report
 
    Examine the report outputted by the previous command.
-   Should everything look OK, make a backup of the newly created
-   database to Amazon S3, for use by the web team:
-
-   .. code-block:: bash
-
-      wb-db-run backup-db
+   Check the output of the report before continuing
+   with :ref:`the next step <build-step-4>`.
 
 .. _build-step-4:
 
 4. Backup the database to :term:`S3` for use by the web team.
 
-   Exit the :term:`tmux` or :term:`screen` session used to perform
-   :ref:`Step 2 <build-step-2>` and :ref:`Step 3 <build-step-3>`.
+   Should you be content with the output of the QA
+   report in :ref:`previous step <build-step-3>`, proceed to
+   create a backup of the :term:`Datomic` database to :term:`S3`:
 
+   .. code-block:: bash
+
+      wb-db-run backup-db
+
+   Exit the :term:`tmux` or :term:`screen` session and log off the EC2
+   instance.
 
 .. _build-step-5:
 
@@ -101,4 +111,9 @@ Build Steps
       wb-db-build --profile $USER terminate
 
 
-The build is now complete.
+Should all steps complete successfully, the migration process is now
+complete.
+
+If you stopped after :ref:`Step 4 <build-step-4>` due to data
+inconsistency, or an error occurred during any of the other steps,
+please ensure to eventually run :ref:`Step 5 <build-step-5>`.
