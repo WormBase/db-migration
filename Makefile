@@ -17,6 +17,6 @@ clean: $(call print-help,clean,Cleans build artefacts)
 	rm -rf build dist
 
 docs: $(call print-help,docs,Builds the documentation for the Python package)
-	cd docs; make clean html
+	cd docs; make clean html man text latextpdf
 
 .PHONY: install uninstall clean docs

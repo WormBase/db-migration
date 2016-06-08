@@ -2,96 +2,54 @@
 Build procedure
 ===============
 
-.. note::
+Preface
+=======
 
-   The following assumes you have used `$USER` as the name of the profile when
-   configuring the AWS cli as above.
+The :term:`client commands` used to interact with :term:`AWS` must be
+invoked from the same working directory, from the same computer the
+initial commands are run from.
 
-.. _build-step-1:
-
-1. Configure an AWS account
-
-   A WormBase AWS administrator should have previously supplied
-   credentials that should be given as input to the following command:
-
-   .. code-block:: bash
-
-      aws configure --profile $USER
-
-.. _build-step-2:
-
-2. Provision and start an instance for doing the database-migration build
-
-   The following `wb-db-build` command below, when run, will print out
-   the ssh commands needed for the next step.
-
-   .. code-block:: bash
-
-      AWS_PROFILE="${USER}"
-      WB_DATA_RELEASE="WS254"
-      WB_DB_RELEASE_TAG="0.1"
-      wb-db-build --profile $USER \
-		   init \
-   		   "dist/wormbase-db-build-${WB_DB_RELEASE}.tar.gz" \
-		   "${WB_DATA_RELEASE}"
-
-.. _build-step-3:
-
-3. Connect to the instance using ssh and Run commands to perform the build.
-
-   .. note::
-      The ssh command(s) required to connect should have been printed
-      by the command in step 2 above.
-
-   Use the `ssh-add` and `ssh` commands printed from step 1, then issue
-   the following commands in either `screen` or `tmux`.
-
-   .. code-block:: bash
-
-      # Create a new tmux session for performing the build.
-      tmux new-session -s wb-db-build
-
-   Install all required software and data (ACeDB, datomic, pseudoace),
-   Dump `.ace` files from the current `ACeDB` data release, create a
-   new Datomic database and converts all .ace files into EDN format:
-
-   .. code-block:: bash
-
-      wb-db-run setup
-
-   Sort the EDN log files by timestamp:
-
-   .. ATTENTION:: The following command will take approximately 5-8 hours
-
-   .. code-block:: bash
-
-      wb-db-run sort-edn-logs
-
-   Import the sorted EDN logs into datomic.
-
-   .. ATTENTION:: The following command will take approximately 72 hours
-
-   .. code-block:: bash
-
-      wb-db-run import-logs
+This build program stores the state of build in the current working directory,
+in a file named ``.db-build.shelve`` (A Python "shelve" file).
 
 
-.. _build-step-4:
+Pre-requisite: Configuring an AWS account
+-----------------------------------------
+A WormBase AWS administrator should have previously supplied
+credentials:
+
+  AWS IAM username
+
+  AWS_ACCESS_KEY_ID
+
+  AWS_SECRET_ACCESS_KEY
 
 
-4. Run the QA report on the newly created database and transfer database
 
-   .. code-block:: bash
+These credentials should be given as input to the following command:
 
-      wb-db-run qa-report
+.. code-block:: bash
 
-   Examine the report outputted by the previous command.
-   Should everything look OK, make a backup of the newly created
-   database to Amazon S3, for use by the web team:
+   aws configure --profile $USER
 
-   .. code-block:: bash
 
-      wb-db-run backup-db
+The build consists of 3 main steps:
 
-   Exit the `tmux` or `screen` session used to perform
-   :ref:`Step 3 <build-step-3>` and :ref:`Step 4 <build-step-4>`.
+1. Provision and run an EC2 instance.
+
+2. Run commands on the EC2 instance.
+
+3. Terminate the EC2 instance
+
+
+Command Reference
+=================
+
+wb-db-build
+  Used to run commands from the client machine to the AWS EC2 instance.
+
+wb-db-run
+  Used to run commands on the AWS EC2 instance in order to perform build steps.
+
+
+.. literalinclude:: build-steps

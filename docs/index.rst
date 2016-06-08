@@ -11,13 +11,20 @@ Contents:
 .. toctree::
    :maxdepth: 1
 
-   user.rst
-   build.rst
-   dev.rst
-   misc.rst
+   user
+   build
+   dev
+   misc
 
 Indices and tables
 ==================
 
+  :ref:`glossary`
 * :ref:`genindex`
 * :ref:`search`
+
+.. toctree::
+   :hidden:
+
+   glossary
+   build-steps
