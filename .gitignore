@@ -67,4 +67,7 @@ target/
 flycheck_*.py
 
 # db-build
-/.build-state
+/.db-migration.db
+
+# generated docs
+_build
