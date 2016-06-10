@@ -73,10 +73,10 @@ def latest_migration_state(ctx):
     bstate.sync()
     curr_bstate = bstate.get('current')
     if curr_bstate is None:
-        util.echo_error('No current instance to terminate.')
-        util.echo_info('Other instances may be running, '
-                       'use the AWS web console or CLI')
-        ctx.abort()
+        logger.error('No current instance to terminate.')
+        logger.info('Other instances may be running, '
+                    'use the AWS web console or CLI')
+        ctx.exit()
     try:
         instance = load_ec2_instance_from_state(ctx, curr_bstate)
         instance_state = dict(instance.state)
