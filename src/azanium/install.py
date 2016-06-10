@@ -17,12 +17,10 @@ import click
 from . import github
 from . import root_command
 from .log import get_logger
-from .log import setup_logging
 from .util import download
 from .util import get_deploy_versions
 from .util import install_path
 from .util import local
-from .util import log_level_option
 from .util import option
 
 
