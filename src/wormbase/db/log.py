@@ -3,8 +3,7 @@ import logging
 import os
 import sys
 
-from .util import echo_error
-from .util import echo_info
+from . import util
 
 
 class Message(object):
@@ -30,9 +29,9 @@ class Logger(logging.LoggerAdapter):
 
 class VerboseLogMethod:
 
-    def __init__(self, printer, name):
-        self._printer = printer
+    def __init__(self, name, printer=print):
         self._name = name
+        self._printer = printer
 
     def __get__(self, obj, objtype=None):
         method = getattr(super(objtype, obj), self._name)
@@ -45,21 +44,23 @@ class VerboseLogMethod:
 
 class VerbosePrettyLogger(Logger):
 
-    error = VerboseLogMethod(echo_error, 'error')
-    info = VerboseLogMethod(echo_info, 'info')
+    debug = VerboseLogMethod('debug')
+    error = VerboseLogMethod('error', util.echo_error)
+    info = VerboseLogMethod('info', util.echo_info)
+    warning = VerboseLogMethod('warning', util.echo_warning)
 
 
 def setup_logging(log_filename=None, log_level=logging.INFO):
     if log_filename is None:
         log_filename = os.path.basename(sys.argv[0]) + '.log'
-    log_dir = os.path.expanduser('~/logs')
+    log_dir = util.install_path('logs')
     log_path = os.path.join(log_dir, log_filename)
     os.makedirs(log_dir, exist_ok=True)
     logging.basicConfig(filename=log_path,
                         format='{asctime:12s} {levelname:5s} {name} {message}',
                         style='{',
                         level=log_level)
-    echo_info('Logging to {}'.format(log_path))
+    util.echo_info('Logging to {}'.format(log_path))
 
 
 def get_logger(namespace, verbose=True):

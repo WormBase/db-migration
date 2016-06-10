@@ -54,32 +54,6 @@ def _ftp(host):
     ftp.quit()
 
 
-def persists_env(shell_init_file='~/.bashrc'):
-    """Decorator for a `install` command.
-
-    Changes to the existing environment after the
-    decorated function  has been called will be
-    appended to current user's shell profile.
-    """
-    def env_updater(func):
-        def cmd_proxy(*args, **kw):
-            env_before = set(os.environ.items())
-            rv = func(*args, **kw)
-            env_after = set(os.environ.items())
-            env_vars = dict(env_after - env_before)
-            if env_vars:
-                path = os.path.expanduser(shell_init_file)
-                with open(path, 'a') as fp:
-                    for (env_var, val) in sorted(env_vars.items()):
-                        new_line = 'export {var}="{val}"'
-                        new_line = new_line.format(var=env_var, val=val)
-                        fp.write(os.linesep.join([new_line]))
-                        fp.write(os.linesep)
-            return rv
-        return functools.update_wrapper(cmd_proxy, func)
-    return env_updater
-
-
 def installer(func):
     """Decorate a click command as an ``installer``.
 
@@ -91,7 +65,7 @@ def installer(func):
     @click.pass_context
     def cmd_proxy(ctx, *args, **kw):
         f_name = func.__name__
-        tmpdir = tempfile.mkdtemp(suffix='-db-build-downloads')
+        tmpdir = tempfile.mkdtemp(suffix='-db-migration-downloads')
         download_dir = os.path.join(tmpdir, f_name)
         install_dir = install_path(f_name)
         version = get_deploy_versions()[f_name]
@@ -111,17 +85,17 @@ def installer(func):
 @click.group(chain=True, invoke_without_command=False)
 @log_level_option(default='INFO')
 @click.pass_context
-def build(ctx, log_level):
+def install(ctx, log_level):
     setup_logging(log_level=log_level)
 
 
-@build.resultcallback()
+@install.resultcallback()
 def pipeline(installers, log_level):
-    for installer in installers:
-        installer()
+    for install_command in installers:
+        install_command()
 
 
-@build.command()
+@install.command(short_help='Installs the ACeDB database')
 @option('--ftp-host',
         default='ftp.ebi.ac.uk',
         help='FTP hostname for ACeDB data.')
@@ -131,12 +105,11 @@ def pipeline(installers, log_level):
 @option('--file-selector-regexp',
         default='.*\.tar\.gz$',
         help='File selection regexp')
-@persists_env()
 @installer
-def acedb_data(meta,
-               ftp_host,
-               remote_path_template,
-               file_selector_regexp):
+def acedb_database(meta,
+                   ftp_host,
+                   remote_path_template,
+                   file_selector_regexp):
     download_dir = meta.download_dir
     install_dir = meta.install_dir
     format_path = remote_path_template.format
@@ -165,16 +138,15 @@ def acedb_data(meta,
     with open(passwd_path, 'a') as fp:
         logger.info('Adding {} to {}', username, passwd_path)
         fp.write(username + os.linesep)
-    os.environ['ACEDB_DATABASE'] = install_dir
 
 
-@build.command()
+@install.command(short_help='Installs the ACeDB "tace" binary')
 @option('-t', '--url-template',
         default=('ftp://ftp.sanger.ac.uk/pub/acedb/MONTHLY/'
                  'ACEDB-binaryLINUX_{version}.tar.gz'),
         help='URL for versioned ACeDB binaries')
 @installer
-def acedb(meta, url_template):
+def tace(meta, url_template):
     install_dir = meta.install_dir
     download_dir = meta.download_dir
     version = meta.version
@@ -192,11 +164,10 @@ def acedb(meta, url_template):
     _make_executable(os.path.join(install_dir, 'tace'), logger)
 
 
-@build.command()
+@install.command(short_help='Installs datomic-free')
 @option('-t', '--url-template',
         default='https://my.datomic.com/downloads/free/{version}',
         help='URL template for Datomic Free version')
-@persists_env()
 @installer
 def datomic_free(meta, url_template):
     install_dir = meta.install_dir
@@ -206,17 +177,19 @@ def datomic_free(meta, url_template):
     local_filename = fullname + '.zip'
     download_path = os.path.join(meta.download_dir, local_filename)
     logger.info('Downloading and extracting {} to {}', fullname, install_dir)
+    tmpdir = tempfile.mkdtemp()
     with zipfile.ZipFile(download(url, download_path)) as zf:
-        zf.extractall(install_dir)
+        zf.extractall(tmpdir)
+    os.rmdir(install_dir)
+    shutil.move(os.path.join(tmpdir, fullname), install_dir)
+    os.rmdir(tmpdir)
     logger.info('Installed {} into {}', fullname, install_dir)
-    datomic_home = os.path.join(install_dir, fullname)
-    logger.info('Setting environment variable DATOMIC_HOME={}', datomic_home)
-    os.environ['DATOMIC_HOME'] = datomic_home
-    bin_dir = os.path.join(datomic_home, 'bin')
+    logger.info('Setting environment variable DATOMIC_HOME={}', install_dir)
+    bin_dir = os.path.join(install_dir, 'bin')
     for filename in os.listdir(bin_dir):
         bin_path = os.path.join(bin_dir, filename)
         _make_executable(bin_path, logger)
-    os.chdir(datomic_home)
+    os.chdir(install_dir)
     mvn_install = os.path.join('bin', 'maven-install')
     logger.info('Installing datomic via {}', os.path.abspath(mvn_install))
     mvn_install_out = local(mvn_install)
@@ -224,8 +197,7 @@ def datomic_free(meta, url_template):
     logger.debug(mvn_install_out)
 
 
-@build.command()
-@persists_env()
+@install.command(short_help='Installs pseudoace')
 @installer
 def pseudoace(meta):
     download_dir = meta.download_dir
@@ -245,8 +217,7 @@ def pseudoace(meta):
     os.rename(tmp_src_path, src_path)
     shutil.rmtree(install_dir)
     shutil.move(src_path, install_dir)
-    os.environ['PSEUDOACE_HOME'] = install_dir
     logger.info('Extracted pseudoace-{} to {}', tag, install_dir)
 
 
-cli = build()
+cli = install()

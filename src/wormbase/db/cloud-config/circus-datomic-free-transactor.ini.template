@@ -13,13 +13,10 @@ port = 4333
 
 # required (even if current $ENV matches before invoking circusd)
 [env:datomic-transactor]
-JAVA_CMD = "java8"
 
 [watcher:datomic-transactor]
-cmd = transactor -Xmx4G -Xms4G datomic-free-transactor.properties
-
+cmd = transactor -Xmx6G -Xms4G datomic-free-transactor.properties
 numprocesses = 1
-use_sockets = True
 
 # debugging http://circus.readthedocs.org/en/latest/faq/#how-to-troubleshoot-circus
 stdout_stream.class = StdoutStream

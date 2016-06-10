@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import functools
-import gzip
-import itertools
 import os
+import psutil
+import shelve
 import subprocess
 
 from pkg_resources import resource_filename
@@ -11,8 +11,8 @@ import configobj
 import requests
 
 
-def _secho(message, **kw):
-    message = '🐛 -> {}'.format(message)
+def _secho(message, prefix='🐛  ', **kw):
+    message = '{} {}'.format(prefix, message)
     return click.secho(message, **kw)
 
 
@@ -22,26 +22,36 @@ echo_sig = functools.partial(click.secho, fg='green', bold=True)
 
 echo_waiting = functools.partial(_secho, nl=False)
 
+echo_warning = functools.partial(_secho,
+                                 prefix='⚠ WARNING!:', fg='yellow', bold=True)
+
 echo_retry = functools.partial(click.secho, fg='cyan')
 
 echo_error = functools.partial(_secho,
                                err=True,
-                               fg='yellow',
-                               bg='red',
+                               fg='red',
                                bold=True)
 
 pkgpath = functools.partial(resource_filename, __package__)
 
 install_path = functools.partial(os.path.join, '/datastore', 'wormbase')
 
+aws_state = functools.partial(shelve.open,
+                              os.path.join(os.getcwd(), '.db-migration.db'))
+
 
 class LocalCommandError(Exception):
     """Raised for commands that produce output on stderr."""
 
 
-def local(cmd, input=None, timeout=None, shell=True, output_decoding='utf-8'):
-    """Run a command locally.
-
+def local(cmd,
+          input=None,
+          timeout=None,
+          shell=True,
+          output_decoding='utf-8',
+          cwd=None):
+    """Run a command locally
+.
     :param cmd: The command to execute.
     :type cmd: str
     :param input: Optional text to pipe as input to `cmd`.
@@ -63,10 +73,11 @@ def local(cmd, input=None, timeout=None, shell=True, output_decoding='utf-8'):
     else:
         input_stream = None
     proc = subprocess.Popen(cmd,
-                            shell=shell,
                             stdin=subprocess.PIPE,
                             stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
+                            stderr=subprocess.PIPE,
+                            cwd=cwd,
+                            shell=shell)
     (out, err) = proc.communicate(input=input_stream, timeout=timeout)
     if proc.returncode != 0:
         raise LocalCommandError(err)
@@ -97,6 +108,7 @@ def option(*args, **kw):
 
 log_level_option = functools.partial(
     option,
+    '-l',
     '--log-level',
     type=click.Choice(choices=('DEBUG', 'INFO', 'WARNING', 'ERROR')),
     help='Logging level.')
@@ -129,22 +141,46 @@ def get_deploy_versions(purpose='default'):
     return dict(co)[purpose]
 
 
-def partition(iterable, n, fillvalue=None):
-    args = [iter(iterable)] * n
-    for seq in itertools.zip_longest(*args, fillvalue=fillvalue):
-        yield filter(os.path.isfile, seq)
+def jvm_mem_opts(pct_of_sys_mem):
+    bytes_free = psutil.virtual_memory().free
+    gb_free = bytes_free // (2 ** 30)
+    max_heap_size = round(gb_free * pct_of_sys_mem)
+    init_heap_size = max_heap_size
+    format_Gb = '{:d}G'.format
+    return ('-Xmx', format_Gb(max_heap_size),
+            '-Xms', format_Gb(init_heap_size))
 
 
-def sort_edn_log(path):
-    out_path = path.replace('.gz', '.sort.gz')
-    try:
-        with gzip.open(path) as fp:
-            lines = fp.readlines()
-        lines.sort()
-        with gzip.open(out_path, 'wb') as fp:
-            fp.write(gzip.compress(b''.join(lines)))
-        return True
-    finally:
-        if os.path.isfile(out_path):
-            os.remove(path)
-    return False
+class EC2InstanceCommandContext:
+
+    def __init__(self, *kw):
+        self.__dict__.update(kw)
+        self.versions = get_deploy_versions()
+
+    @property
+    def java_cmd(self):
+        return 'java -server ' + ' '.join(jvm_mem_opts(0.75))
+
+    @property
+    def pseudoace_jar_path(self):
+        jar_name = 'pseudoace-{[pseudoace]}.jar'.format(self.versions)
+        return os.path.join(self.path('pseudoace'), jar_name)
+
+    @property
+    def data_release_version(self):
+        return self.versions['acedb_database']
+
+    def datomic_url(self,
+                    db='',
+                    protocol='free',
+                    host='localhost',
+                    port='4334'):
+        db_name = db if db else self.data_release_version
+        url = 'datomic:{protocol}://{host}:{port}/{db}'
+        return url.format(protocol=protocol, host=host, port=port, db=db_name)
+
+    def path(self, artefact):
+        return install_path(self, artefact)
+
+
+pass_ec2_command_context = click.make_pass_decorator(EC2InstanceCommandContext)

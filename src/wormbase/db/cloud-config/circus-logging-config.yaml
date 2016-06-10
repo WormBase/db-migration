@@ -6,7 +6,7 @@ formatters:
 handlers:
   logfile:
     class: logging.FileHandler
-    filename: circus-datomic-tranasctor.log
+    filename: /datastore/wormbase/logs/circus-datomic-tranasctor.log
     level: DEBUG
     formatter: simple
 loggers:
