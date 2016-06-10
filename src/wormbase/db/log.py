@@ -35,11 +35,14 @@ class VerboseLogMethod:
 
     def __get__(self, obj, objtype=None):
         method = getattr(super(objtype, obj), self._name)
-        return functools.partial(self._dispatch, method)
 
-    def _dispatch(self, method, msg, *args, **kw):
-        self._printer(msg.format(*args, **kw))
-        return method(msg, *args, **kw)
+        def logprint_dispatch(method, msg, *args, **kw):
+            level = getattr(logging, self._name.upper())
+            if obj.logger.isEnabledFor(level):
+                self._printer(msg.format(*args, **kw))
+            return method(msg, *args, **kw)
+
+        return functools.partial(logprint_dispatch, method)
 
 
 class VerbosePrettyLogger(Logger):
@@ -60,9 +63,13 @@ def setup_logging(log_filename=None, log_level=logging.INFO):
                         format='{asctime:12s} {levelname:5s} {name} {message}',
                         style='{',
                         level=log_level)
-    util.echo_info('Logging to {}'.format(log_path))
+    root_logger = get_logger(__package__)
+    root_logger.setLevel(log_level)
+    root_logger.debug('Logging to {} at level {}',
+                      log_path,
+                      logging.getLevelName(root_logger.logger.level))
 
 
-def get_logger(namespace, verbose=True):
+def get_logger(namespace=None, verbose=True):
     adapter = VerbosePrettyLogger if verbose else Logger
     return adapter(logging.getLogger(namespace))
