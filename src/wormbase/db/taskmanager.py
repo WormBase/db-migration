@@ -246,7 +246,7 @@ def init(ctx,
     session = ctx.obj['session']
     state = ctx.obj['db-mig-state']
     ec2 = session.resource('ec2')
-    key_pair = ssh.recycle_key_pair(ec2, keypair_name)
+    (key_pair, key_pair_path) = ssh.recycle_key_pair(ec2, keypair_name)
     with open(USER_DATA_PATH) as fp:
         user_data = fp.read()
     instance_options = dict(
