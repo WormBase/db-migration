@@ -22,7 +22,6 @@ DB_MIG_GROUP_POLICIES = {
 
 logger = get_logger(__name__)
 
-# XXX: Danger: These names could be changed in the AWS console.
 DB_MIG_ROLE_POLICIES = {
     'DecodeAuthorizationMessages',
     'IAMReadOnlyAccess',

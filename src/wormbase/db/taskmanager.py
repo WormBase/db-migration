@@ -22,13 +22,12 @@ USER_DATA_PATH = resource_filename(
     __package__,
     'cloud-config/AWS-cloud-config-UserData.template')
 
+# Instance settings based on image of default Amazon AMI (ami-f5f41398, 2016)
 EC2_INSTANCE_DEFAULTS = dict(
-    # Based on image of default Amazon AMI (ami-f5f41398, 2016)
     ami='ami-1517ee78',
     instance_type='r3.4xlarge',
-    monitoring=False,
-    dry_run=False
-)
+    monitoring=True,
+    dry_run=False)
 
 EC2_INSTANCE_ROLE = 'development'
 
