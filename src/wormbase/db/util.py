@@ -171,6 +171,8 @@ class EC2InstanceCommandContext:
     def data_release_version(self):
         return self.versions['acedb_database']
 
+    path = staticmethod(install_path)
+
     def datomic_url(self,
                     db='',
                     protocol='free',
@@ -179,9 +181,6 @@ class EC2InstanceCommandContext:
         db_name = db if db else self.data_release_version
         url = 'datomic:{protocol}://{host}:{port}/{db}'
         return url.format(protocol=protocol, host=host, port=port, db=db_name)
-
-    def path(self, artefact):
-        return install_path(self, artefact)
 
 
 pass_ec2_command_context = click.make_pass_decorator(EC2InstanceCommandContext)
