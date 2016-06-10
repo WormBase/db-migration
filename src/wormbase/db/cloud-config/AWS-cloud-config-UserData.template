@@ -23,14 +23,15 @@ bootcmd:
 - chown ec2-user /datastore/wormbase
 
 runcmd:
-# hack to make the tace binary work on the latest Amazon AMI:
-#  Expects libreadline.so.5, which is not currently installable.
-- ln -s /lib64/libreadline.so.6 /lib64/libreadline.so.5
 - yum groupinstall -y "Development Tools"
-- pip3 install upgrade pip
+- update-alternatives --set java /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
+- pip3 install --upgrade pip
 - yum update -y
 - wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
 - sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
 - yum install -y apache-maven
+# hack to make the tace binary work on the latest Amazon AMI:
+#  Expects libreadline.so.5, which is not currently installable.
+- ln -s /lib64/libreadline.so.6 /lib64/libreadline.so.5
 
 output : { all : '| tee -a /var/log/cloud-init-output.log' }
