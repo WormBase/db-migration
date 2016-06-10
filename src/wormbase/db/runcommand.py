@@ -14,8 +14,8 @@ logger = log.get_logger(__name__, verbose=True)
 
 @util.command_group()
 @util.log_level_option()
-@util.pass_ec2_command_context
-def run(ctx, log_level, java_cmd):
+@click.pass_context
+def run(ctx, log_level):
     log.setup_logging(log_level=log_level)
     ctx.obj = util.EC2InstanceCommandContext()
 
@@ -58,7 +58,7 @@ def init_datomic_db(context, acedb_dump_dir):
 @run.command()
 @util.pass_ec2_command_context
 def setup(context):
-    util.local(['wb-db-install'] + list(context.versions))
+    util.local(['wb-db-mig-install'] + list(context.versions))
     acedb_dump_dir = context.path('acedb_dump')
     ctx = click.get_current_context()
     ctx.invoke(acedb_dump,
