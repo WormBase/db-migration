@@ -18,7 +18,7 @@ The following steps should be executed in order.
       AWS_PROFILE="${USER}"
       WB_DATA_RELEASE="WS254"
       WB_DB_RELEASE_TAG="0.1"
-      wb-db-migrationrate --profile $USER \
+      wb-db-migrate --profile $USER \
 		   init \
    		   "dist/wormbase-db-migration-${WB_DB_RELEASE}.tar.gz" \
 		   "${WB_DATA_RELEASE}"
@@ -111,7 +111,7 @@ The following steps should be executed in order.
 
    .. code-block:: bash
 
-      wb-db-migrationrate --profile $USER terminate
+      wb-db-migrate --profile $USER terminate
 
 
 Should all steps complete successfully, the migration process is now
