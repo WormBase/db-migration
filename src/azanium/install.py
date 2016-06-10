@@ -95,7 +95,7 @@ def install(ctx):
 
 
 @install.resultcallback()
-def pipeline(installers, log_level):
+def pipeline(installers):
     for install_command in installers:
         install_command()
 
