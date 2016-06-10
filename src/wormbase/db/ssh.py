@@ -5,9 +5,10 @@ import os
 import paramiko
 from botocore.exceptions import ClientError
 
+from . import util
 
 # Function to get the ssh key directory for a given user.
-# Defined as a function to allow change of user at point of invocation,
+# Defined as a fucntion to allow change of user at point of invocation,
 # (as opposed to the process owner)
 keypair_directory = functools.partial(os.path.expanduser, '~/.ssh')
 
