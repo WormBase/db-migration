@@ -37,7 +37,8 @@ def recycle_key_pair(ec2, key_pair_name):
     with open(key_pair_path, 'wb') as fp:
         fp.write(key_pair.key_material.encode('ascii'))
         os.chmod(fp.name, 0o600)
-    return key_pair
+    util.local('ssh-add ' + key_pair_path)
+    return (key_pair, key_pair_path)
 
 
 def connection(ec2_instance, timeout=180, username='ec2-user'):
