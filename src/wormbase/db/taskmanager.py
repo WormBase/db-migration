@@ -281,11 +281,8 @@ def init(ctx,
     bootstrap(instance, wb_db_migrate_version)
     util.echo_sig('done')
     report_status(instance)
-
-    # XXX: DEBUG
-    msg = 'ssh -i {0.key_pair.name} -l ec2-user {0.public_dns_name}'
+    msg = 'ssh -i -l ec2-user {0.public_dns_name}'
     logger.info(msg.format(instance))
-
     state['instance-state'] = dict(instance.state)
     return state
 
