@@ -76,7 +76,7 @@ to the role to be assumed:
   Allow decoding of error messages.
 
 `IAMReadOnlyAccess`
-  Allow listing of groups, users, roles and polciies.
+  Allow listing of groups, users, roles and policies.
 
 `ec2-manage-instances`
   Allow manipulation of EC2 instance profiles.
