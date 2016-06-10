@@ -6,6 +6,21 @@ Glossary
 .. glossary::
    :sorted:
 
+   azanium
+     The name of this software package.
+
+   `azanium admin`
+      The :term:`azanium` sub-command used to administer WormBase AWS
+      accounts for the database migration.
+
+   `azanium cloud`
+      The :term:`azanium` sub-command used from a client machine to
+      interact with :term:`AWS`.
+
+   `azanium run`
+      The :term:`azanium` sub-command used on an :term:`AWS`
+      :term:`EC2` instance in order to perform the database migration.
+
    AWS
       Amazon Web Services - the umbrella term for all of the Amazon
       services described in this project.
@@ -52,17 +67,6 @@ Glossary
    pseudoace
       The name of the software package used to migrate to the Datomic
       database.
-
-   wb-db-mig-admin
-      The command used to administer WormBase AWS accounts for the
-      database migration.
-
-   wb-db-migrate
-      The command used from a client machine to interact with :term:`AWS`.
-
-   wb-db-mig
-      The command used on an :term:`AWS` :term:`EC2` instance in order
-      to perform the database migration.
 
 
 .. _`Amazon Resource Name`: http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html

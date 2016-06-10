@@ -4,6 +4,7 @@ import json
 import click
 from botocore.exceptions import ClientError
 
+from . import root_command
 from . import awsiam
 from . import log
 from . import util
@@ -42,9 +43,8 @@ class AdminSession:
 pass_admin_session = click.make_pass_decorator(AdminSession)
 
 
-@util.command_group()
+@root_command.group()
 @util.option('--profile', default='default', help='aws profile name')
-@util.log_level_option()
 @click.option('-p',
               '--assume-role-policy-name',
               default=awsiam.DB_MIG_ROLE + '-assume',
@@ -63,8 +63,9 @@ pass_admin_session = click.make_pass_decorator(AdminSession)
              default=awsiam.DB_MIG_ROLE_POLICIES,
              help='Policies to be attached to the Role users assume.')
 @click.pass_context
-def admin(ctx, profile, log_level, **aws_meta):
-    log.setup_logging(log_level=log_level)
+def admin(ctx, profile, **aws_meta):
+    """Manage AWS IAM accounts for the WormBase database migration.
+    """
     ctx.obj = AdminSession(profile, **aws_meta)
 
 
@@ -169,6 +170,3 @@ def sync(session):
                                 role_name=aws_meta.role_name,
                                 group_name=group_name)
     util.echo_sig('done')
-
-
-cli = admin(obj={})

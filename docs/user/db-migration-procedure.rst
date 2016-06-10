@@ -12,19 +12,18 @@ The following steps should be executed in order.
 
 1. Provision and bootstrap an EC2 instance
 
-   The following `wb-db-migration` command below, when run, will print out
-   the ssh commands needed for the next step.
+   The following :term:`azanium` sub-command below, when run, will
+   print out the ssh commands needed for the next step.
 
    .. code-block:: bash
 
       AWS_PROFILE="${USER}"
       WB_DATA_RELEASE="WS254"
       WB_DB_RELEASE_TAG="0.1"
-      wb-db-mig-cloud \
-		   --profile $USER \
-		   init \
-      		   "dist/wormbase-db-migration-${WB_DB_RELEASE}.tar.gz" \
-		   "${WB_DATA_RELEASE}"
+      azanium cloud --profile $USER \
+		    init \
+      		    "dist/wormbase-db-migration-${WB_DB_RELEASE}.tar.gz" \
+		    "${WB_DATA_RELEASE}"
 
 .. _db-migration-step-2:
 
@@ -42,10 +41,10 @@ The following steps should be executed in order.
 
    .. code-block:: bash
 
-      tmux new-session -s wb-db-mig-commands \; detach
+      tmux new-session -s azanium-commands \; detach
 
       # Attach to the session to run commands
-      tmux attach-session -t wb-db-mig-commands
+      tmux attach-session -t azanium-commands
 
    Install all required software and data (:term:`ACeDB`,
    :term:`Datomic`, :term:`pseudoace`),
@@ -56,7 +55,7 @@ The following steps should be executed in order.
 
    .. code-block:: bash
 
-      wb-db-mig setup
+      azanium run setup
 
    Sort the EDN log files by timestamp:
 
@@ -64,7 +63,7 @@ The following steps should be executed in order.
 
    .. code-block:: bash
 
-      wb-db-mig sort-edn-logs
+      azanium run sort-edn-logs
 
    Import the sorted EDN logs into datomic.
 
@@ -72,7 +71,7 @@ The following steps should be executed in order.
 
    .. code-block:: bash
 
-      wb-db-mig import-logs
+      azanium run import-logs
 
 
 .. _db-migration-step-3:
@@ -81,7 +80,7 @@ The following steps should be executed in order.
 
    .. code-block:: bash
 
-      wb-db-mig qa-report
+      azanium run qa-report
 
    Examine the report outputted by the previous command.
    Check the output of the report before continuing
@@ -97,7 +96,7 @@ The following steps should be executed in order.
 
    .. code-block:: bash
 
-      wb-db-mig backup-db
+      azanium run backup-db
 
    Exit the :term:`tmux` or :term:`screen` session and log off the EC2
    instance.
@@ -112,7 +111,7 @@ The following steps should be executed in order.
 
    .. code-block:: bash
 
-      wb-db-mig-cloud --profile $USER terminate
+      azanium cloud --profile $USER terminate
 
 
 Should all steps complete successfully, the migration process is now

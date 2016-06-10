@@ -12,6 +12,7 @@ from pkg_resources import resource_filename
 from scp import SCPClient
 import click
 
+from . import root_command
 from . import awsiam
 from . import log
 from . import ssh
@@ -178,8 +179,7 @@ def report_status(instance):
                     instance.public_ip_address)
 
 
-@util.command_group()
-@util.log_level_option(default='INFO')
+@root_command.group()
 @util.option('--profile',
              default='default',
              help='AWS profile')
@@ -187,8 +187,8 @@ def report_status(instance):
              default=awsiam.DB_MIG_ROLE,
              help='AWS Role that will be assumed to execute the migrate')
 @click.pass_context
-def tasks(ctx, log_level, profile, assume_role):
-    log.setup_logging(log_level=log_level)
+def cloud(ctx, profile, assume_role):
+    """AWS EC2 operations for the WormBase database migration."""
     ctx.obj['profile'] = profile
     session = awsiam.make_session(profile_name=profile)
     iam = session.resource('iam')
@@ -208,7 +208,7 @@ def tasks(ctx, log_level, profile, assume_role):
     ctx.obj['db-mig-state'] = util.aws_state()
 
 
-@tasks.command(short_help='Start the migrate process')
+@cloud.command(short_help='Start the migrate process')
 @util.option('--wb-db-migrate-version',
              default='0.1',
              help='The version of *this* python package')
@@ -263,7 +263,7 @@ def init(ctx,
     instance = next(iter(instances))
     instance.create_tags(Tags=[
         dict(Key='CreatedBy', Value=created_by),
-        dict(Key='Name', Value='wb-db-migrate-experimental'),
+        dict(Key='Name', Value='wb-db-migrate'),
         dict(Key='Role', Value=EC2_INSTANCE_ROLE)])
     state[instance.id] = dict(id=instance.id,
                               init_options=instance_options,
@@ -287,7 +287,7 @@ def init(ctx,
     return state
 
 
-@tasks.command(short_help='Terminate ephemeral EC2 resources')
+@cloud.command(short_help='Terminate ephemeral EC2 resources')
 @click.pass_context
 def terminate(ctx):
     with latest_migration_state(ctx) as (instance, state):
@@ -305,7 +305,7 @@ def terminate(ctx):
         util.echo_info(msg.format(instance, instance.state))
 
 
-@tasks.command('view-state',
+@cloud.command('view-state',
                short_help='Describe the state of the instance.')
 @click.pass_context
 def view_state(ctx):
@@ -313,11 +313,8 @@ def view_state(ctx):
         util.echo_info(pprint.pformat(state))
 
 
-@tasks.command(short_help='Describes the status of the instance.')
+@cloud.command(short_help='Describes the status of the instance.')
 @click.pass_context
 def status(ctx):
     with latest_migration_state(ctx) as (instance, _):
         report_status(instance)
-
-
-cli = tasks(obj={})

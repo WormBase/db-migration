@@ -15,9 +15,9 @@ import zipfile
 import click
 
 from . import github
+from . import root_command
 from .log import get_logger
 from .log import setup_logging
-from .util import command_group
 from .util import download
 from .util import get_deploy_versions
 from .util import install_path
@@ -83,11 +83,15 @@ def installer(func):
     return functools.update_wrapper(command_proxy, func)
 
 
-@command_group(chain=True, invoke_without_command=False)
-@log_level_option(default='INFO')
+@root_command.group(chain=True, invoke_without_command=False)
 @click.pass_context
-def install(ctx, log_level):
-    setup_logging(log_level=log_level)
+def install(ctx):
+    """Software installers for the WormBase database migration.
+
+    All software will be installed under a common path:
+
+       /datastore/wormbase
+    """
 
 
 @install.resultcallback()
@@ -142,7 +146,7 @@ def acedb_database(meta,
         fp.write(username + os.linesep)
 
 
-@install.command(short_help='Installs the ACeDB "tace" binary')
+@install.command(short_help='Install the ACeDB "tace" binary')
 @option('-t', '--url-template',
         default=('ftp://ftp.sanger.ac.uk/pub/acedb/MONTHLY/'
                  'ACEDB-binaryLINUX_{version}.tar.gz'),
@@ -223,6 +227,3 @@ def pseudoace(meta):
     shutil.rmtree(install_dir)
     shutil.move(src_path, install_dir)
     logger.info('Extracted pseudoace-{} to {}', tag, install_dir)
-
-
-cli = install()

@@ -13,7 +13,7 @@ CHANGES = _read_file('CHANGES.rst')
 INSTALL_REQUIRES = _read_file('requirements.txt').splitlines()
 
 setup(
-    name='wormbase-db-migration',
+    name='azanium',
     version='0.1.dev0',
     url='http://www.wormmbase.org/',
     author='Matt Russell, EMBL-EBI',
@@ -31,10 +31,7 @@ setup(
     install_requires=INSTALL_REQUIRES,
     entry_points={
         'console_scripts': [
-            'wb-db-mig-cloud=wormbase.db.taskmanager:cli',
-            'wb-db-mig-install=wormbase.db.install:cli',
-            'wb-db-mig=wormbase.db.runcommand:cli',
-            'wb-db-mig-admin=wormbase.db.admin:cli'
+            'azanium=azanium.__main__:cli',
         ],
     },
     zip_safe=False,
@@ -55,7 +52,7 @@ setup(
             'Sphinx',
             # 'sphinx_bootstrap_theme',
             'sphinx_rtd_theme',
-            'zest.releaser[recommended]'
+            'zest.releaser[recommended]',
         ]
     }
 )

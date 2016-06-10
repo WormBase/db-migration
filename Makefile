@@ -15,6 +15,7 @@ uninstall: $(call print-help,uninstall,un-installs the Python package)
 
 clean: $(call print-help,clean,Cleans build artefacts)
 	rm -rf build dist
+	find . -type f \( -name '*~' -or -name '*.pyc'  \) -delete
 
 dev-docs: $(call print-help,dev-docs,Builds the documentation for users)
 	  cd docs/dev; make clean html man text

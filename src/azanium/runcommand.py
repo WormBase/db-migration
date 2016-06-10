@@ -3,6 +3,7 @@ import psutil
 
 import click
 
+from . import root_command
 from . import datomic
 from . import log
 from . import pseudoace
@@ -12,11 +13,11 @@ from . import util
 logger = log.get_logger(__name__, verbose=True)
 
 
-@util.command_group()
-@util.log_level_option()
+@root_command.group()
 @click.pass_context
-def run(ctx, log_level):
-    log.setup_logging(log_level=log_level)
+def run(ctx):
+    """Execute database migration on an ephemeral AWS EC2 instance.
+    """
     ctx.obj = util.EC2InstanceCommandContext()
 
 
@@ -58,7 +59,7 @@ def init_datomic_db(context, acedb_dump_dir):
 @run.command()
 @util.pass_ec2_command_context
 def setup(context):
-    util.local(['wb-db-mig-install'] + list(context.versions))
+    util.local(['azanium', 'install'] + list(context.versions))
     acedb_dump_dir = context.path('acedb_dump')
     ctx = click.get_current_context()
     ctx.invoke(acedb_dump,
@@ -88,6 +89,3 @@ def qa_report(context, build_data_path):
 def backup_database(context):
     os.chdir(context.path('datomic_free'))
     datomic.backup_db(context.data_release_version, logger)
-
-
-cli = run()

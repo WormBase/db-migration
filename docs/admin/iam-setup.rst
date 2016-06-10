@@ -1,6 +1,6 @@
-=====================
-:term:`AWS` IAM setup
-=====================
+=============
+AWS IAM setup
+=============
 The following instructions assume a fresh-setup of the database
 migration, with no pre-existing groups, users, roles or policies
 defined.
@@ -22,8 +22,8 @@ The rationale
    permissions required to perform the build; thus it is best that they
    are granted the ability to perform these operations only when needed.
 
-:term:`IAM` admin tool (wb-db-mig-admin)
-====================================
+IAM admin tool (`azanium admin`)
+================================
 For convenience, the `wormbase-db-migration` package provides a
 :term:`CLI` for performing the *minimal* :term:`IAM` configuration
 necessary for a migration to be performed.
@@ -31,8 +31,19 @@ necessary for a migration to be performed.
 .. code-block:: bash
 
    # Obtain a copy of the tar-file for code and run:
-   pip3 install --user wormbase-db-migration.tar.gz
-   wb-db-mig-admin setup
+   AZANIUM_VERSION="0.1"  # example. use latest github release tag
+   pip3 install --user "azanium-${AZANIUM_VERSION}.tar.gz"
+   azanium admin setup
+
+.. ATTENTION::
+   The remainder of this document provides a walk-through of how one
+   would work with :term:`AWS` :term:`IAM` scheme employed by
+   :term:`azanium admin`.
+
+   The commands below should not need to be used in normal
+   circumstances.  This is because using Amazon's AssumeRole API
+   requires specification of an :term:`ARN` when forming relationships
+   between trusted entities in :term:`IAM`.
 
 Initial configuration
 =====================

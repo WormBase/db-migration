@@ -15,9 +15,9 @@ system package manager, you'll need to install an extra package:
    sudo apt-get install python3-venv
 
 
-.. TODO::
+.. note::
 
-   Document use of virtualenvwrapper
+   You may find that virtualenvwrapper_ is a more convenient tool.
 
 Create a virtualenv:
 
@@ -25,7 +25,7 @@ Create a virtualenv:
 
    VENV_HOME="~/.virtualenv"
    mkdir -p "${VENV_HOME}"
-   VENV="${VENV_HOME}/wormbase-db-migration"
+   VENV="${VENV_HOME}/azanium"
    python3 -m venv "${VENV}"
    # Activate the virtualenv (type deactivate to return to normal shell)
    source "${VENV}/bin/activate"
@@ -44,3 +44,4 @@ Install the source code in "editable" mode.
 
 
 .. _virtualenv: http://docs.python-guide.org/en/latest/dev/virtualenvs/
+.. _virtualenvwrapper: https://virtualenvwrapper.readthedocs.io/en/latest/
