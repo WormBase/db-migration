@@ -18,11 +18,11 @@ The following steps should be executed in order.
       AWS_PROFILE="${USER}"
       WB_DATA_RELEASE="WS254"
       WB_DB_RELEASE_TAG="0.1"
-      wb-db-migrate --profile $USER \
+      wb-db-mig-cloud \
+		   --profile $USER \
 		   init \
-   		   "dist/wormbase-db-migration-${WB_DB_RELEASE}.tar.gz" \
+      		   "dist/wormbase-db-migration-${WB_DB_RELEASE}.tar.gz" \
 		   "${WB_DATA_RELEASE}"
-
 
 .. _db-migration-step-2:
 
@@ -40,10 +40,10 @@ The following steps should be executed in order.
    .. code-block:: bash
 
       # Create a new tmux session for watching logs, detach immediately
-      tmux new-session -s wb-db-run-logs \; detach
+      tmux new-session -s wb-db-mig-logs \; detach
 
       # Create a new tmux session for issuing commands
-      tmux new-session -s wb-db-run \; detach
+      tmux new-session -s wb-db-mig \; detach
 
 
    Install all required software and data (:term:`ACeDB`,
@@ -55,7 +55,7 @@ The following steps should be executed in order.
 
    .. code-block:: bash
 
-      wb-db-run setup
+      wb-db-mig setup
 
    Sort the EDN log files by timestamp:
 
@@ -63,7 +63,7 @@ The following steps should be executed in order.
 
    .. code-block:: bash
 
-      wb-db-run sort-edn-logs
+      wb-db-mig sort-edn-logs
 
    Import the sorted EDN logs into datomic.
 
@@ -71,7 +71,7 @@ The following steps should be executed in order.
 
    .. code-block:: bash
 
-      wb-db-run import-logs
+      wb-db-mig import-logs
 
 
 .. _db-migration-step-3:
@@ -80,7 +80,7 @@ The following steps should be executed in order.
 
    .. code-block:: bash
 
-      wb-db-run qa-report
+      wb-db-mig qa-report
 
    Examine the report outputted by the previous command.
    Check the output of the report before continuing
@@ -96,7 +96,7 @@ The following steps should be executed in order.
 
    .. code-block:: bash
 
-      wb-db-run backup-db
+      wb-db-mig backup-db
 
    Exit the :term:`tmux` or :term:`screen` session and log off the EC2
    instance.
@@ -111,7 +111,7 @@ The following steps should be executed in order.
 
    .. code-block:: bash
 
-      wb-db-migrate --profile $USER terminate
+      wb-db-mig-cloud --profile $USER terminate
 
 
 Should all steps complete successfully, the migration process is now

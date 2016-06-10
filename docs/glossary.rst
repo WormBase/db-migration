@@ -53,14 +53,14 @@ Glossary
       The name of the software package used to migrate to the Datomic
       database.
 
-   wb-db-admin
+   wb-db-mig-admin
       The command used to administer WormBase AWS accounts for the
       database migration.
 
    wb-db-migrate
       The command used from a client machine to interact with :term:`AWS`.
 
-   wb-db-run
+   wb-db-mig
       The command used on an :term:`AWS` :term:`EC2` instance in order
       to perform the database migration.
 

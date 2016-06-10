@@ -22,7 +22,7 @@ The rationale
    permissions required to perform the build; thus it is best that they
    are granted the ability to perform these operations only when needed.
 
-:term:`IAM` admin tool (wb-db-admin)
+:term:`IAM` admin tool (wb-db-mig-admin)
 ====================================
 For convenience, the `wormbase-db-migration` package provides a
 :term:`CLI` for performing the *minimal* :term:`IAM` configuration
@@ -32,7 +32,7 @@ necessary for a migration to be performed.
 
    # Obtain a copy of the tar-file for code and run:
    pip3 install --user wormbase-db-migration.tar.gz
-   wb-db-admin setup
+   wb-db-mig-admin setup
 
 Initial configuration
 =====================

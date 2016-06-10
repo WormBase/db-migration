@@ -26,10 +26,10 @@ setup(
     install_requires=INSTALL_REQUIRES,
     entry_points={
         'console_scripts': [
-            'wb-db-migrate=wormbase.db.taskmanager:cli',
-            'wb-db-install=wormbase.db.install:cli',
-            'wb-db-run=wormbase.db.runcommand:cli',
-            'wb-db-admin=wormbase.db.admin:cli'
+            'wb-db-mig-cloud=wormbase.db.taskmanager:cli',
+            'wb-db-mig-install=wormbase.db.install:cli',
+            'wb-db-mig=wormbase.db.runcommand:cli',
+            'wb-db-mig-admin=wormbase.db.admin:cli'
         ],
     },
     zip_safe=False,
