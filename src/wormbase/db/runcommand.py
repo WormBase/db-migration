@@ -12,9 +12,9 @@ from . import util
 logger = log.get_logger(__name__, verbose=True)
 
 
-@click.group()
+@util.command_group()
 @util.log_level_option()
-@click.pass_ec2_command_context
+@util.pass_ec2_command_context
 def run(ctx, log_level, java_cmd):
     log.setup_logging(log_level=log_level)
     ctx.obj = util.CommandContext()

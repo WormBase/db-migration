@@ -184,3 +184,7 @@ class EC2InstanceCommandContext:
 
 
 pass_ec2_command_context = click.make_pass_decorator(EC2InstanceCommandContext)
+
+command_group = functools.partial(click.group, context_settings={
+    'help_option_names': ['-h', '--help']
+})

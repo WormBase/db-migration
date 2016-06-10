@@ -179,7 +179,7 @@ def report_status(instance):
                     instance.public_ip_address)
 
 
-@click.group()
+@util.command_group()
 @util.log_level_option(default='INFO')
 @util.option('--profile',
              default='default',
@@ -309,7 +309,8 @@ def terminate(ctx):
         util.echo_info(msg.format(instance, instance.state))
 
 
-@tasks.command(short_help='Describe the state of the instance.')
+@tasks.command('view-state',
+               short_help='Describe the state of the instance.')
 @click.pass_context
 def view_state(ctx):
     with latest_migration_state(ctx) as (_, state):

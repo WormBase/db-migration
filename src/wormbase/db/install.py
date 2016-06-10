@@ -17,6 +17,7 @@ import click
 from . import github
 from .log import get_logger
 from .log import setup_logging
+from .util import command_group
 from .util import download
 from .util import get_deploy_versions
 from .util import install_path
@@ -82,7 +83,7 @@ def installer(func):
     return functools.update_wrapper(command_proxy, func)
 
 
-@click.group(chain=True, invoke_without_command=False)
+@command_group(chain=True, invoke_without_command=False)
 @log_level_option(default='INFO')
 @click.pass_context
 def install(ctx, log_level):
