@@ -18,8 +18,13 @@ setup(
     url='http://www.wormbase.org/',
     author='Matt Russell, EMBL-EBI',
     author_email='matthew.russell@wormbase.org',
-    description='Migration of the WormBase ACeDB database to Datomic',
+    description='WormBase Database Migration Tools',
+    long_description="""\
+    Provides command line interfaces to run the database migration steps
+    for converting the WormBase ACeDB database to Datomic.
+    """,
     license='MIT',
+    keywords='WormBase, ACeDB, C. Elegans, Model Organisms',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,
@@ -49,7 +54,8 @@ setup(
         'dev': [
             'Sphinx',
             # 'sphinx_bootstrap_theme',
-            'sphinx_rtd_theme'
+            'sphinx_rtd_theme',
+            'zest.releaser[recommended]'
         ]
     }
 )
