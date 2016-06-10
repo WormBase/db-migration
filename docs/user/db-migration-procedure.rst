@@ -39,14 +39,13 @@ The following steps should be executed in order.
    Use the `ssh-add` and `ssh` commands printed from step 1, then issue
    the following commands in either `screen` or `tmux`.
 
+
    .. code-block:: bash
 
-      # Create a new tmux session for watching logs, detach immediately
-      tmux new-session -s wb-db-mig-logs \; detach
+      tmux new-session -s wb-db-mig-commands \; detach
 
-      # Create a new tmux session for issuing commands
-      tmux new-session -s wb-db-mig \; detach
-
+      # Attach to the session to run commands
+      tmux attach-session -t wb-db-mig-commands
 
    Install all required software and data (:term:`ACeDB`,
    :term:`Datomic`, :term:`pseudoace`),
