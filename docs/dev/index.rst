@@ -10,6 +10,7 @@ Development
    coding-style.rst
    testing.rst
    documentation.rst
+   releases.rst
    misc.rst
 
 .. toctree::
