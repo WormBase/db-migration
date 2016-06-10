@@ -6,6 +6,8 @@ Database Migration Procedure
 ============================
 The following steps should be executed in order.
 
+.. note:: You must have ``ssh-agent`` running in your shell session.
+
 .. _db-migration-step-1:
 
 1. Provision and bootstrap an EC2 instance
