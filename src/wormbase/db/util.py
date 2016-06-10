@@ -110,6 +110,7 @@ log_level_option = functools.partial(
     option,
     '-l',
     '--log-level',
+    default='INFO',
     type=click.Choice(choices=('DEBUG', 'INFO', 'WARNING', 'ERROR')),
     help='Logging level.')
 
