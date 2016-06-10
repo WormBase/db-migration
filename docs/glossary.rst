@@ -39,7 +39,8 @@ Glossary
       Command Line Interface.
 
    screen
-      The most infamous program used to preserve sessions on remote hosts.
+      The most infamous program used to preserve sessions on remote
+      hosts.
 
    tmux
       A newer program used to preserve sessions on remote hosts with
@@ -49,7 +50,12 @@ Glossary
       A daemon that runs the circus_ process watcher.
 
    pseudoace
-      The name of the software package used to migrate to the Datomic database.
+      The name of the software package used to migrate to the Datomic
+      database.
+
+   wb-db-admin
+      The command used to administer WormBase AWS accounts for the
+      database migration.
 
    wb-db-migrate
       The command used from a client machine to interact with :term:`AWS`.

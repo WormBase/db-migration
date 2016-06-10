@@ -1,6 +1,6 @@
-=============
-AWS IAM setup
-=============
+=====================
+:term:`AWS` IAM setup
+=====================
 The following instructions assume a fresh-setup of the database
 migration, with no pre-existing groups, users, roles or policies
 defined.
@@ -12,28 +12,27 @@ defined.
           thus all custom ARNs have been elided within all examples.
 
 Design
-======
-We attempt to follow best-practice in regard to security, thus;
-the scheme for creating the requisite resources for database migration
-involves a user `assuming a role_` rather then they, or their group
-having the permission to perform all the required operations directly.
+  We attempt to follow best-practice in regard to security, thus;
+  the scheme for creating the requisite resources for database migration
+  involves a user `assuming a role_` as opposed to permission to perform
+  all the required operations directly being attached to a user or group.
 
-The rationale is that users do not typically require the full set of
-permissions required to perform the build; thus it is best that they
-are granted the ability to perform these operations only when needed.
+The rationale
+   users do not typically require the full set of
+   permissions required to perform the build; thus it is best that they
+   are granted the ability to perform these operations only when needed.
 
-:term:`IAM` setup tool
-======================
+:term:`IAM` admin tool (wb-db-admin)
+====================================
 For convenience, the `wormbase-db-migration` package provides a
 :term:`CLI` for performing the *minimal* :term:`IAM` configuration
 necessary for a migration to be performed.
 
 .. code-block:: bash
 
-   # Obtain a copy of the tarfile for code and run:
+   # Obtain a copy of the tar-file for code and run:
    pip3 install --user wormbase-db-migration.tar.gz
-   wb-db-migrate setup_iam
-
+   wb-db-admin setup
 
 Initial configuration
 =====================
@@ -60,7 +59,6 @@ This should be the only policy attached to this group.
    iam attach-group-policy \
 		--group-name="${GROUP_NAME}" \
 		--policy_arn="arn:aws:iam::aws:policy/IAMReadOnlyAccess"
-
 
 Create the role to be assumed
 =============================
@@ -156,7 +154,6 @@ This policy allows states that the role is allowed to be assumed.
           "Resource": "arn:aws:iam::...:role/wb-db-migrator"
       }]
     }
-
 
 
 .. _`assuming a role`: http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-console.html
