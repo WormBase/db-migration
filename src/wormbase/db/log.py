@@ -6,7 +6,7 @@ import sys
 from . import util
 
 
-class Message(object):
+class Message:
 
     def __init__(self, fmt, args):
         self.fmt = fmt
