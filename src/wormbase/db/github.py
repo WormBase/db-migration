@@ -1,6 +1,4 @@
 import os
-import sys
-
 import github3
 
 from .util import download
@@ -9,7 +7,7 @@ from .util import download
 def download_release_binary(repo_path, tag, to_directory=None):
     """Download a release binary from `repo_path` to `to_directory`.
 
-    `to_directory` will be the current working directory by default.
+    `to_directory` will be the current working direcnutory by default.
 
     Assumes that a binary release has been attached to a release.
 
@@ -34,12 +32,3 @@ def download_release_binary(repo_path, tag, to_directory=None):
     local_filename = download_url.rsplit('/')[-1]
     local_path = os.path.join(to_directory, local_filename)
     return download(download_url, local_path)
-
-
-if __name__ == '__main__':
-    try:
-        download_release_binary(sys.argv[1])
-    except IndexError:
-        print('Usage:', sys.executable, '<GIT TAG>')
-        sys.exit(1)
-
