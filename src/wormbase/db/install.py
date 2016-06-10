@@ -96,7 +96,7 @@ def pipeline(installers, log_level):
         install_command()
 
 
-@install.command(short_help='Installs the ACeDB database')
+@install.command(short_help='Install ACeDB.')
 @option('--ftp-host',
         default='ftp.ebi.ac.uk',
         help='FTP hostname for ACeDB data.')
@@ -111,6 +111,7 @@ def acedb_database(meta,
                    ftp_host,
                    remote_path_template,
                    file_selector_regexp):
+    """Install ACeDB."""
     download_dir = meta.download_dir
     install_dir = meta.install_dir
     format_path = remote_path_template.format
@@ -148,6 +149,7 @@ def acedb_database(meta,
         help='URL for versioned ACeDB binaries')
 @installer
 def tace(meta, url_template):
+    """Install the ACeDB "tace" binary program."""
     install_dir = meta.install_dir
     download_dir = meta.download_dir
     version = meta.version
@@ -165,12 +167,13 @@ def tace(meta, url_template):
     _make_executable(os.path.join(install_dir, 'tace'), logger)
 
 
-@install.command(short_help='Installs datomic-free')
+@install.command(short_help='Install datomic-free')
 @option('-t', '--url-template',
         default='https://my.datomic.com/downloads/free/{version}',
         help='URL template for Datomic Free version')
 @installer
 def datomic_free(meta, url_template):
+    """Install Datomic (free version)."""
     install_dir = meta.install_dir
     version = meta.version
     url = url_template.format(version=version)
@@ -198,9 +201,10 @@ def datomic_free(meta, url_template):
     logger.debug(mvn_install_out)
 
 
-@install.command(short_help='Installs pseudoace')
+@install.command(short_help='Install pseudoace')
 @installer
 def pseudoace(meta):
+    """Install pseudoace."""
     download_dir = meta.download_dir
     install_dir = meta.install_dir
     tag = meta.version
