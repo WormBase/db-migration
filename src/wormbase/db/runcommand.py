@@ -17,7 +17,7 @@ logger = log.get_logger(__name__, verbose=True)
 @util.pass_ec2_command_context
 def run(ctx, log_level, java_cmd):
     log.setup_logging(log_level=log_level)
-    ctx.obj = util.CommandContext()
+    ctx.obj = util.EC2InstanceCommandContext()
 
 
 @run.command()
