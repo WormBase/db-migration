@@ -141,10 +141,10 @@ def get_deploy_versions(purpose='default'):
     return dict(co)[purpose]
 
 
-def jvm_mem_opts(pct_of_sys_mem):
+def jvm_mem_opts(pct_of_free_mem):
     bytes_free = psutil.virtual_memory().free
     gb_free = bytes_free // (2 ** 30)
-    max_heap_size = round(gb_free * pct_of_sys_mem)
+    max_heap_size = round(gb_free * pct_of_free_mem)
     init_heap_size = max_heap_size
     format_Gb = '{:d}G'.format
     return ('-Xmx', format_Gb(max_heap_size),
