@@ -1,15 +1,16 @@
 
-.. _build-steps:
+.. _db-migration-steps:
 
-Build Steps
-===========
+============================
+Database Migration Procedure
+============================
 The following steps should be executed in order.
 
-.. _build-step-1:
+.. _db-migration-step-1:
 
-1. Bootstrap an EC2 instance for performing the build
+1. Provision and bootstrap an EC2 instance
 
-   The following `wb-db-build` command below, when run, will print out
+   The following `wb-db-migration` command below, when run, will print out
    the ssh commands needed for the next step.
 
    .. code-block:: bash
@@ -17,15 +18,15 @@ The following steps should be executed in order.
       AWS_PROFILE="${USER}"
       WB_DATA_RELEASE="WS254"
       WB_DB_RELEASE_TAG="0.1"
-      wb-db-build --profile $USER \
+      wb-db-migrationrate --profile $USER \
 		   init \
-   		   "dist/wormbase-db-build-${WB_DB_RELEASE}.tar.gz" \
+   		   "dist/wormbase-db-migration-${WB_DB_RELEASE}.tar.gz" \
 		   "${WB_DATA_RELEASE}"
 
 
-.. _build-step-2:
+.. _db-migration-step-2:
 
-2. Connect to the EC2 instance using ssh, run build commands
+2. Connect to the EC2 instance using ssh, run db-migration commands
 
    .. note::
 	The commands below will emit their current progress to the console,
@@ -50,6 +51,8 @@ The following steps should be executed in order.
    Dump `.ace` files from the current :term:`ACeDB` data release, create a
    new :term:`Datomic` database and converts all .ace files into EDN format:
 
+   .. attention:: The following command will take approximately 5-8 hours
+
    .. code-block:: bash
 
       wb-db-run setup
@@ -71,7 +74,7 @@ The following steps should be executed in order.
       wb-db-run import-logs
 
 
-.. _build-step-3:
+.. _db-migration-step-3:
 
 3. Run the QA report on the newly created database
 
@@ -81,14 +84,14 @@ The following steps should be executed in order.
 
    Examine the report outputted by the previous command.
    Check the output of the report before continuing
-   with :ref:`the next step <build-step-4>`.
+   with :ref:`the next step <db-migration-step-4>`.
 
-.. _build-step-4:
+.. _db-migration-step-4:
 
 4. Backup the database to :term:`S3` for use by the web team.
 
    Should you be content with the output of the QA
-   report in :ref:`previous step <build-step-3>`, proceed to
+   report in :ref:`previous step <db-migration-step-3>`, proceed to
    create a backup of the :term:`Datomic` database to :term:`S3`:
 
    .. code-block:: bash
@@ -98,7 +101,7 @@ The following steps should be executed in order.
    Exit the :term:`tmux` or :term:`screen` session and log off the EC2
    instance.
 
-.. _build-step-5:
+.. _db-migration-step-5:
 
 5. Terminate the EC2 instance
 
@@ -108,12 +111,12 @@ The following steps should be executed in order.
 
    .. code-block:: bash
 
-      wb-db-build --profile $USER terminate
+      wb-db-migrationrate --profile $USER terminate
 
 
 Should all steps complete successfully, the migration process is now
 complete.
 
-If you stopped after :ref:`Step 4 <build-step-4>` due to data
+If you stopped after :ref:`Step 4 <db-migration-step-4>` due to data
 inconsistency, or an error occurred during any of the other steps,
-please ensure to eventually run :ref:`Step 5 <build-step-5>`.
+please ensure to eventually run :ref:`Step 5 <db-migration-step-5>`.
