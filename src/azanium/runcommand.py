@@ -62,9 +62,7 @@ def setup(context):
     util.local(['azanium', 'install'] + list(context.versions))
     acedb_dump_dir = context.path('acedb_dump')
     ctx = click.get_current_context()
-    ctx.invoke(acedb_dump,
-               dump_dir=acedb_dump_dir,
-               db_directory=context.path('acedb_database'))
+    ctx.invoke(acedb_dump, dump_dir=acedb_dump_dir)
     ctx.invoke(init_datomic_db, acedb_dump_dir, java_cmd=context.java_cmd)
 
 
