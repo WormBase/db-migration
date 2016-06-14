@@ -37,13 +37,15 @@ necessary for a migration to be performed.
 
 .. ATTENTION::
    The remainder of this document provides a walk-through of how one
-   would work with :term:`AWS` :term:`IAM` scheme employed by
-   :term:`azanium admin`.
+   would manually setup the  :term:`AWS` :term:`IAM` scheme.
+   The  :term:`azanium admin` automates this.
 
-   The commands below should not need to be used in normal
-   circumstances.  This is because using Amazon's AssumeRole API
-   requires specification of an :term:`ARN` when forming relationships
-   between trusted entities in :term:`IAM`.
+   The commands shown below illustrate the steps required to configure
+   IAM such that users can use the `AssumeRole` API.
+
+   The `azanium admin` command was written, as the formation of these
+   policies require specification of a fully-qualified :term:`ARN`
+   when forming relationships between trusted entities in :term:`IAM`.
 
 Initial configuration
 =====================
