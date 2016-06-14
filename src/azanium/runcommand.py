@@ -14,7 +14,7 @@ logger = log.get_logger(__name__, verbose=True)
 
 
 @root_command.group()
-@util.pass_ec2_command_context
+@util.pass_command_context
 def run(ctx):
     """Execute database migration on an ephemeral AWS EC2 instance.
     """
@@ -26,7 +26,7 @@ def run(ctx):
              default='-s -T -C',
              help='tace "Dump" command options')
 @click.argument('dump_dir')
-@util.pass_ec2_command_context
+@util.pass_command_context
 def acedb_dump(context, dump_dir, tace_dump_options):
     db_directory = context.path('acedb_database')
     os.makedirs(dump_dir, exist_ok=True)
@@ -40,7 +40,7 @@ def acedb_dump(context, dump_dir, tace_dump_options):
 
 @run.command()
 @click.argument('dump_dir')
-@util.pass_ec2_command_context
+@util.pass_command_context
 def acedb_compress_dump(context, dump_dir):
     gzip_cmd = ['find', dump_dir, '-type', 'f', '-name', '"*.ace"']
     gzip_cmd.extend([
@@ -52,7 +52,7 @@ def acedb_compress_dump(context, dump_dir):
 
 @run.command('init-datomic-db')
 @click.argument('acedb_dump_dir')
-@util.pass_ec2_command_context
+@util.pass_command_context
 def init_datomic_db(context, acedb_dump_dir):
     edn_logs_dir = context.path('edn_logs')
     datomic.configure_transactor(context, logger)
@@ -63,7 +63,7 @@ def init_datomic_db(context, acedb_dump_dir):
                                      logger)
 
 @run.command()
-@util.pass_ec2_command_context
+@util.pass_command_context
 def setup(context):
     util.local(['azanium', 'install'] + list(context.versions))
     acedb_dump_dir = context.path('acedb_dump')
@@ -73,20 +73,20 @@ def setup(context):
 
 
 @run.command('sort-edn-logs')
-@util.pass_ec2_command_context
+@util.pass_command_context
 def sort_edn_logs(context):
     pseudoace.sort_edn_logs(context, logger)
 
 
 @run.command('qa-report')
 @util.option('-b', '--build-data-path')
-@util.pass_ec2_command_context
+@util.pass_command_context
 def qa_report(context, build_data_path):
     pseudoace.qa_report(context.java_cmd, logger)
 
 
 @run.command('backup-database')
-@util.pass_ec2_command_context
+@util.pass_command_context
 def backup_database(context):
     os.chdir(context.path('datomic_free'))
     datomic.backup_db(context.data_release_version, logger)

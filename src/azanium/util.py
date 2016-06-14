@@ -151,7 +151,7 @@ def jvm_mem_opts(pct_of_free_mem):
                      '-Xms' + format_Gb(init_heap_size)])
 
 
-class EC2InstanceCommandContext:
+class CommandContext:
 
     def __init__(self, base_path):
         self.base_path = base_path
@@ -183,7 +183,7 @@ class EC2InstanceCommandContext:
         return url.format(protocol=protocol, host=host, port=port, db=db_name)
 
 
-pass_ec2_command_context = click.make_pass_decorator(EC2InstanceCommandContext)
+pass_command_context = click.make_pass_decorator(CommandContext)
 
 command_group = functools.partial(click.group, context_settings={
     'help_option_names': ['-h', '--help']

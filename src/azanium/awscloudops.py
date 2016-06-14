@@ -186,7 +186,7 @@ def report_status(instance):
 @util.option('--assume-role',
              default=awsiam.DB_MIG_ROLE,
              help='AWS Role that will be assumed to execute the migrate')
-@util.pass_ec2_command_context
+@util.pass_command_context
 def cloud(ctx, profile, assume_role):
     """AWS EC2 operations for the WormBase database migration."""
     ctx.profile = profile
@@ -232,7 +232,7 @@ def cloud(ctx, profile, assume_role):
              help='Name of EC2 KeyPair.')
 @click.argument('sdist_path', metavar='<sdist>')
 @click.argument('ws_data_release', metavar='<WSXXX data release>')
-@util.pass_ec2_command_context
+@util.pass_command_context
 def init(ctx,
          sdist_path,
          ws_data_release,
@@ -288,7 +288,7 @@ def init(ctx,
 
 
 @cloud.command(short_help='Terminate ephemeral EC2 resources')
-@util.pass_ec2_command_context
+@util.pass_command_context
 def terminate(ctx):
     with latest_migration_state(ctx) as (instance, state):
         try:
@@ -307,14 +307,14 @@ def terminate(ctx):
 
 @cloud.command('view-state',
                short_help='Describe the state of the instance.')
-@util.pass_ec2_command_context
+@util.pass_command_context
 def view_state(ctx):
     with latest_migration_state(ctx) as (_, state):
         util.echo_info(pprint.pformat(state))
 
 
 @cloud.command(short_help='Describes the status of the instance.')
-@util.pass_ec2_command_context
+@util.pass_command_context
 def status(ctx):
     with latest_migration_state(ctx) as (instance, _):
         report_status(instance)

@@ -15,6 +15,6 @@ from . import util
 @click.pass_context
 def root_command(ctx, log_level, base_path):
     """A WormBase DB Migration Command Line Tool."""
-    ctx.obj = util.EC2InstanceCommandContext(base_path=base_path)
+    ctx.obj = util.CommandContext(base_path=base_path)
     log.setup_logging(os.path.join(base_path, 'logs'),
                       log_level=log_level)

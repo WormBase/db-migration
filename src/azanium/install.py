@@ -21,7 +21,7 @@ from .util import download
 from .util import get_deploy_versions
 from .util import local
 from .util import option
-from .util import pass_ec2_command_context
+from .util import pass_command_context
 
 
 logger = get_logger(__name__)
@@ -62,7 +62,7 @@ def installer(func):
 
     Wraps the command function in a function for result chaining.
     """
-    @pass_ec2_command_context
+    @pass_command_context
     def cmd_proxy(cmd_ctx, *args, **kw):
         f_name = func.__name__
         tmpdir = tempfile.mkdtemp(suffix='-db-migration-downloads')
@@ -84,7 +84,7 @@ def installer(func):
 
 
 @root_command.group(chain=True, invoke_without_command=False)
-@pass_ec2_command_context
+@pass_command_context
 def install(ctx):
     """Software installers for the WormBase database migration.
 
