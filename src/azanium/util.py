@@ -50,8 +50,8 @@ def local(cmd,
           shell=True,
           output_decoding='utf-8',
           cwd=None):
-    """Run a command locally
-.
+    """Run a command locally.
+
     :param cmd: The command to execute.
     :type cmd: str
     :param input: Optional text to pipe as input to `cmd`.

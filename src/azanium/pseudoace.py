@@ -9,7 +9,7 @@ def run_pseudoace(logger, context, *args):
            '-jar', context.pseudoace_jar_path,
            '--url=' + context.datomic_url()]
     cmd.extend(list(args))
-    logger.info('Running pseudoace command: {}', cmd)
+    logger.info('Running pseudoace command: {}', ' '.join(cmd))
     out = util.local(cmd)
     logger.info(out)
 
