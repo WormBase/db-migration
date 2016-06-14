@@ -19,9 +19,9 @@ from . import root_command
 from .log import get_logger
 from .util import download
 from .util import get_deploy_versions
-from .util import install_path
 from .util import local
 from .util import option
+from .util import pass_ec2_command_context
 
 
 logger = get_logger(__name__)
@@ -62,18 +62,19 @@ def installer(func):
 
     Wraps the command function in a function for result chaining.
     """
-    @click.pass_context
-    def cmd_proxy(ctx, *args, **kw):
+    @pass_ec2_command_context
+    def cmd_proxy(cmd_ctx, *args, **kw):
         f_name = func.__name__
         tmpdir = tempfile.mkdtemp(suffix='-db-migration-downloads')
         download_dir = os.path.join(tmpdir, f_name)
-        install_dir = install_path(f_name)
+        install_dir = cmd_ctx.path(f_name)
         version = get_deploy_versions()[f_name]
         for path in (download_dir, install_dir):
             os.makedirs(path, exist_ok=True)
         meta = Meta(download_dir=download_dir,
                     install_dir=install_dir,
                     version=version)
+        ctx = click.get_current_context()
         return ctx.invoke(func, meta, *args[1:], **kw)
 
     def command_proxy(*args, **kw):

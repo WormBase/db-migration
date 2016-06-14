@@ -34,7 +34,6 @@ echo_error = functools.partial(_secho,
 
 pkgpath = functools.partial(resource_filename, __package__)
 
-install_path = functools.partial(os.path.join, '/media/ephemeral0/wormbase')
 
 aws_state = functools.partial(shelve.open,
                               os.path.join(os.getcwd(), '.db-migration.db'))
@@ -154,8 +153,8 @@ def jvm_mem_opts(pct_of_free_mem):
 
 class EC2InstanceCommandContext:
 
-    def __init__(self, *kw):
-        self.__dict__.update(kw)
+    def __init__(self, base_path):
+        self.base_path = base_path
         self.versions = get_deploy_versions()
 
     @property
@@ -171,7 +170,8 @@ class EC2InstanceCommandContext:
     def data_release_version(self):
         return self.versions['acedb_database']
 
-    path = staticmethod(install_path)
+    def path(self, *args):
+        return os.path.join(self.base_path, *args)
 
     def datomic_url(self,
                     db='',
