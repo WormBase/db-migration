@@ -32,5 +32,7 @@ runcmd:
 # hack to make the tace binary work on the latest Amazon AMI:
 #  Expects libreadline.so.5, which is not currently installable.
 - ln -s /lib64/libreadline.so.6 /lib64/libreadline.so.5
+- cat {azanium_completion_script} >> ~ec2-user/.bashrc
+- chown ec2-user ~ec2-user/.bashrc
 
 output : { all : '| tee -a /var/log/cloud-init-output.log' }
