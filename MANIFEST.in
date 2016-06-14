@@ -5,4 +5,4 @@ include *.rst
 recursive-include docs *.py
 recursive-include docs Makefile *.rst
 recursive-exclude src *~ *.pyc
-recursive-include src *.py *.cfg *.txt *.json *.yaml *.ini *.template
+recursive-include src *.py *.cfg *.txt *.json *.yaml *.ini *.template *.sh
