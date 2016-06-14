@@ -8,7 +8,7 @@ from . import util
 def backup_db(context, db, logger):
     from_uri = context.datomic_url(db)
     to_uri = 's3://wb-datomic-backups/' + db
-    cmd = ['bin/datomic'] + list(util.jvm_mem_opts(0.20)) + [from_uri, to_uri]
+    cmd = ['bin/datomic', util.jvm_mem_opts(0.20), from_uri, to_uri]
     cwd = util.install_path('datomic_free')
     logger.info('Backing up {} {}', from_uri, to_uri)
     util.local(cmd, cwd=cwd)
@@ -26,7 +26,7 @@ def configure_transactor(context, logger):
         conf = ConfigObj(infile=infile)
     datomic_path = context.path('datomic_free')
     transactor_cmd = ['{dist}/bin/transactor'.format(dist=datomic_path)]
-    transactor_cmd.extend(util.jvm_mem_opts(0.20))
+    transactor_cmd.append(util.jvm_mem_opts(0.20))
     transactor_cmd.append(transactor_properties_path)
     conf['env:datomic-transactor'] = dict(JAVA_CMD=context.java_cmd)
     conf['watcher:datomic-transactor'] = dict(cmd=' '.join(transactor_cmd))

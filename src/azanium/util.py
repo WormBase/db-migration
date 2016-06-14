@@ -148,8 +148,8 @@ def jvm_mem_opts(pct_of_free_mem):
     max_heap_size = round(gb_free * pct_of_free_mem)
     init_heap_size = max_heap_size
     format_Gb = '{:d}G'.format
-    return ('-Xmx', format_Gb(max_heap_size),
-            '-Xms', format_Gb(init_heap_size))
+    return ' '.join(['-Xmx' + format_Gb(max_heap_size),
+                     '-Xms' + format_Gb(init_heap_size)])
 
 
 class EC2InstanceCommandContext:
@@ -160,7 +160,7 @@ class EC2InstanceCommandContext:
 
     @property
     def java_cmd(self):
-        return 'java -server ' + ' '.join(jvm_mem_opts(0.75))
+        return 'java -server ' + jvm_mem_opts(0.75)
 
     @property
     def pseudoace_jar_path(self):
