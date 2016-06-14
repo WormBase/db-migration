@@ -250,8 +250,9 @@ def init(ctx,
     with open(USER_DATA_PATH) as fp:
         user_data = fp.read()
         completion_script = util.pkgpath('completion/azanium-complete.sh')
-        user_data = user_data.format(
-            azanium_completion_script=completion_script)
+        user_data %= {
+            'azanium_completion_script': completion_script
+        }
     instance_options = dict(
         ImageId=ami,
         InstanceType=instance_type,
