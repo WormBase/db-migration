@@ -1,0 +1,23 @@
+[circus]
+# stats
+statsd = 1
+check_delay = 5
+endpoint = tcp://0.0.0.0:5555
+pubsub_endpoint = tcp://0.0.0.0:5556
+stats_endpoint = tcp://0.0.0.0:5557
+loggerconfig = circus-logging-config.yaml
+
+[socket:datomic-transactor]
+host = 0.0.0.0
+port = 4333
+
+# required (even if current $ENV matches before invoking circusd)
+[env:datomic-transactor]
+
+[watcher:datomic-transactor]
+cmd = transactor -Xmx6G -Xms4G datomic-free-transactor.properties
+numprocesses = 1
+
+# debugging http://circus.readthedocs.org/en/latest/faq/#how-to-troubleshoot-circus
+stdout_stream.class = StdoutStream
+stderr_stream.class = StdoutStream

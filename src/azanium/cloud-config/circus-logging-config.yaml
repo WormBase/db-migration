@@ -1,0 +1,19 @@
+version: 1
+disable_existing_loggers: false
+formatters:
+  simple:
+    format: '%(asctime)s - %(name)s - [%(levelname)s] %(message)s'
+handlers:
+  logfile:
+    class: logging.FileHandler
+    filename: /datastore/wormbase/logs/circus-datomic-tranasctor.log
+    level: DEBUG
+    formatter: simple
+loggers:
+  circus:
+    level: DEBUG
+    handlers: [logfile]
+    propagate: no
+root:
+  level: DEBUG
+  handlers: [logfile]
