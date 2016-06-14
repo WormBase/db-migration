@@ -14,6 +14,20 @@ def run_pseudoace(logger, context, *args):
     logger.info(out)
 
 
+def create_database(context, logger):
+    logger.info('Creating datomic database')
+    run_pseudoace(logger, context, '-v', 'create-database')
+
+def acedb_dump_to_edn_logs(context, edn_logs_dir, acedb_dump_dir, logger):
+    logger.info('Convering ACeDB files to EDN logs')
+    run_pseudoace(logger,
+                  context,
+                  '--acedump-dir=' + acedb_dump_dir,
+                  '--log-dir=' + edn_logs_dir,
+                  '--verbose',
+                  'acedump-to-edn-logs')
+
+
 def prepare_target_db(context, edn_logs_dir, acedb_dump_dir, logger):
     run_pseudoace(logger,
                   context,

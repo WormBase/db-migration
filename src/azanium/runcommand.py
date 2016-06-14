@@ -57,11 +57,12 @@ def acedb_compress_dump(context, dump_dir):
 def init_datomic_db(context, acedb_dump_dir):
     edn_logs_dir = context.path('edn_logs')
     datomic.configure_transactor(context, logger)
-    pseudoace.prepare_target_db(context,
-                                edn_logs_dir,
-                                acedb_dump_dir,
-                                logger)
-
+    logger.info('Creating datomic database')
+    pseudoace.create_database(context, logger)
+    pseudoace.acedb_dump_to_edn_logs(context,
+                                     edn_logs_dir,
+                                     acedb_dump_dir,
+                                     logger)
 
 @run.command()
 @util.pass_ec2_command_context
