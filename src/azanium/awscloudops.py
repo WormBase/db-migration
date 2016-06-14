@@ -25,7 +25,7 @@ USER_DATA_PATH = resource_filename(
 
 # Instance settings based on image of default Amazon AMI (ami-f5f41398, 2016)
 EC2_INSTANCE_DEFAULTS = dict(
-    ami='ami-1517ee78',
+    ami='ami-02d7136f',
     instance_type='r3.4xlarge',
     monitoring=True,
     dry_run=False)
