@@ -249,6 +249,9 @@ def init(ctx,
     (key_pair, key_pair_path) = ssh.recycle_key_pair(ec2, keypair_name)
     with open(USER_DATA_PATH) as fp:
         user_data = fp.read()
+        completion_script = util.pkgpath('completion/azanium-complete.sh')
+        user_data = user_data.format(
+            azanium_completion_script=completion_script)
     instance_options = dict(
         ImageId=ami,
         InstanceType=instance_type,

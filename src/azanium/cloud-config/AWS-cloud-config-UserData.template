@@ -16,10 +16,10 @@ packages:
   - tmux
 
 bootcmd:
-- mkfs.ext4 /dev/sdb
-- mount -t ext4 /dev/sdb
+- mkfs.ext4 /dev/xvdb
+- mount /dev/xvdb
 - mkdir /media/ephemeral0/wormbase
-- chown ec2-user /media/ephemeral0/wormbase
+- chown ec2-user:ec2-user /media/ephemeral0/wormbase
 
 runcmd:
 - yum groupinstall -y "Development Tools"
