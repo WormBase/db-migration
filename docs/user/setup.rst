@@ -45,6 +45,10 @@ Mac OSX
 .. code-block:: bash
 
    pip3 install --user awscli
+   pip3 install --user <PATH-TO-AZANIUM-TARBALL>
+
+
+TBD: In the above, PATH-TO-AZANIUM-TARBALL needs to be defined.
 
 
 :term:`AWS` Configuration
