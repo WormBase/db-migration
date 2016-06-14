@@ -277,7 +277,8 @@ def init(ctx,
     instance.wait_until_running()
     util.echo_sig('done')
     wait_for_sshd(instance)
-    util.echo_waiting('Bootstrapping instance with wormbase.db')
+    util.echo_waiting(
+        'Bootstrapping instance with {}'.format(__package__))
     bootstrap(instance, wb_db_migrate_version)
     util.echo_sig('done')
     report_status(instance)
