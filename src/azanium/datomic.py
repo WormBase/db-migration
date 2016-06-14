@@ -24,7 +24,7 @@ def configure_transactor(context, logger):
         'cloud-config/circus-logging-config.yaml')
     with open(circus_ini_template_path) as infile:
         conf = ConfigObj(infile=infile)
-    datomic_path = context.datomic_path
+    datomic_path = context.path('datomic_free')
     transactor_cmd = ['{}/bin/transactor'.format(dist=datomic_path)]
     transactor_cmd.extend(util.jvm_mem_opts(0.20))
     transactor_cmd.append(transactor_properties_path)
