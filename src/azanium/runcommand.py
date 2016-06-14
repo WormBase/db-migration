@@ -84,10 +84,7 @@ def sort_edn_logs(context):
 @util.option('-b', '--build-data-path')
 @util.pass_ec2_command_context
 def qa_report(context, build_data_path):
-    pseudoace.qa_report(context.java_cmd,
-                        context.data_release_version,
-                        build_data_path,
-                        logger)
+    pseudoace.qa_report(context.java_cmd, logger)
 
 
 @run.command('backup-database')
