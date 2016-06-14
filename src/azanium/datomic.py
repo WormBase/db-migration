@@ -10,9 +10,9 @@ def backup_db(context, db, logger):
     to_uri = 's3://wb-datomic-backups/' + db
     cmd = ['bin/datomic', util.jvm_mem_opts(0.20), from_uri, to_uri]
     cwd = util.install_path('datomic_free')
-    logger.info('Backing up {} {}', from_uri, to_uri)
+    logger.info('Backing up database {} to {}', from_uri, to_uri)
     util.local(cmd, cwd=cwd)
-    logger.info('Backup complete')
+    logger.info('Database backup complete')
 
 
 def configure_transactor(context, logger):

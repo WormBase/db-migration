@@ -84,7 +84,7 @@ def installer(func):
 
 
 @root_command.group(chain=True, invoke_without_command=False)
-@click.pass_context
+@pass_ec2_command_context
 def install(ctx):
     """Software installers for the WormBase database migration.
 

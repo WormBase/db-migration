@@ -14,11 +14,10 @@ logger = log.get_logger(__name__, verbose=True)
 
 
 @root_command.group()
-@click.pass_context
+@util.pass_ec2_command_context
 def run(ctx):
     """Execute database migration on an ephemeral AWS EC2 instance.
     """
-    ctx.obj = util.EC2InstanceCommandContext()
 
 
 @run.command()

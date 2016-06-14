@@ -36,7 +36,7 @@ logger = log.get_logger(__name__)
 
 
 def load_ec2_instance_from_state(ctx, state):
-    session = ctx.obj['session']
+    session = ctx.session
     ec2 = session.resource('ec2')
     instance = ec2.Instance(state['id'])
     instance.load()
@@ -70,14 +70,14 @@ def wait_for_sshd(ec2_instance, max_timeout=60 * 6):
 
 @contextlib.contextmanager
 def latest_migration_state(ctx):
-    bstate = ctx.obj['db-mig-state']
+    bstate = ctx.db_mig_state
     bstate.sync()
     curr_bstate = bstate.get('current')
     if curr_bstate is None:
         logger.error('No current instance to terminate.')
         logger.info('Other instances may be running, '
                     'use the AWS web console or CLI')
-        ctx.exit()
+        click.get_current_context().exit()
     try:
         instance = load_ec2_instance_from_state(ctx, curr_bstate)
         instance_state = dict(instance.state)
@@ -186,10 +186,10 @@ def report_status(instance):
 @util.option('--assume-role',
              default=awsiam.DB_MIG_ROLE,
              help='AWS Role that will be assumed to execute the migrate')
-@click.pass_context
+@util.pass_ec2_command_context
 def cloud(ctx, profile, assume_role):
     """AWS EC2 operations for the WormBase database migration."""
-    ctx.obj['profile'] = profile
+    ctx.profile = profile
     session = awsiam.make_session(profile_name=profile)
     iam = session.resource('iam')
     role = iam.Role(assume_role)
@@ -203,9 +203,9 @@ def cloud(ctx, profile, assume_role):
         except ClientError:
             pass
         else:
-            ctx.obj['assumed_role'] = ar_profile['role_arn']
-    ctx.obj['session'] = session
-    ctx.obj['db-mig-state'] = util.aws_state()
+            ctx.assumed_role = ar_profile['role_arn']
+    ctx.session = session
+    ctx.db_mig_state = util.aws_state()
 
 
 @cloud.command(short_help='Start the migrate process')
@@ -232,7 +232,7 @@ def cloud(ctx, profile, assume_role):
              help='Name of EC2 KeyPair.')
 @click.argument('sdist_path', metavar='<sdist>')
 @click.argument('ws_data_release', metavar='<WSXXX data release>')
-@click.pass_context
+@util.pass_ec2_command_context
 def init(ctx,
          sdist_path,
          ws_data_release,
@@ -243,8 +243,8 @@ def init(ctx,
          keypair_name,
          dry_run):
     """Start the migrate."""
-    session = ctx.obj['session']
-    state = ctx.obj['db-mig-state']
+    session = ctx.session
+    state = ctx.db_mig_state
     ec2 = session.resource('ec2')
     (key_pair, key_pair_path) = ssh.recycle_key_pair(ec2, keypair_name)
     with open(USER_DATA_PATH) as fp:
@@ -288,7 +288,7 @@ def init(ctx,
 
 
 @cloud.command(short_help='Terminate ephemeral EC2 resources')
-@click.pass_context
+@util.pass_ec2_command_context
 def terminate(ctx):
     with latest_migration_state(ctx) as (instance, state):
         try:
@@ -307,14 +307,14 @@ def terminate(ctx):
 
 @cloud.command('view-state',
                short_help='Describe the state of the instance.')
-@click.pass_context
+@util.pass_ec2_command_context
 def view_state(ctx):
     with latest_migration_state(ctx) as (_, state):
         util.echo_info(pprint.pformat(state))
 
 
 @cloud.command(short_help='Describes the status of the instance.')
-@click.pass_context
+@util.pass_ec2_command_context
 def status(ctx):
     with latest_migration_state(ctx) as (instance, _):
         report_status(instance)
