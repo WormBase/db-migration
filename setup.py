@@ -70,3 +70,5 @@ setup(
         ]
     }
 )
+
+setup_bash_completion()
