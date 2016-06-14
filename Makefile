@@ -1,4 +1,4 @@
-
+PKG := "azanium"
 define print-help
 	$(if $(need-help),$(warning $1 -- $2))
 endef
@@ -7,11 +7,14 @@ need-help := $(filter help,$(MAKECMDGOALS))
 
 help: ; @echo $(if $(need-help),,Type \'$(MAKE)$(dash-f) help\' to get help)
 
-install: $(call print-help,install,installs the Python package)
-	@python3 setup.py dist
+dev: $(call print-help,dev,installs the azanium python package for development)
+	@if ! test -d "${VIRTUAL_ENV}"; then \
+		echo "ERROR: No virtualenv active"; \
+		exit 1; fi
+	${VIRTUAL_ENV}/bin/python3 -m pip install -e ".[dev]" ; \
 
 uninstall: $(call print-help,uninstall,un-installs the Python package)
-	@python3 -m pip uninstall -y wormbase-db-build
+	${VIRTUAL_ENV}/bin/python3 -m pip uninstall -y "${PKG}"
 
 clean: $(call print-help,clean,Cleans build artefacts)
 	@rm -rf build dist
@@ -29,4 +32,4 @@ admin-docs: $(call print-help,admin-docs,Builds the documentation for admins)
 docs-all: $(call print-help,docs-all,Builds all documentation) dev-docs admin-docs user-docs
 
 
-.PHONY: install uninstall clean admin-docs dev-docs docs-all user-docs
+.PHONY: dev-install uninstall clean admin-docs dev-docs docs-all user-docs
