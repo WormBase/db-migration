@@ -83,14 +83,13 @@ def installer(func):
     return functools.update_wrapper(command_proxy, func)
 
 
-@root_command.group(chain=True, invoke_without_command=False)
+@root_command.group(chain=True, invoke_without_command=True)
 @pass_command_context
 def install(ctx):
     """Software installers for the WormBase database migration.
 
-    All software will be installed under a common path:
-
-       /datastore/wormbase
+    All software will be installed under a common base path,
+    as specified to the parent command.
     """
 
 
