@@ -24,7 +24,7 @@ The rationale
 
 IAM admin tool (`azanium admin`)
 ================================
-For convenience, the `wormbase-db-migration` package provides a
+For convenience, the `azanium` package provides a
 :term:`CLI` for performing the *minimal* :term:`IAM` configuration
 necessary for a migration to be performed.
 
