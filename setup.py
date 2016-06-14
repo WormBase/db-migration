@@ -3,9 +3,23 @@ from setuptools import find_packages, setup
 
 here = os.path.abspath(os.path.dirname(__file__))
 
+
 def _read_file(name):
     with open(os.path.join(here, name)) as fp:
         return fp.read()
+
+
+def setup_bash_completion():
+    completion_script = os.path.join(
+        here,
+        'src/azanium/bash-completion/azanium-complete.sh')
+    content = 'source ' + completion_script
+    with open(os.path.expanduser('~/.bashrc')) as fp:
+        lines = map(str.rstrip, fp.readlines())
+    if content in lines:
+        return
+    with open(os.path.expanduser('~/.bashrc'), 'a') as fp:
+        fp.write(os.linesep.join([content]))
 
 
 README = _read_file('README.rst')
