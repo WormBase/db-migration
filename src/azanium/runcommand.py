@@ -34,12 +34,21 @@ def acedb_dump(context, dump_dir, tace_dump_options):
     dump_cmd = ' '.join(['Dump', tace_dump_options, dump_dir])
     logger.info('Dumping ACeDB files to {}', dump_dir)
     util.local('tace ' + db_directory, input=dump_cmd)
-    gzip_cmd = ['find', dump_cmd, '-type', 'f', '-name', '"*.ace"']
+    logger.info('Dumped ACeDB files to {}', dump_dir)
+    ctx = click.get_current_context()
+    ctx.invoke(acedb_compress_dump, dump_dir)
+
+
+@run.command()
+@click.argument('dump_dir')
+@util.pass_ec2_command_context
+def acedb_compress_dump(context, dump_dir):
+    gzip_cmd = ['find', dump_dir, '-type', 'f', '-name', '"*.ace"']
     gzip_cmd.extend([
         '|', 'xargs', '-n', '1', '-P', str(psutil.cpu_count()), 'gzip'
     ])
     util.local(gzip_cmd)
-    logger.info('Dumped ACeDB files to {}', dump_dir)
+    logger.info('Compressed all .ace files in {}', dump_dir)
 
 
 @run.command('init-datomic-db')
