@@ -31,18 +31,19 @@ Meta = collections.namedtuple('Meta', ('download_dir',
                                        'version'))
 
 
-def _make_executable(path, logger, mode=0o775):
+def _make_executable(path, logger, mode=0o775, symlink_to_local_bin=False):
     logger.info('Setting permissions on {} to {}',
                 path,
                 stat.filemode(mode))
     os.chmod(path, mode)
-    bin_dirname = os.path.expanduser('~/.local/bin')
-    bin_filename = os.path.basename(path)
-    bin_path = os.path.join(bin_dirname, bin_filename)
-    if os.path.islink(bin_path):
-        os.unlink(bin_path)
-    os.symlink(path, bin_path)
-    logger.debug('Created symlink from {} to {}', path, bin_path)
+    if symlink_to_local_bin:
+        bin_dirname = os.path.expanduser('~/.local/bin')
+        bin_filename = os.path.basename(path)
+        bin_path = os.path.join(bin_dirname, bin_filename)
+        if os.path.islink(bin_path):
+            os.unlink(bin_path)
+        os.symlink(path, bin_path)
+        logger.debug('Created symlink from {} to {}', path, bin_path)
 
 
 @contextlib.contextmanager
@@ -166,7 +167,9 @@ def tace(meta, url_template):
             ftp.retrbinary('RETR ' + filename, fp.write)
     with tarfile.open(local_filename) as tf:
         tf.extract('./tace', path=install_dir)
-    _make_executable(os.path.join(install_dir, 'tace'), logger)
+    _make_executable(os.path.join(install_dir, 'tace'),
+                     logger,
+                     symlink_to_local_bin=True)
 
 
 @install.command(short_help='Install datomic-free')
