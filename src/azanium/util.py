@@ -34,7 +34,7 @@ echo_error = functools.partial(_secho,
 
 pkgpath = functools.partial(resource_filename, __package__)
 
-install_path = functools.partial(os.path.join, '/datastore', 'wormbase')
+install_path = functools.partial(os.path.join, '/media/ephemeral0/wormbase')
 
 aws_state = functools.partial(shelve.open,
                               os.path.join(os.getcwd(), '.db-migration.db'))
