@@ -209,6 +209,7 @@ def users(iam, assume_role_policy_name,
         arp = attached_assume_role_policy(user, assume_role_policy_name)
         assume_role_policy_attached = arp is not None
         user_trusted_by_role = user.arn in trusted_user_arns
+        assumes_role = assume_role_policy_attached and user_trusted_by_role
         if verify:
             if not assume_role_policy_attached:
                 logger.error(
@@ -227,6 +228,6 @@ def users(iam, assume_role_policy_name,
                 continue
         users.append(dict(name=user.name,
                           arn=user.arn,
-                          assumes_role=False))
+                          assumes_role=assumes_role))
     user_data = dict(group=dict(name=group_name, users=users))
     return (user_data, errors)
