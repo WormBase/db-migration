@@ -19,10 +19,10 @@ The following steps should be executed in order.
 
       AWS_PROFILE="${USER}"
       WB_DATA_RELEASE="WS254"
-      WB_DB_RELEASE_TAG="0.1"
+      TAG="0.1"
       azanium cloud --profile $USER \
 		    init \
-      		    "dist/wormbase-db-migration-${WB_DB_RELEASE}.tar.gz" \
+      		    "dist/azanium-${TAG}.tar.gz" \
 		    "${WB_DATA_RELEASE}"
 
 .. _db-migration-step-2:
