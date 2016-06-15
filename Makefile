@@ -15,7 +15,7 @@ dev: $(call print-help,dev,installs the ${PKG} python package for development)
 	@if ! test -d "${VIRTUAL_ENV}"; then \
 		echo "ERROR: No virtualenv active"; \
 		exit 1; fi
-	${VIRTUAL_ENV}/bin/python3 -m pip install -e ".[dev]" ; \
+	${VIRTUAL_ENV}/bin/python3 -m pip install -e ".[dev]"
 
 install: $(call print-help,install,installs the ${PKG} python package in user-space)
 	${PYTHON} setup.py sdist 2> /dev/null
