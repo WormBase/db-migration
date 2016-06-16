@@ -1,8 +1,7 @@
 import collections
-import contextlib
-import ftplib
 import functools
 import getpass
+import gzip
 import os
 import re
 import shutil
@@ -18,6 +17,7 @@ from . import github
 from . import root_command
 from .log import get_logger
 from .util import download
+from .util import ftp_download
 from .util import get_deploy_versions
 from .util import local
 from .util import option
@@ -44,14 +44,6 @@ def _make_executable(path, logger, mode=0o775, symlink_to_local_bin=False):
             os.unlink(bin_path)
         os.symlink(path, bin_path)
         logger.debug('Created symlink from {} to {}', path, bin_path)
-
-
-@contextlib.contextmanager
-def _ftp(host):
-    ftp = ftplib.FTP(host=host, user='anonymous')
-    ftp.set_pasv(True)
-    yield ftp
-    ftp.quit()
 
 
 def installer(func):
@@ -99,7 +91,41 @@ def pipeline(installers):
         install_command()
 
 
-@install.command(short_help='Install ACeDB.')
+@install.command(short_help='Installs the ACeDB ID catalog for QA report.')
+@option('--ftp-host',
+        default='ftp.ebi.ac.uk',
+        help='FTP hostname for ACeDB data.')
+@option('--remote-path-template',
+        default='pub/databases/wormbase/releases/{version}/REPORTS',
+        help='Path to the file(s) containing compressed database.')
+@option('--file-selector-regexp',
+        default='all_classes_report.{version}\.txt\.gz$',
+        help='File selection regexp')
+@installer
+def acedb_id_catalog(meta,
+                     ftp_host,
+                     remote_path_template,
+                     file_selector_regexp):
+    """Installs the ACeDB id catalog use by QA report generation."""
+    format_path = remote_path_template.format
+    file_selector_regexp = file_selector_regexp.format(version=meta.version)
+    downloaded = ftp_download(ftp_host,
+                              file_selector_regexp,
+                              meta.download_dir,
+                              logger,
+                              initial_cwd=format_path(version=meta.version))
+    for path in downloaded:
+        with gzip.open(path) as gz_fp:
+            filename = re.sub('^(?P<fn>.*)\.gz',
+                              '\g<fn>',
+                              os.path.basename(path))
+            out_path = os.path.join(meta.install_dir, filename)
+            with open(out_path, 'wb') as fp:
+                print('Writing', fp.name)
+                fp.write(gz_fp.read())
+
+
+@install.command(short_help='Installs the ACeDB database.')
 @option('--ftp-host',
         default='ftp.ebi.ac.uk',
         help='FTP hostname for ACeDB data.')
@@ -115,25 +141,19 @@ def acedb_database(meta,
                    remote_path_template,
                    file_selector_regexp):
     """Install ACeDB."""
-    download_dir = meta.download_dir
-    install_dir = meta.install_dir
     format_path = remote_path_template.format
-    file_selector = functools.partial(re.match, file_selector_regexp)
     version = meta.version
-    logger.info('Connecting to {}', ftp_host)
-    with _ftp(ftp_host) as ftp:
-        ftp.cwd(format_path(version=version))
-        filenames = filter(file_selector, ftp.nlst('.'))
-        for filename in filenames:
-            out_path = os.path.join(download_dir, filename)
-            logger.info('Saving {} to {}', filename, out_path)
-            with open(out_path, 'wb') as fp:
-                ftp.retrbinary('RETR ' + filename, fp.write)
-            with tarfile.open(fp.name) as tf:
-                logger.info('Extracting {} to {}', fp.name, install_dir)
-                tf.extractall(path=install_dir)
+    downloaded = ftp_download(ftp_host,
+                              file_selector_regexp,
+                              meta.download_dir,
+                              logger,
+                              initial_cwd=format_path(version=version))
+    for path in downloaded:
+        with tarfile.open(path) as tf:
+            logger.info('Extracting {} to {}', path, meta.install_dir)
+            tf.extractall(path=meta.install_dir)
     # Enable the Dump command
-    passwd_path = os.path.join(install_dir, 'wspec', 'passwd.wrm')
+    passwd_path = os.path.join(meta.install_dir, 'wspec', 'passwd.wrm')
     mode = 0o644
     logger.info('Changing permissions of {} to {}',
                 passwd_path,
@@ -153,21 +173,18 @@ def acedb_database(meta,
 @installer
 def tace(meta, url_template):
     """Install the ACeDB "tace" binary program."""
-    install_dir = meta.install_dir
-    download_dir = meta.download_dir
     version = meta.version
     url = url_template.format(version=version)
     pr = urllib.parse.urlparse(url)
-    with _ftp(pr.netloc) as ftp:
-        ftp.cwd(os.path.dirname(pr.path))
-        filename = os.path.basename(pr.path)
-        local_filename = os.path.join(download_dir, os.path.basename(pr.path))
-        with open(local_filename, 'wb') as fp:
-            logger.info('Downloading {}', filename)
-            ftp.retrbinary('RETR ' + filename, fp.write)
-    with tarfile.open(local_filename) as tf:
-        tf.extract('./tace', path=install_dir)
-    _make_executable(os.path.join(install_dir, 'tace'),
+    downloaded = ftp_download(pr.netloc,
+                              os.path.basename(pr.path),
+                              meta.download_dir,
+                              logger,
+                              initial_cwd=os.path.dirname(pr.path))
+    local_path = downloaded[0]
+    with tarfile.open(local_path) as tf:
+        tf.extract('./tace', path=meta.install_dir)
+    _make_executable(os.path.join(meta.install_dir, 'tace'),
                      logger,
                      symlink_to_local_bin=True)
 

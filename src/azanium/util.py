@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+import contextlib
+import ftplib
 import functools
 import os
 import psutil
+import re
 import shelve
 import subprocess
 
@@ -132,6 +135,32 @@ def download(url, local_filename, chunk_size=1024 * 10):
             if chunk:
                 fp.write(chunk)
     return fp.name
+
+
+@contextlib.contextmanager
+def ftp_connection(host, logger):
+    logger.info('Connecting to {}', host)
+    ftp = ftplib.FTP(host=host, user='anonymous')
+    ftp.set_pasv(True)
+    yield ftp
+    logger.info('Disconnecting from {}', host)
+    ftp.quit()
+
+
+def ftp_download(host, file_selector_regexp, download_dir, logger, initial_cwd=None):
+    downloaded = []
+    file_selector = functools.partial(re.match, file_selector_regexp)
+    with ftp_connection(host, logger) as ftp:
+        if initial_cwd is not None:
+            ftp.cwd(initial_cwd)
+        filenames = filter(file_selector, ftp.nlst('.'))
+        for filename in filenames:
+            out_path = os.path.join(download_dir, filename)
+            logger.info('Saving {} to {}', filename, out_path)
+            with open(out_path, 'wb') as fp:
+                ftp.retrbinary('RETR ' + filename, fp.write)
+            downloaded.append(fp.name)
+    return downloaded
 
 
 def get_deploy_versions(purpose='default'):
