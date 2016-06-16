@@ -25,10 +25,21 @@ USER_DATA_PATH = resource_filename(
 
 # Instance settings based on image of default Amazon AMI (ami-f5f41398, 2016)
 EC2_INSTANCE_DEFAULTS = dict(
-    ami='ami-02d7136f',
+    ami='ami-4d925520',
     instance_type='r3.4xlarge',
     monitoring=True,
     dry_run=False)
+
+BLOCK_DEVICE_MAPPINGS = [{
+    'DeviceName': '/dev/xvda',
+    'Ebs': {
+        'VolumeSize': 60,
+        'DeleteOnTermination': True
+    },
+}, {
+    'DeviceName': '/dev/xvdb',
+    'VirtualName': 'ephemeral0'
+}]
 
 EC2_INSTANCE_ROLE = 'development'
 
@@ -257,6 +268,7 @@ def init(ctx,
         ImageId=ami,
         InstanceType=instance_type,
         KeyName=key_pair.name,
+        BlockDeviceMappings=BLOCK_DEVICE_MAPPINGS,
         MinCount=1,
         MaxCount=1,
         UserData=base64.b64encode(user_data.encode('utf-8')),
