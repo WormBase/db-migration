@@ -37,10 +37,9 @@ def prepare_target_db(context, edn_logs_dir, acedb_dump_dir, logger):
                   'prepare-import')
 
 
-def sort_edn_logs(context, logger):
+def sort_edn_logs(context, logger, edn_logs_dir):
     pseudoace_path = context.path('pseudoace')
     script_path = os.path.join(pseudoace_path, 'sort_edn_log.sh')
-    edn_logs_dir = context.path('edn-logs')
     n_procs = str(psutil.cpu_count())
     cmd = ['find', edn_logs_dir, '-type', 'f', '-name', '"*.edn.gz"']
     cmd.extend(['|', 'xargs', '-n', '1', '-P', n_procs, script_path])
@@ -49,7 +48,7 @@ def sort_edn_logs(context, logger):
     logger.info('Finished sorting EDN logs')
 
 
-def import_logs(context, edn_logs_dir, logger):
+def import_logs(context, logger, edn_logs_dir):
     run_pseudoace(logger,
                   context,
                   '--log-dir=' + edn_logs_dir,
