@@ -59,11 +59,11 @@ def import_logs(context, edn_logs_dir, logger):
 
 def qa_report(context, logger):
     data_release = context.data_release_version
-    ref_build_data_path = context.path('ref-build-data')
+    id_catalog_path = context.path('acedb_id_catalog')
     out_path = os.path.expanduser(
         '~/{data_release}-report.txt'.format(data_relase=data_release))
     run_pseudoace(logger,
                   context,
-                  '--build-data=' + ref_build_data_path,
+                  '--build-data=' + id_catalog_path,
                   '--report-filename=' + out_path,
                   'generate-report')
