@@ -1,10 +1,14 @@
+import logging
 import os
 import psutil
 
 from . import util
 
 
-def run_pseudoace(logger, context, *args):
+logger = logging.getLogger(__name__)
+
+
+def run_pseudoace(context, *args):
     cmd = [context.java_cmd,
            '-jar', context.pseudoace_jar_path,
            '--url=' + context.datomic_url()]
@@ -14,30 +18,29 @@ def run_pseudoace(logger, context, *args):
     logger.info(out)
 
 
-def create_database(context, logger):
+def create_database(context):
     logger.info('Creating datomic database')
-    run_pseudoace(logger, context, '-v', 'create-database')
+    run_pseudoace(context, '-v', 'create-database')
 
-def acedb_dump_to_edn_logs(context, edn_logs_dir, acedb_dump_dir, logger):
+
+def acedb_dump_to_edn_logs(context, acedb_dump_dir, edn_logs_dir):
     logger.info('Convering ACeDB files to EDN logs')
-    run_pseudoace(logger,
-                  context,
+    run_pseudoace(context,
                   '--acedump-dir=' + acedb_dump_dir,
                   '--log-dir=' + edn_logs_dir,
                   '--verbose',
                   'acedump-to-edn-logs')
 
 
-def prepare_target_db(context, edn_logs_dir, acedb_dump_dir, logger):
-    run_pseudoace(logger,
-                  context,
+def prepare_target_db(context, edn_logs_dir, acedb_dump_dir):
+    run_pseudoace(context,
                   '--acedump-dir=' + acedb_dump_dir,
                   '--log-dir=' + edn_logs_dir,
                   '--verbose',
                   'prepare-import')
 
 
-def sort_edn_logs(context, logger, edn_logs_dir):
+def sort_edn_logs(context, edn_logs_dir):
     pseudoace_path = context.path('pseudoace')
     script_path = os.path.join(pseudoace_path, 'sort_edn_log.sh')
     n_procs = str(psutil.cpu_count())
@@ -48,21 +51,19 @@ def sort_edn_logs(context, logger, edn_logs_dir):
     logger.info('Finished sorting EDN logs')
 
 
-def import_logs(context, logger, edn_logs_dir):
-    run_pseudoace(logger,
-                  context,
+def import_logs(context, edn_logs_dir):
+    run_pseudoace(context,
                   '--log-dir=' + edn_logs_dir,
                   '--verbose',
                   'import-logs')
 
 
-def qa_report(context, logger):
+def qa_report(context, acedb_id_catalog_path):
     data_release = context.data_release_version
-    id_catalog_path = context.path('acedb_id_catalog')
     out_path = os.path.expanduser(
         '~/{data_release}-report.txt'.format(data_relase=data_release))
-    run_pseudoace(logger,
-                  context,
-                  '--build-data=' + id_catalog_path,
+    run_pseudoace(context,
+                  '--build-data=' + acedb_id_catalog_path,
                   '--report-filename=' + out_path,
                   'generate-report')
+    return out_path

@@ -15,6 +15,7 @@ import click
 from . import root_command
 from . import awsiam
 from . import log
+from . import notifications
 from . import ssh
 from . import util
 
@@ -119,7 +120,8 @@ def bootstrap(ec2_instance, package_version):
     """
     finished_regex = re.compile(r'Cloud-init.*finished')
     archive_filename = get_archive_filename()
-    path = os.path.join('dist', archive_filename)
+    dist_path = os.path.join('dist', archive_filename)
+    conf_filename = os.path.basename(notifications.CONF_PATH)
     util.local('python setup.py sdist')
 
     # Wait for cloud-init/config process to finish
@@ -133,17 +135,18 @@ def bootstrap(ec2_instance, package_version):
             break
         time.sleep(30)
 
-    # Upload the tar file
+    # Upload the tar file and configuration
     with ssh.connection(ec2_instance) as conn:
         with SCPClient(conn.get_transport()) as scp:
-            scp.put(path, archive_filename)
+            scp.put(dist_path, archive_filename)
+            scp.put(notifications.CONF_PATH, conf_filename)
 
     # Now the wormbase-db-migrate package dependencies are available
     # and installation can proceed
     pip_install = 'python3 -m pip install --user '
-    wbdb_install_cmd = pip_install + archive_filename
+    install_cmd = pip_install + archive_filename
     pip_install_cmds = [pip_install + ' --upgrade pip',
-                        wbdb_install_cmd]
+                        install_cmd]
     with ssh.connection(ec2_instance) as conn:
         for cmd in pip_install_cmds:
             try:

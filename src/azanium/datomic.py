@@ -1,3 +1,4 @@
+import logging
 import time
 
 from configobj import ConfigObj
@@ -5,7 +6,10 @@ from configobj import ConfigObj
 from . import util
 
 
-def backup_db(context, db, logger):
+logger = logging.getLogger(__name__)
+
+
+def backup_db(context, db):
     from_uri = context.datomic_url(db)
     to_uri = 's3://wb-datomic-backups/' + db
     cmd = ['bin/datomic', util.jvm_mem_opts(0.20), from_uri, to_uri]
@@ -15,7 +19,7 @@ def backup_db(context, db, logger):
     logger.info('Database backup complete')
 
 
-def configure_transactor(context, logger):
+def configure_transactor(context, datomic_path):
     circus_ini_template_path = util.pkgpath(
         'cloud-config/circus-datomic-free-transactor.ini.template')
     transactor_properties_path = util.pkgpath(
@@ -24,7 +28,6 @@ def configure_transactor(context, logger):
         'cloud-config/circus-logging-config.yaml')
     with open(circus_ini_template_path) as infile:
         conf = ConfigObj(infile=infile)
-    datomic_path = context.path('datomic_free')
     transactor_cmd = ['{dist}/bin/transactor'.format(dist=datomic_path)]
     transactor_cmd.append(util.jvm_mem_opts(0.20))
     transactor_cmd.append(transactor_properties_path)

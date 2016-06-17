@@ -20,6 +20,7 @@ from .util import download
 from .util import ftp_download
 from .util import get_deploy_versions
 from .util import local
+from .util import make_executable
 from .util import option
 from .util import pass_command_context
 
@@ -29,21 +30,6 @@ logger = get_logger(__name__)
 Meta = collections.namedtuple('Meta', ('download_dir',
                                        'install_dir',
                                        'version'))
-
-
-def _make_executable(path, logger, mode=0o775, symlink_to_local_bin=False):
-    logger.info('Setting permissions on {} to {}',
-                path,
-                stat.filemode(mode))
-    os.chmod(path, mode)
-    if symlink_to_local_bin:
-        bin_dirname = os.path.expanduser('~/.local/bin')
-        bin_filename = os.path.basename(path)
-        bin_path = os.path.join(bin_dirname, bin_filename)
-        if os.path.islink(bin_path):
-            os.unlink(bin_path)
-        os.symlink(path, bin_path)
-        logger.debug('Created symlink from {} to {}', path, bin_path)
 
 
 def installer(func):
@@ -114,15 +100,16 @@ def acedb_id_catalog(meta,
                               meta.download_dir,
                               logger,
                               initial_cwd=format_path(version=meta.version))
-    for path in downloaded:
-        with gzip.open(path) as gz_fp:
-            filename = re.sub('^(?P<fn>.*)\.gz',
-                              '\g<fn>',
-                              os.path.basename(path))
-            out_path = os.path.join(meta.install_dir, filename)
-            with open(out_path, 'wb') as fp:
-                print('Writing', fp.name)
-                fp.write(gz_fp.read())
+    downloaded_path = downloaded[0]
+    with gzip.open(downloaded_path) as gz_fp:
+        filename = re.sub('^(?P<fn>.*)\.gz',
+                          '\g<fn>',
+                          os.path.basename(downloaded_path))
+        out_path = os.path.join(meta.install_dir, filename)
+        with open(out_path, 'wb') as fp:
+            logger.info('Writing {}', fp.name)
+            fp.write(gz_fp.read())
+        return fp.name
 
 
 @install.command(short_help='Installs the ACeDB database.')
@@ -140,7 +127,7 @@ def acedb_database(meta,
                    ftp_host,
                    remote_path_template,
                    file_selector_regexp):
-    """Install ACeDB."""
+    """Installs the ACeDB database system."""
     format_path = remote_path_template.format
     version = meta.version
     downloaded = ftp_download(ftp_host,
@@ -163,16 +150,17 @@ def acedb_database(meta,
     with open(passwd_path, 'a') as fp:
         logger.info('Adding {} to {}', username, passwd_path)
         fp.write(username + os.linesep)
+    return meta.install_dir
 
 
-@install.command(short_help='Install the ACeDB "tace" binary')
+@install.command(short_help='Installs the ACeDB "tace" binary')
 @option('-t', '--url-template',
         default=('ftp://ftp.sanger.ac.uk/pub/acedb/MONTHLY/'
                  'ACEDB-binaryLINUX_{version}.tar.gz'),
         help='URL for versioned ACeDB binaries')
 @installer
 def tace(meta, url_template):
-    """Install the ACeDB "tace" binary program."""
+    """Installs the ACeDB "tace" binary program."""
     version = meta.version
     url = url_template.format(version=version)
     pr = urllib.parse.urlparse(url)
@@ -184,18 +172,18 @@ def tace(meta, url_template):
     local_path = downloaded[0]
     with tarfile.open(local_path) as tf:
         tf.extract('./tace', path=meta.install_dir)
-    _make_executable(os.path.join(meta.install_dir, 'tace'),
-                     logger,
-                     symlink_to_local_bin=True)
+    tace_path = os.path.join(meta.install_dir, 'tace')
+    make_executable(tace_path, logger)
+    return tace_path
 
 
-@install.command(short_help='Install datomic-free')
+@install.command(short_help='Installs datomic-free')
 @option('-t', '--url-template',
         default='https://my.datomic.com/downloads/free/{version}',
         help='URL template for Datomic Free version')
 @installer
 def datomic_free(meta, url_template):
-    """Install Datomic (free version)."""
+    """Installs Datomic (free version)."""
     install_dir = meta.install_dir
     version = meta.version
     url = url_template.format(version=version)
@@ -214,19 +202,20 @@ def datomic_free(meta, url_template):
     bin_dir = os.path.join(install_dir, 'bin')
     for filename in os.listdir(bin_dir):
         bin_path = os.path.join(bin_dir, filename)
-        _make_executable(bin_path, logger)
+        make_executable(bin_path, logger, symlink_dir=None)
     os.chdir(install_dir)
     mvn_install = os.path.join('bin', 'maven-install')
     logger.info('Installing datomic via {}', os.path.abspath(mvn_install))
     mvn_install_out = local(mvn_install)
     logger.info('Installed datomic_free')
     logger.debug(mvn_install_out)
+    return install_dir
 
 
-@install.command(short_help='Install pseudoace')
+@install.command(short_help='Installs pseudoace')
 @installer
 def pseudoace(meta):
-    """Install pseudoace."""
+    """Installs pseudoace."""
     download_dir = meta.download_dir
     install_dir = meta.install_dir
     tag = meta.version
@@ -245,3 +234,4 @@ def pseudoace(meta):
     shutil.rmtree(install_dir)
     shutil.move(src_path, install_dir)
     logger.info('Extracted pseudoace-{} to {}', tag, install_dir)
+    return install_dir

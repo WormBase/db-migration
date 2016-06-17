@@ -1,8 +1,9 @@
 import functools
 import logging
 import os
-import sys
+import traceback
 
+from . import notifications
 from . import util
 
 
@@ -51,6 +52,17 @@ class VerbosePrettyLogger(Logger):
     error = VerboseLogMethod('error', util.echo_error)
     info = VerboseLogMethod('info', util.echo_info)
     warning = VerboseLogMethod('warning', util.echo_warning)
+
+    def exception(self, msg, *args, **kw):
+        att = notifications.Attachment('Bug',
+                                       preface='An unexpected error occurred')
+        att.add_content(traceback.format_exc())
+        notifications.notify_threaded(msg,
+                                      attachments=[att],
+                                      color='danger',
+                                      icon_emoji=':bug:')
+        return super(VerbosePrettyLogger, self).exception(msg, *args, **kw)
+
 
 
 def setup_logging(log_dir, log_level=logging.INFO):

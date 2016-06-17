@@ -7,11 +7,15 @@ import psutil
 import re
 import shelve
 import subprocess
+import stat
 
 from pkg_resources import resource_filename
 import click
 import configobj
 import requests
+
+from . import log
+from . import notifications
 
 
 def _secho(message, prefix='🐛  ', **kw):
@@ -25,21 +29,29 @@ echo_sig = functools.partial(click.secho, fg='green', bold=True)
 
 echo_waiting = functools.partial(_secho, nl=False)
 
-echo_warning = functools.partial(_secho,
-                                 prefix='⚠ WARNING!:', fg='yellow', bold=True)
-
 echo_retry = functools.partial(click.secho, fg='cyan')
-
-echo_error = functools.partial(_secho,
-                               err=True,
-                               fg='red',
-                               bold=True)
 
 pkgpath = functools.partial(resource_filename, __package__)
 
 
 aws_state = functools.partial(shelve.open,
                               os.path.join(os.getcwd(), '.db-migration.db'))
+
+
+def echo_warning(message, prefix='⚠ WARNING!:', fg='yellow', bold=True, **kw):
+    notifications.notify_threaded(message,
+                                  icon_emoji=':warning',
+                                  color='warning')
+    return _secho(message, prefix=prefix, fg=fg, bold=bold)
+
+
+def echo_error(message, err=True, fg='red', bold=True):
+    notifications.notify_threaded(message, icon_emoji=':fire', color='warning')
+    return _secho(message, err=err, fg=fg, bold=bold)
+
+
+def echo_exc(message, err=True, fg='red', bold=True):
+    return _secho(message, err=err, fg=fg, bold=bold)
 
 
 class LocalCommandError(Exception):
@@ -147,8 +159,12 @@ def ftp_connection(host, logger):
     ftp.quit()
 
 
-def ftp_download(host, file_selector_regexp, download_dir, logger, initial_cwd=None):
+def ftp_download(host,
+                 file_selector_regexp,
+                 download_dir,
+                 initial_cwd=None):
     downloaded = []
+    logger = log.get_logger()
     file_selector = functools.partial(re.match, file_selector_regexp)
     with ftp_connection(host, logger) as ftp:
         if initial_cwd is not None:
@@ -180,6 +196,21 @@ def jvm_mem_opts(pct_of_free_mem):
                      '-Xms' + format_Gb(init_heap_size)])
 
 
+def make_executable(path, logger, mode=0o775, symlink_dir='~/.local/bin'):
+    logger.info('Setting permissions on {} to {}',
+                path,
+                stat.filemode(mode))
+    os.chmod(path, mode)
+    if symlink_dir is not None:
+        bin_dirname = os.path.abspath(os.path.expanduser(symlink_dir))
+        bin_filename = os.path.basename(path)
+        bin_path = os.path.join(bin_dirname, bin_filename)
+        if os.path.islink(bin_path):
+            os.unlink(bin_path)
+        os.symlink(path, bin_path)
+        logger.debug('Created symlink from {} to {}', path, bin_path)
+
+
 class CommandContext:
 
     def __init__(self, base_path):
@@ -198,6 +229,31 @@ class CommandContext:
     @property
     def data_release_version(self):
         return self.versions['acedb_database']
+
+    def _notify_step(self, step_n, message, **kw):
+        message = 'WromBase DB Migration Step {:d}: {}'.format(step_n, message)
+        return notifications.notify(message, **kw)
+
+    def exec_step(self,
+                  step_n,
+                  notification_message,
+                  step_command,
+                  *step_args,
+                  **notify_kw):
+        ctx = click.get_current_context()
+        notify = self._notify_step
+        notify(step_n, notification_message)
+        rv = ctx.invoke(step_command, *step_args)
+        if isinstance(rv, dict):
+            notify(step_n, notification_message, attachments=[rv])
+        else:
+            notify(step_n, 'Completed with {}'.format(rv))
+
+    def install_all_artefacts(self, installers, call):
+        installed = {}
+        for artefact in self.versions:
+            installed[artefact] = call(getattr(installers, artefact))
+        return installed
 
     def path(self, *args):
         return os.path.join(self.base_path, *args)
