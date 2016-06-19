@@ -55,12 +55,6 @@ SLACK_HOOK_URL = URL(human_readable_name='Slack webhook URL',
                      path='/services/\w+/\w+/\w+')
 
 
-def config():
-    with open(CONF_PATH) as fp:
-        conf = ConfigObj(infile=fp)
-    return conf[__name__]
-
-
 def notify(message,
            attachments=None,
            icon_emoji=None,
