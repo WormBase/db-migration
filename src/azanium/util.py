@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+import collections
 import contextlib
 import ftplib
 import functools
+import itertools
+import operator
 import os
 import psutil
 import re
@@ -45,7 +48,9 @@ def echo_warning(message, prefix='⚠ WARNING!:', fg='yellow', bold=True, **kw):
 
 
 def echo_error(message, err=True, fg='red', bold=True):
-    notifications.notify_threaded(message, icon_emoji=':fire', color='warning')
+    notifications.notify_threaded(message,
+                                  icon_emoji=':fire:',
+                                  color='warning')
     return _secho(message, err=err, fg=fg, bold=bold)
 
 
@@ -261,24 +266,19 @@ class CommandContext:
     def data_release_version(self):
         return self.versions['acedb_database']
 
-    def _notify_step(self, step_n, message, **kw):
-        message = 'WromBase DB Migration Step {:d}: {}'.format(step_n, message)
-        return notifications.notify(message, **kw)
-
     def exec_step(self,
                   step_n,
-                  notification_message,
+                  headline,
+                  message,
                   step_command,
-                  *step_args,
+                  step_kwargs,
                   **notify_kw):
         ctx = click.get_current_context()
-        notify = self._notify_step
-        notify(step_n, notification_message)
-        rv = ctx.invoke(step_command, *step_args)
-        if isinstance(rv, dict):
-            notify(step_n, notification_message, attachments=[rv])
-        else:
-            notify(step_n, 'Completed with {}'.format(rv))
+        ctx.params = step_kwargs
+        attachments_pre = [notifications.Attachment(title=headline)]
+        notifications.notify(headline, attachments=attachments_pre)
+        rv = step_command.invoke(ctx)
+        notifications.notify(headline + ' - *complete*', attachments=rv)
 
     def install_all_artefacts(self, installers, call):
         installed = {}

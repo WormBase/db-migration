@@ -14,6 +14,7 @@ import zipfile
 import click
 
 from . import github
+from . import notifications
 from . import root_command
 from .log import get_logger
 from .util import download

@@ -153,27 +153,48 @@ def all_migration_steps(context):
     ** Only performed if you confirm report output looks good (7).
 
     """
-    call = click.get_current_context().invoke
-    logger.info('Step 0: Installing all required software')
     logs_dir = context.path('edn-logs')
     dump_dir = context.path('acedb-dump')
-
-    installed = context.install_all_artefacts(install, call)
-    datomic_path = installed['datomic_free']
-    id_catalog_path = installed['acedb_id_catalog']
-
-    steps = (
-        ('Dumping all ACeDB files', acedb_dump, dump_dir),
-        ('Compresssing all ACeDB files', acedb_compress_dump, dump_dir),
-        ('Creating Datomic database', create_database, datomic_path),
-        ('Converting ACeDB files to EDN logs', ace_to_edn, dump_dir, logs_dir),
-        ('Sorting EDN logs by timestamp', sort_edn_logs, logs_dir),
-        ('Import EDN logs into Datomic database', import_logs, logs_dir),
-        ('Running QA report on Datomic database', qa_report, id_catalog_path),
-    )
+    datomic_path = context.path('datomic_free')
+    id_catalog_path = context.path('acedb_id_catalog')
+    headline_fmt = 'Migrating ACeDB {release} to Datomic, *Step {step}*'
+    release = context.versions['acedb_database']
+    steps = []
+    steps.append((1, 'Installing all software', install.all, {}))
+    steps.extend([
+        (0, 'Dumping all ACeDB files',
+         acedb_dump,
+         dict(dump_dir=dump_dir)),
+        (0, 'Compresssing all ACeDB files',
+         acedb_compress_dump,
+         dict(dump_dir=dump_dir)),
+        (0, 'Creating Datomic database',
+         create_database,
+         dict(datomic_path=datomic_path)),
+        (0, 'Converting ACeDB files to EDN logs',
+         ace_to_edn,
+         dict(acedb_dump_dir=dump_dir, edn_logs_dir=logs_dir)),
+        (0, 'Sorting EDN logs by timestamp',
+         sort_edn_logs,
+         dict(edn_logs_dir=logs_dir)),
+        (0, 'Importet EDN logs into Datomic database',
+         import_logs,
+         dict(edn_logs_dir=logs_dir)),
+        (1, 'Running QA report on Datomic database',
+         qa_report,
+         dict(acedb_id_catalog=id_catalog_path)),
+    ])
     for (step_n, step) in enumerate(steps, start=1):
-        (message, step_command, *step_args) = step
-        context.exec_step(step_n, message, step_command, *step_args)
+        (doit, message, step_command, step_kwargs) = step
+        if not doit:
+            continue
+        headline = headline_fmt.format(release=release, step=step_n)
+        with logger:
+            context.exec_step(step_n,
+                              headline,
+                              message,
+                              step_command,
+                              step_kwargs)
 
     # Final step
     if input('Backup database to S3? [y/N]:').lower().startswith('y'):

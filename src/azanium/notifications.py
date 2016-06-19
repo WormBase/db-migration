@@ -22,11 +22,20 @@ class URL(click.types.ParamType):
     opts = None
 
     def __init__(self, human_readable_name=None, **pr_match_kw):
+        """Initializes a click option type.
+
+        :params human_readable_name: Name shown to user.
+
+        Names of keywords provided as ``pr_match_kw`` (if any)
+        should match the attributes of ``urllib.parse.ParseResult`` -
+        the return type of ``urllib.parse.urlparse ``.
+        """
         if human_readable_name is not None:
             self.human_readable_name = human_readable_name
         self.match_parse_result = pr_match_kw
 
     def convert(self, value, param, ctx):
+        """Ensures `value` is a valid Slack webhook url."""
         try:
             pr = urllib.parse.urlparse(value)
             for (k, v) in self.match_parse_result.items():
@@ -107,10 +116,15 @@ def notify_threaded(*args, **kw):
 class Attachment(collections.Mapping):
 
     def __init__(self, title, **kw):
-        self._fields = dict(title=title, value='', short=False)
-        self.data = dict(fallback=kw.get('fallack', title),
+        self.title = title
+        self.fields = []
+        self.data = dict(title=self.title,
+                         fallback=kw.get('fallack', 'Fallback:' + self.title),
                          pretext=kw.get('pretext', ''),
-                         fields=self._fields)
+                         mrkdwn_in=['fields', 'pretext', 'text'],
+                         color=kw.get('color', 'good'),
+                         ts=kw.get('ts', time.time()),
+                         fields=self.fields)
 
     def __iter__(self):
         return iter(self.data)
@@ -128,8 +142,10 @@ class Attachment(collections.Mapping):
             value = content.decode('utf-8')
         else:
             raise ValueError('content must be str or bytes')
-        self._fields['value'] = value
-        self._fields['sort'] = len(value) <= 120
+        field = {}
+        field['value'] = value
+        field['short'] = len(value) <= 120
+        self.fields.append(field)
 
     def add_file(self, file_like):
         if isinstance(file_like, str) and os.path.isfile(file_like):

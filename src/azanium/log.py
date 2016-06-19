@@ -22,6 +22,14 @@ class Logger(logging.LoggerAdapter):
     def __init__(self, logger, extra=None):
         super(Logger, self).__init__(logger, extra or {})
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, tb):
+        if exc_type is not None:
+            self.exception(str(exc_value))
+            raise exc_value
+
     def log(self, level, msg, *args, **kw):
         if self.isEnabledFor(level):
             msg, kw = self.process(msg, kw)
