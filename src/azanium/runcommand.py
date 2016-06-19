@@ -22,7 +22,8 @@ def run(context):
     """
 
 
-@run.command('acedb-compress-dump', short_help='Compresses all ACeDB dump files.')
+@run.command('acedb-compress-dump',
+             short_help='Compresses all ACeDB dump files.')
 @click.argument('dump_dir')
 @util.pass_command_context
 def acedb_compress_dump(context, dump_dir):
