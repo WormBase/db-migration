@@ -35,9 +35,9 @@ def root_command(ctx, log_level, base_path, profile, assume_role):
     except ClientError as e:
         print(e)
         ctx.exit()
-    (profile_name, ar_profile_name) = awsiam.ensureconfig(command_context,
-                                                          session,
-                                                          role)
+    (profile_name, ar_profile_name) = awsiam.ensure_config(command_context,
+                                                           session,
+                                                           role)
     if ar_profile_name is not None:
         profiles = session._session.fullconfig['profiles']
         ar_profile = profiles[ar_profile_name]
