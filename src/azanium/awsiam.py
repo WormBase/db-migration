@@ -68,7 +68,7 @@ def ensure_config(ctx, session, role):
     for (prop, val) in [('region', session.region_name),
                         ('role_arn', role.arn),
                         ('source_profile', session.profile_name),
-                        ('role_session_name', '{.name}-assumed'.format(role))]:
+                        ('role_session_name', '{.name}'.format(role))]:
         changes.append(ensure_set_val(prop, val))
     if any(changes):
         config.write()
