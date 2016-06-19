@@ -25,7 +25,7 @@ from . import util
              help='AWS Role that will be assumed to execute the migrate')
 @click.pass_context
 def root_command(ctx, log_level, base_path, profile, assume_role):
-    """A WormBase DB Migration Command Line Tool."""
+    """WormBase DB Migration Command Line Tool."""
     command_context = util.CommandContext(base_path, profile, assume_role)
     session = awsiam.make_session(profile_name=command_context.profile)
     iam = session.resource('iam')
