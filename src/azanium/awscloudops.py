@@ -182,44 +182,22 @@ def report_status(instance):
     instance_state = instance.state.get('Name')
     is_active = instance_state != 'terminated'
     status = instance_state if is_active else 'terminated'
-    logger.info('Instance Id: ' '{}', instance.id)
-    logger.info('Tags: {}', instance.tags)
-    logger.info('Launched at: ' + instance.launch_time.isoformat(' '))
-    logger.info('Status: {}', status)
+    logger.debug('Instance Id: ' '{}', instance.id)
+    logger.debug('Tags: {}', instance.tags)
+    logger.debug('Launched at: ' + instance.launch_time.isoformat(' '))
     if is_active:
-        logger.info('Instance Type: {}', instance.instance_type)
-        logger.info('Instance Public DNS name: {}', instance.public_dns_name)
-        logger.info('Instance Public IP Address: {}',
-                    instance.public_ip_address)
+        logger.debug('Instance Type: {}', instance.instance_type)
+        logger.debug('Instance Public DNS name: {}', instance.public_dns_name)
+        logger.debug('Instance Public IP Address: {}',
+                     instance.public_ip_address)
+    logger.info('Instance is {}', status.capitalize())
 
 
 @root_command.group()
-@util.option('--profile',
-             default='default',
-             help='AWS profile')
-@util.option('--assume-role',
-             default=awsiam.DB_MIG_ROLE,
-             help='AWS Role that will be assumed to execute the migrate')
 @util.pass_command_context
-def cloud(ctx, profile, assume_role):
+def cloud(ctx):
     """AWS EC2 operations for the WormBase database migration."""
-    ctx.profile = profile
-    session = awsiam.make_session(profile_name=profile)
-    iam = session.resource('iam')
-    role = iam.Role(assume_role)
-    role.load()
-    (profile_name, ar_profile_name) = awsiam.ensure_config(ctx, session, role)
-    if ar_profile_name is not None:
-        profiles = session._session.full_config['profiles']
-        ar_profile = profiles[ar_profile_name]
-        try:
-            session = awsiam.make_session(profile_name)
-        except ClientError:
-            pass
-        else:
-            ctx.assumed_role = ar_profile['role_arn']
-    ctx.session = session
-    ctx.db_mig_state = util.aws_state()
+    pass
 
 
 @cloud.command(short_help='Start the migrate process')
