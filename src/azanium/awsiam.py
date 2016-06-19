@@ -20,8 +20,6 @@ DB_MIG_GROUP_POLICIES = {
     'IAMReadOnlyAccess',
 }
 
-logger = get_logger(__name__)
-
 DB_MIG_ROLE_POLICIES = {
     'DecodeAuthorizationMessages',
     'IAMReadOnlyAccess',
@@ -32,6 +30,8 @@ DB_MIG_ROLE_POLICIES = {
     'ec2-tagging',
     's3-datomic-backups-full-access'
 }
+
+logger = get_logger(namespace=__name__)
 
 
 def make_session(profile_name):

@@ -162,9 +162,9 @@ def ftp_connection(host, logger):
 def ftp_download(host,
                  file_selector_regexp,
                  download_dir,
+                 logger,
                  initial_cwd=None):
     downloaded = []
-    logger = log.get_logger()
     file_selector = functools.partial(re.match, file_selector_regexp)
     with ftp_connection(host, logger) as ftp:
         if initial_cwd is not None:
