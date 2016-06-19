@@ -1,7 +1,6 @@
 import os
-import github3
 
-from .util import download
+import github3
 
 
 def download_release_binary(repo_path, tag, to_directory=None):
@@ -23,12 +22,11 @@ def download_release_binary(repo_path, tag, to_directory=None):
     (org_name, _, repo_name) = repo_path.partition('/')
     repo = github3.repository(org_name, repo_name)
     release = repo.release_from_tag(tag)
-    markdown_text = release.body
-    li = markdown_text.find('(') + 1
-    ri = markdown_text.rfind(')')
-    download_url = markdown_text[li:ri]
-    if to_directory is None:
-        to_directory = os.getcwd()
-    local_filename = download_url.rsplit('/')[-1]
-    local_path = os.path.join(to_directory, local_filename)
-    return download(download_url, local_path)
+    asset = next(release.assets(), None)
+    asset_tarball_name = '{name}-{version}.tar.gz'.format(name=repo_name,
+                                                          version=tag)
+    if asset is None or asset.name != asset_tarball_name:
+        msg = 'Expected asset {!r} has not been uploaded to github releases'
+        raise EnvironmentError(msg.format(asset_tarball_name))
+    local_path = os.path.join(to_directory, asset.name)
+    return asset.download(path=local_path)

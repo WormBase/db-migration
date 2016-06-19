@@ -227,11 +227,37 @@ def pseudoace(meta):
     tempdir = tempfile.mkdtemp()
     with tarfile.open(dl_path) as tf:
         tf.extractall(path=tempdir)
-    fullname = 'pseudoace-' + tag
+    archive_filename = os.path.split(dl_path)[-1]
+    fullname = archive_filename.rsplit('.', 2)[0]
     tmp_src_path = os.path.join(tempdir, fullname)
     src_path = tmp_src_path.rstrip('-' + tag)
     os.rename(tmp_src_path, src_path)
     shutil.rmtree(install_dir)
     shutil.move(src_path, install_dir)
-    logger.info('Extracted pseudoace-{} to {}', tag, install_dir)
+    logger.info('Extracted {} to {}', archive_filename, install_dir)
     return install_dir
+
+
+@install.command('all', short_help='Installs everything')
+@pass_command_context
+def all(context):
+    """Installs all software and data."""
+    # Invoke all commands via the install group command chain.
+    # This has the same effect as if run on command line, e.g:
+    # azanium install dataomic_free pseudoace acedb_database ..
+    ctx = click.get_current_context()
+    install_cmd_names = sorted(context.versions)
+    orig_protected_args = ctx.protected_args[:]
+    ctx.protected_args.extend(install_cmd_names)
+    try:
+        install.invoke(ctx)
+    finally:
+        ctx.protected_args[:] = orig_protected_args
+    attachments = []
+    for name in install_cmd_names:
+        version = context.versions[name]
+        title = 'Installed {} (version: {})'.format(name, version)
+        ts = os.path.getmtime(context.path(name))
+        attachment = notifications.Attachment(title, ts=ts)
+        attachments.append(attachment)
+    return attachments
