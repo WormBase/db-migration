@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import base64
 import contextlib
+import mimetypes
 import os
 import pprint
 import re
@@ -11,11 +12,12 @@ from botocore.exceptions import ClientError
 from pkg_resources import resource_filename
 from scp import SCPClient
 import click
+import configobj
 
-from . import root_command
 from . import awsiam
+from . import config
 from . import log
-from . import notifications
+from . import root_command
 from . import ssh
 from . import util
 
@@ -281,7 +283,7 @@ def init(ctx,
                               KeyPairName=key_pair.name,
                               public_dns_name=instance.public_dns_name,
                               public_ip_addr=instance.public_ip_address,
-                              started_by=session.profile_name,
+                              started_by=ctx.user_profile,
                               ws_data_release=ws_data_release)
     state['current'] = state[instance.id]
     util.echo_waiting('Waiting for instance to enter running state ... ')
@@ -330,3 +332,47 @@ def view_state(ctx):
 def status(ctx):
     with latest_migration_state(ctx) as (instance, _):
         report_status(instance)
+
+
+@cloud.command('upload-file',
+               short_help='Upload a file to a db-migration folder on s3')
+@util.option('-b', '--bucket-name',
+             default='wormbase',
+             help='Name of the S3 bucket')
+@util.pass_command_context
+@click.argument('path_to_upload')
+@click.argument('path_in_bucket')
+def upload_file(ctx, path_to_upload, path_in_bucket, bucket_name):
+    session = ctx.session
+    s3 = session.resource('s3')
+    key = path_in_bucket
+    bucket = s3.Bucket(bucket_name)
+    config_path = awsiam.get_conf_var(session, 'config_file')
+    conf = configobj.ConfigObj(config_path)
+    role_arn = conf['profile ' + ctx.assumed_profile]['role_arn']
+    extra_args = {
+        'Metadata': {
+            'CreatedBy': ctx.user_profile,
+            'AssumedRole': role_arn.rsplit('/', 1)[-1]
+        },
+        'ACL': 'public-read'
+    }
+    ct_match = mimetypes.guess_type(path_to_upload)
+    if ct_match:
+        extra_args['ContentType'] = ct_match[0]
+    try:
+        logger.debug('{} (assumed role:{}) '
+                     'is attempting to upload {} to s3://{}/{}',
+                     ctx.user_profile,
+                     ctx.assumed_profile,
+                     path_to_upload,
+                     bucket_name,
+                     key)
+        bucket.upload_file(path_to_upload, key, ExtraArgs=extra_args)
+    except ClientError as client_err:
+        logger.exception(str(client_err))
+        click.get_current_context().exit()
+    else:
+        url = 'https://s3.amazonaws.com/{}/{}'.format(bucket.name, key)
+        logger.info('Uploaded {} to {}', path_to_upload, url)
+    return url

@@ -2,6 +2,8 @@ import logging
 import os
 import psutil
 
+import markdown
+
 from . import util
 
 
@@ -67,3 +69,13 @@ def qa_report(context, acedb_id_catalog_path):
                   '--report-filename=' + out_path,
                   'generate-report')
     return out_path
+
+
+def qa_report_to_html(report_path, title):
+    with open(report_path) as fp:
+        report_matrix = list(line.strip().split() for line in fp)
+    md_table = util.markdown_table(report_matrix)
+    html_report = '<html><body><h1>{title}</h1>'.format(title=title)
+    html_report += markdown.markdown(md_table, ['markdown.extensions.extra'])
+    html_report += '</body></html>'
+    return html_report

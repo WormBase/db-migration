@@ -1,7 +1,9 @@
+import contextlib
 import functools
 import json
 import operator
 import os
+import tempfile
 
 import boto3
 import click

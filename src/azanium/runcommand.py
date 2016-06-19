@@ -1,8 +1,10 @@
 import os
 import psutil
+import tempfile
 
 import click
 
+from . import awscloudops
 from . import root_command
 from . import datomic
 from . import install
@@ -90,11 +92,22 @@ def qa_report(context, acedb_id_catalog):
 
     """
     report_path = pseudoace.qa_report(context, acedb_id_catalog)
-    title = 'QA report for {[acedb_database]}'.format(context.versions)
-    pretext = ('Please check this looks correct '
-               'before backing the datomic database')
+    key_template = 'db-migration/{}-report.html'
+    bucket_path = key_template.format(context.versions['acedb_database'])
+    with tempfile.NamedTemporaryFile(suffix='WS252-report.html') as fp:
+        html_title = 'QA Report for {versions[acedb_database]}'
+        html_title = html_title.format(versions=context.versions)
+        html_report = pseudoace.qa_report_to_html(report_path, html_title)
+        fp.write(html_report.encode('utf-8'))
+        invoke = click.get_current_context().invoke
+        report_url = invoke(awscloudops.upload_file,
+                            path_to_upload=fp.name,
+                            path_in_bucket=bucket_path)
+    title = 'QA report for {versions[acedb_database]} available at <{loc}>'
+    title = title.format(versions=context.versions, loc=report_url)
+    pretext = ('*Please check this looks correct '
+               'before backing the datomic database*')
     attachment = notifications.Attachment(title, pretext=pretext)
-    attachment.add_file(open(report_path))
     return attachment
 
 

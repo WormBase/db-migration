@@ -58,6 +58,36 @@ class LocalCommandError(Exception):
     """Raised for commands that produce output on stderr."""
 
 
+def markdown_table(rows):
+    column_matrix = list(map(list, itertools.zip_longest(*rows)))
+    len_matrix = map(list, (map(len, columns) for columns in column_matrix))
+    col_max_lens = list(max(lens) for lens in len_matrix)
+    divider = []
+    matrix = collections.deque(rows)
+    header_row = matrix.popleft()
+    # cls_rows = tuple(set(map(tuple, matrix)))
+
+    cls_rows = tuple(set((row[0],) + tuple(map(int, row[1:]))
+                         for row in matrix))
+    matrix = sorted(cls_rows, key=operator.itemgetter(1), reverse=True)
+    matrix.insert(0, header_row)
+    matrix = list(map(str, row) for row in matrix)
+    # matrix.sort(key=operator.itemgetter(0))
+    # matrix = [matrix[0]] + sorted(tuple(set(tuple(map(tuple, matrix[1:])))),
+    #                               key=operator.itemgetter(0))
+    for i, columns in enumerate(column_matrix):
+        divider.append('-' * col_max_lens[i])
+    matrix.insert(1, divider)
+    lines = []
+    for i, row in enumerate(matrix):
+        line = ['| ']
+        for j, cell in enumerate(row):
+            line.append(' {} '.format(cell.rjust(col_max_lens[j])))
+            line.append(' |')
+        lines.append(''.join(line))
+    return os.linesep.join(lines)
+
+
 def local(cmd,
           input=None,
           timeout=None,
@@ -213,8 +243,10 @@ def make_executable(path, logger, mode=0o775, symlink_dir='~/.local/bin'):
 
 class CommandContext:
 
-    def __init__(self, base_path):
+    def __init__(self, base_path, profile, assume_role):
         self.base_path = base_path
+        self.profile = profile
+        self.assume_role = assume_role
         self.versions = get_deploy_versions()
 
     @property
