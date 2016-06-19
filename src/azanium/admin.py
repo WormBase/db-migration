@@ -4,13 +4,10 @@ import json
 import click
 from botocore.exceptions import ClientError
 
-from . import root_command
 from . import awsiam
 from . import log
+from . import root_command
 from . import util
-
-
-logger = log.get_logger(__name__)
 
 
 AWSMeta = collections.namedtuple('AWSMeta', (
