@@ -14,7 +14,6 @@ import click
 import configobj
 import requests
 
-from . import log
 from . import notifications
 
 

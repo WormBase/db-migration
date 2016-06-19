@@ -1,19 +1,18 @@
 import collections
+import importlib
 import os
 import re
 import urllib
+import time
 import threading
 
-from configobj import ConfigObj
 import click
 import requests
 
-from . import log
+from . import config
 
-CONF_PATH = os.path.expanduser('~/.azanium.conf')
 
-DEFAULTS = dict(channel='wb-db-migration-alerts',
-                icon_emoji=':wormbase-db-dev:')
+DEFAULTS = dict(icon_emoji=':wormbase-db-dev:')
 
 
 class URL(click.types.ParamType):
