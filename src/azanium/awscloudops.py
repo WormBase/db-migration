@@ -165,8 +165,8 @@ def bootstrap(ctx, ec2_instance, package_version):
         for cmd in pip_install_cmds:
             try:
                 out = ssh.exec_command(conn, cmd)
-            except Exception:
-                logger.exception()
+            except Exception as e:
+                logger.exception(str(e))
             else:
                 logger.debug(out)
 
