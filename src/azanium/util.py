@@ -275,7 +275,7 @@ class CommandContext:
                   **notify_kw):
         ctx = click.get_current_context()
         ctx.params = step_kwargs
-        attachments_pre = [notifications.Attachment(title=headline)]
+        attachments_pre = [notifications.Attachment(title=message)]
         notifications.notify(headline, attachments=attachments_pre)
         rv = step_command.invoke(ctx)
         notifications.notify(headline + ' - *complete*', attachments=rv)
