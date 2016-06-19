@@ -107,7 +107,6 @@ def notify(message,
 
 
 def notify_threaded(*args, **kw):
-    kw.setdefault('channel', 'test-webhook-for-mig')
     t = threading.Thread(target=notify, args=args, kwargs=kw)
     t.start()
     t.join()
