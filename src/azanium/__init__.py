@@ -39,7 +39,7 @@ def root_command(ctx, log_level, base_path, profile, assume_role):
                                                            session,
                                                            role)
     if ar_profile_name is not None:
-        profiles = session._session.fullconfig['profiles']
+        profiles = session._session.full_config['profiles']
         ar_profile = profiles[ar_profile_name]
         try:
             session = awsiam.make_session(profile_name)
