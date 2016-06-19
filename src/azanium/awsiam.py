@@ -81,6 +81,23 @@ def ensure_config(ctx, session, role):
     return (sess.profile_name, profile_name)
 
 
+def get_conf_var(session, varname):
+    return os.path.expanduser(session._session.get_config_variable(varname))
+
+
+@contextlib.contextmanager
+def copy_config_file(session, artefact, keys):
+    src = configobj.ConfigObj(get_conf_var(session, artefact + '_file'))
+    fn_suffix = 'aws-' + artefact + '-copy'
+    with tempfile.NamedTemporaryFile(suffix=fn_suffix) as fp:
+        dest = configobj.ConfigObj(fp.name)
+        for key in keys:
+            dest[key] = src[key]
+        dest['default'] = dest[keys[0]]
+        dest.write()
+        yield fp.name
+
+
 def ensure_role(iam,
                 role_name=DB_MIG_ROLE,
                 role_policies=DB_MIG_ROLE_POLICIES,

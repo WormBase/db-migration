@@ -107,7 +107,7 @@ def get_archive_filename():
     return archive_filename
 
 
-def bootstrap(ec2_instance, package_version):
+def bootstrap(ctx, ec2_instance, package_version):
     """Deploy this package to the AWS instance.
 
     This involves scp'ing the data due to the repo being private.
@@ -118,10 +118,11 @@ def bootstrap(ec2_instance, package_version):
 
     This also requires the system package 'python3-dev'.
     """
+    session = ctx.session
     finished_regex = re.compile(r'Cloud-init.*finished')
     archive_filename = get_archive_filename()
     dist_path = os.path.join('dist', archive_filename)
-    conf_filename = os.path.basename(notifications.CONF_PATH)
+    conf_filename = os.path.basename(config.PATH)
     util.local('python setup.py sdist')
 
     # Wait for cloud-init/config process to finish
@@ -135,11 +136,24 @@ def bootstrap(ec2_instance, package_version):
             break
         time.sleep(30)
 
-    # Upload the tar file and configuration
+    # Upload the tar file and configuration files
+    aws_conf_dir = '~/.aws'
+    copy_config_file = awsiam.copy_config_file
+    aws_config_2_copy = (
+        ('credentials', [ctx.user_profile]),
+        ('config', ['profile ' + ctx.user_profile,
+                    'profile ' + ctx.assumed_profile])
+    )
     with ssh.connection(ec2_instance) as conn:
+        ssh.exec_command(conn, 'mkdir ' + aws_conf_dir)
         with SCPClient(conn.get_transport()) as scp:
             scp.put(dist_path, archive_filename)
-            scp.put(notifications.CONF_PATH, conf_filename)
+            scp.put(config.PATH, conf_filename)
+
+            for (artefact, keys) in aws_config_2_copy:
+                with copy_config_file(session, artefact, keys) as tmp_path:
+                    remote_conf_path = os.path.join(aws_conf_dir, artefact)
+                    scp.put(tmp_path, remote_conf_path)
 
     # Now the wormbase-db-migrate package dependencies are available
     # and installation can proceed
@@ -276,7 +290,7 @@ def init(ctx,
     wait_for_sshd(instance)
     util.echo_waiting(
         'Bootstrapping instance with {}'.format(__package__))
-    bootstrap(instance, wb_db_migrate_version)
+    bootstrap(ctx, instance, wb_db_migrate_version)
     util.echo_sig('done')
     report_status(instance)
     msg = 'ssh -i {} -l ec2-user {}'
