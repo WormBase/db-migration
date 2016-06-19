@@ -16,13 +16,13 @@ from . import util
 @util.option('-b', '--base-path',
              default='/media/ephemeral0/wormbase',
              help=('The default base directory all software and data '
-                   'will be installed into'))
+                   'will be installed into.'))
 @util.option('--profile',
              default='default',
              help='AWS profile')
 @util.option('--assume-role',
              default=awsiam.DB_MIG_ROLE,
-             help='AWS Role that will be assumed to execute the migrate')
+             help='AWS Role that will be assumed.')
 @click.pass_context
 def root_command(ctx, log_level, base_path, profile, assume_role):
     """WormBase DB Migration Command Line Tool."""
