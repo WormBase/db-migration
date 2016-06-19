@@ -68,13 +68,21 @@ def notify(message,
            username=None,
            color=None,
            n_retries=3):
-    conf = config()
-    logger = log.get_logger(__name__)
+    conf = config.parse()
+    log = importlib.import_module(__package__ + '.log')
+    logger = log.get_logger(namespace=__name__)
     data = dict(text=message)
-    if channel is not None:
-        data['channel'] = channel
+
+    # XXX: remove - debugging!
+    channel = 'test-webhook-for-mig'
     if attachments is not None:
+        if isinstance(attachments, Attachment):
+            attachments = [attachments]
         data['attachments'] = list(map(dict, attachments))
+    if channel is not None:
+        if not channel.startswith('#'):
+            channel = '#' + channel
+        data['channel'] = channel
     if icon_emoji is not None:
         data['icon_emoji'] = icon_emoji
     if username is not None:

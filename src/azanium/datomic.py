@@ -1,12 +1,12 @@
-import logging
 import time
 
 from configobj import ConfigObj
 
+from . import log
 from . import util
 
 
-logger = logging.getLogger(__name__)
+logger = log.get_logger(namespace=__name__)
 
 
 def backup_db(context, db):

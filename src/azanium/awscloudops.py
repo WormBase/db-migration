@@ -44,7 +44,7 @@ BLOCK_DEVICE_MAPPINGS = [{
 
 EC2_INSTANCE_ROLE = 'development'
 
-logger = log.get_logger(__name__)
+logger = log.get_logger(namespace=__name__)
 
 
 def load_ec2_instance_from_state(ctx, state):

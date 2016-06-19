@@ -12,7 +12,7 @@ from . import pseudoace
 from . import util
 
 
-logger = log.get_logger(__name__, verbose=True)
+logger = log.get_logger(namespace=__name__)
 
 
 @root_command.group()
