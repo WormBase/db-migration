@@ -51,7 +51,6 @@ setup(
     extras_require={
         'dev': [
             'Sphinx',
-            # 'sphinx_bootstrap_theme',
             'sphinx_rtd_theme',
             'zest.releaser[recommended]',
         ]
