@@ -114,6 +114,16 @@ def notify_threaded(*args, **kw):
     t.join()
 
 
+def around(func, headline, message, pre_kw=None, post_kw=None):
+    pre_kw = pre_kw if pre_kw else {}
+    post_kw = post_kw if post_kw else {}
+    post_kw.setdefault('color', 'good')
+    attachments_pre = [Attachment(title=message)]
+    notify(headline, attachments=attachments_pre, **pre_kw)
+    result = func()
+    notify(headline + ' - *complete*', attachments=result, **post_kw)
+
+
 class Attachment(collections.Mapping):
 
     def __init__(self, title, **kw):

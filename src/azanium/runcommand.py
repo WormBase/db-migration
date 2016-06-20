@@ -1,6 +1,7 @@
 import os
 import psutil
 import tempfile
+from functools import partial
 
 import click
 
@@ -161,9 +162,18 @@ def all_migration_steps(context):
     id_catalog_path = context.path('acedb_id_catalog')
     headline_fmt = 'Migrating ACeDB {release} to Datomic, *Step {step}*'
     release = context.versions['acedb_database']
+    ctx = click.get_current_context()
     steps = []
-    steps.append((1, 'Installing all software', install.all, {}))
-    steps.extend([
+    step_n = 1
+    with logger:
+        headline = headline_fmt.format(release=release, step=step_n)
+        command = partial(install.all.invoke, ctx)
+        if 0:
+            notifications.around(command,
+                                 headline,
+                                 'Installing all software and ACeDB')
+    step_n += 1
+    steps = [
         (0, 'Dumping all ACeDB files',
          acedb_dump,
          dict(dump_dir=dump_dir)),

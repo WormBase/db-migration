@@ -270,15 +270,17 @@ class CommandContext:
                   step_n,
                   headline,
                   message,
-                  step_command,
+                  step_func,
                   step_kwargs,
-                  **notify_kw):
+                  **post_notify_kw):
         ctx = click.get_current_context()
         ctx.params = step_kwargs
         attachments_pre = [notifications.Attachment(title=message)]
         notifications.notify(headline, attachments=attachments_pre)
-        rv = step_command.invoke(ctx)
-        notifications.notify(headline + ' - *complete*', attachments=rv)
+        rv = step_func(ctx)
+        notifications.notify(headline + ' - *complete*',
+                             attachments=rv,
+                             **post_notify_kw)
 
     def install_all_artefacts(self, installers, call):
         installed = {}
