@@ -1,10 +1,19 @@
+import click
 
+from . import admin
+from . import awscloudops
+from . import install
+from . import notifications
 from . import root_command
-from . import github
-from . import admin, awscloudops, install, notifications, runcommand
+from . import runcommand
 
-# imported for side effect of command group population.
-# Silence PEP8 linter
-_ = admin, awscloudops, install, notifications, runcommand, github
+
+cli = click.CommandCollection(sources=[
+    admin,
+    awscloudops,
+    install,
+    notifications,
+    runcommand
+])
 
 cli = root_command(obj={})
