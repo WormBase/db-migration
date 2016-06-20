@@ -3,6 +3,11 @@ import os
 import github3
 
 
+def repo_from_path(repo_path):
+    (org_name, _, repo_name) = repo_path.partition('/')
+    return github3.repository(org_name, repo_name)
+
+
 def download_release_binary(repo_path, tag, to_directory=None):
     """Download a release binary from `repo_path` to `to_directory`.
 
@@ -19,11 +24,10 @@ def download_release_binary(repo_path, tag, to_directory=None):
     :returns: The path to the saved file.
     :rtype: str
     """
-    (org_name, _, repo_name) = repo_path.partition('/')
-    repo = github3.repository(org_name, repo_name)
+    repo = repo_from_path(repo_path)
     release = repo.release_from_tag(tag)
     asset = next(release.assets(), None)
-    asset_tarball_name = '{name}-{version}.tar.gz'.format(name=repo_name,
+    asset_tarball_name = '{name}-{version}.tar.gz'.format(name=repo.name,
                                                           version=tag)
     if asset is None or asset.name != asset_tarball_name:
         msg = 'Expected asset {!r} has not been uploaded to github releases'
