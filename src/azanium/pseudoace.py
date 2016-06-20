@@ -1,13 +1,13 @@
-import logging
 import os
 import psutil
 
 import markdown
 
+from . import log
 from . import util
 
 
-logger = logging.getLogger(__name__)
+logger = log.get_logger(namespace=__name__)
 
 
 def run_pseudoace(context, *args):
@@ -27,6 +27,7 @@ def create_database(context):
 
 def acedb_dump_to_edn_logs(context, acedb_dump_dir, edn_logs_dir):
     logger.info('Convering ACeDB files to EDN logs')
+    os.makedirs(edn_logs_dir, exist_ok=True)
     run_pseudoace(context,
                   '--acedump-dir=' + acedb_dump_dir,
                   '--log-dir=' + edn_logs_dir,

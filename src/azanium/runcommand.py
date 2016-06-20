@@ -127,7 +127,8 @@ def import_logs(context, edn_logs_dir):
 def backup_db_to_s3(context):
     """Back up the Datomic database to Amazon S3 storage."""
     os.chdir(context.path('datomic_free'))
-    datomic.backup_db(context.data_release_version)
+    s3_uri = datomic.backup_db(context.data_release_version)
+    return 'Datomic database transferred to {uri}.'.format(uri=s3_uri)
 
 
 @run.command('all-migration-steps', short_help='Runs all db migration steps')
