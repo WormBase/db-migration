@@ -70,7 +70,7 @@ def notify(message,
            username=None,
            color=None,
            n_retries=3):
-    conf = config.parse()
+    conf = config.parse(section=__name__)
     log = importlib.import_module(__package__ + '.log')
     logger = log.get_logger(namespace=__name__)
     data = dict(text=message)
