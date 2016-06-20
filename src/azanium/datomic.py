@@ -17,6 +17,7 @@ def backup_db(context, db):
     logger.info('Backing up database {} to {}', from_uri, to_uri)
     util.local(cmd, cwd=cwd)
     logger.info('Database backup complete')
+    return to_uri
 
 
 def configure_transactor(context, datomic_path):
