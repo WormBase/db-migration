@@ -80,6 +80,8 @@ def notify(message,
     if attachments is not None:
         if isinstance(attachments, Attachment):
             attachments = [attachments]
+        elif isinstance(attachments, str):
+            attachments = [Attachment(title=attachments)]
         data['attachments'] = list(map(dict, attachments))
     if channel is not None:
         if not channel.startswith('#'):
