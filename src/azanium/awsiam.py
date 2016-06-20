@@ -59,7 +59,7 @@ def ensure_config(ctx, session, role):
     config_file = p_session.get_config_variable('config_file')
     config_path = os.path.expanduser(config_file)
     config = configobj.ConfigObj(config_path, raise_errors=True)
-    assume_role_profile_name = '{.name}-assumer'.format(role)
+    assume_role_profile_name = role.name
     section = 'profile ' + assume_role_profile_name
     if section not in set(config):
         config.setdefault(section, {})
