@@ -44,7 +44,7 @@ def prepare_target_db(context, edn_logs_dir, acedb_dump_dir):
 
 def sort_edn_logs(context, edn_logs_dir):
     pseudoace_path = context.path('pseudoace')
-    script_path = os.path.join(pseudoace_path, 'sort_edn_log.sh')
+    script_path = os.path.join(pseudoace_path, 'sort-edn-log.sh')
     n_procs = str(psutil.cpu_count())
     cmd = ['find', edn_logs_dir, '-type', 'f', '-name', '"*.edn.gz"']
     cmd.extend(['|', 'xargs', '-n', '1', '-P', n_procs, script_path])
