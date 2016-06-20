@@ -44,9 +44,8 @@ class URL(click.types.ParamType):
                     break
             else:
                 fail = False
-        except Exception as e:
+        except AttributeError:
             fail = True
-            raise e
         else:
             response = requests.get(pr.geturl())
             if response.status_code != 400:
