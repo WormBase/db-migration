@@ -173,33 +173,35 @@ def all_migration_steps(context):
         (0, 'Creating Datomic database',
          create_database,
          dict(datomic_path=datomic_path)),
-        (0, 'Converting ACeDB files to EDN logs',
+        (1, 'Converting ACeDB files to EDN logs',
          ace_to_edn,
          dict(acedb_dump_dir=dump_dir, edn_logs_dir=logs_dir)),
-        (0, 'Sorting EDN logs by timestamp',
+        (1, 'Sorting EDN logs by timestamp',
          sort_edn_logs,
          dict(edn_logs_dir=logs_dir)),
-        (0, 'Importet EDN logs into Datomic database',
+        (1, 'Import EDN logs into Datomic database',
          import_logs,
          dict(edn_logs_dir=logs_dir)),
         (1, 'Running QA report on Datomic database',
          qa_report,
          dict(acedb_id_catalog=id_catalog_path)),
-    ])
-    for (step_n, step) in enumerate(steps, start=1):
+        (1,
+         ('@{user} - How does the report look?'
+          'Please answer the question in ssh console session '
+          'to continue the db migration '
+          'process').format(user=context.user_profile),
+         backup_db_to_s3,
+         dict(prompt='Backup database to S3? [y/N]:'))
+    ]
+    for (step_n, step) in enumerate(steps, start=step_n):
         (doit, message, step_command, step_kwargs) = step
+        headline = headline_fmt.format(release=release, step=step_n)
+        command = partial(ctx.invoke, step_command, **step_kwargs)
         if not doit:
             continue
-        headline = headline_fmt.format(release=release, step=step_n)
         with logger:
-            context.exec_step(step_n,
-                              headline,
-                              message,
-                              step_command,
-                              step_kwargs)
-
-    # Final step
-    if input('Backup database to S3? [y/N]:').lower().startswith('y'):
-        context.exec_step(step_n + 1,
-                          backup_db_to_s3,
-                          icon_emoji=':fireworks:')
+            if step_command is backup_db_to_s3:
+                post_kw = dict(icon_emoji=':fireworks:')
+            else:
+                post_kw = {}
+            notifications.around(command, headline, message, post_kw=post_kw)

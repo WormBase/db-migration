@@ -339,10 +339,12 @@ def status(ctx):
 @util.option('-b', '--bucket-name',
              default='wormbase',
              help='Name of the S3 bucket')
+@util.option('-p', '--prompt',
+             default=None)
 @util.pass_command_context
 @click.argument('path_to_upload')
 @click.argument('path_in_bucket')
-def upload_file(ctx, path_to_upload, path_in_bucket, bucket_name):
+def upload_file(ctx, path_to_upload, path_in_bucket, bucket_name, prompt):
     session = ctx.session
     s3 = session.resource('s3')
     key = path_in_bucket
@@ -368,6 +370,8 @@ def upload_file(ctx, path_to_upload, path_in_bucket, bucket_name):
                      path_to_upload,
                      bucket_name,
                      key)
+        if prompt and not input(prompt).lower().startswith('y'):
+            click.get_current_context().abort()
         bucket.upload_file(path_to_upload, key, ExtraArgs=extra_args)
     except ClientError as client_err:
         logger.exception(str(client_err))
