@@ -46,7 +46,7 @@ def acedb_compress_dump(context, dump_dir):
              help='tace "Dump" command options')
 @click.argument('dump_dir')
 @util.pass_command_context
-def acedb_dump(context, tace_dump_options, dump_dir):
+def acedb_dump(context, dump_dir, tace_dump_options):
     """Dump the ACeDB database."""
     db_directory = context.path('acedb_database')
     os.makedirs(dump_dir, exist_ok=True)
