@@ -13,6 +13,8 @@ from pkg_resources import resource_filename
 from scp import SCPClient
 import click
 import configobj
+import git
+import github3
 
 from . import awsiam
 from . import config
@@ -109,7 +111,68 @@ def get_archive_filename():
     return archive_filename
 
 
-def bootstrap(ctx, ec2_instance, package_version):
+def deploy_aws_config(ctx, ec2_instance):
+    session = ctx.session
+    aws_conf_dir = '~/.aws'
+    copy_config_file = awsiam.copy_config_file
+    conf_filename = os.path.basename(config.PATH)
+    aws_config_2_copy = (
+        ('credentials', [ctx.user_profile]),
+        ('config', ['profile ' + ctx.user_profile,
+                    'profile ' + ctx.assumed_profile])
+    )
+    with ssh.connection(ec2_instance) as conn:
+        ssh.exec_command(conn, 'mkdir ' + aws_conf_dir)
+        with SCPClient(conn.get_transport()) as scp:
+            scp.put(config.PATH, conf_filename)
+
+            for (artefact, keys) in aws_config_2_copy:
+                with copy_config_file(session, artefact, keys) as tmp_path:
+                    remote_conf_path = os.path.join(aws_conf_dir, artefact)
+                    scp.put(tmp_path, remote_conf_path)
+
+
+def deploy_myself(ctx, ec2_instance, dev_mode=False):
+    pip_install = 'python3 -m pip install --user '
+    pip_install_cmds = [pip_install + ' --upgrade pip']
+    if dev_mode:
+        repo = git.Repo()
+        tracking_branch = repo.head.ref.tracking_branch()
+        if tracking_branch is None or not tracking_branch.is_remote():
+            raise EnvironmentError(
+                'Cannot deploy from a non-tracking branch.\n'
+                'Use:\n'
+                '\tgit branch --setup-upstream-to'
+                'to fix this issue.')
+        # XXX: pip install <url>#branch-name
+        # curr_branch = tracking_branch
+        url = repo.remotes.origin.url.replace(':', '/')
+        url = url[url.find('@') + 1:]
+        url = 'git+ssh://{}url@{}#egg={}[dev]'.format(
+            url,
+            tracking_branch.remote_head,
+            __package__)
+        install_cmd = pip_install + url
+        pip_install_cmds.append(install_cmd)
+    else:
+        repo = github3.repository('Wormbase', 'db-migration')
+        release_asset = next(repo.latest_release().assets(), None)
+        if release_asset is None:
+            raise EnvironmentError(
+                'No binary files uploaded to latest release')
+        latest_release_url = release_asset.browser_download_url
+        pip_install_cmds.append(pip_install + latest_release_url)
+    with ssh.connection(ec2_instance) as conn:
+        for cmd in pip_install_cmds:
+            try:
+                out = ssh.exec_command(conn, cmd)
+            except Exception as e:
+                logger.exception(str(e))
+            else:
+                logger.debug(out)
+
+
+def bootstrap(ctx, ec2_instance, package_version, dev_mode=False):
     """Deploy this package to the AWS instance.
 
     This involves scp'ing the data due to the repo being private.
@@ -120,12 +183,7 @@ def bootstrap(ctx, ec2_instance, package_version):
 
     This also requires the system package 'python3-dev'.
     """
-    session = ctx.session
     finished_regex = re.compile(r'Cloud-init.*finished')
-    archive_filename = get_archive_filename()
-    dist_path = os.path.join('dist', archive_filename)
-    conf_filename = os.path.basename(config.PATH)
-    util.local('python setup.py sdist')
 
     # Wait for cloud-init/config process to finish
     while True:
@@ -138,39 +196,8 @@ def bootstrap(ctx, ec2_instance, package_version):
             break
         time.sleep(30)
 
-    # Upload the tar file and configuration files
-    aws_conf_dir = '~/.aws'
-    copy_config_file = awsiam.copy_config_file
-    aws_config_2_copy = (
-        ('credentials', [ctx.user_profile]),
-        ('config', ['profile ' + ctx.user_profile,
-                    'profile ' + ctx.assumed_profile])
-    )
-    with ssh.connection(ec2_instance) as conn:
-        ssh.exec_command(conn, 'mkdir ' + aws_conf_dir)
-        with SCPClient(conn.get_transport()) as scp:
-            scp.put(dist_path, archive_filename)
-            scp.put(config.PATH, conf_filename)
-
-            for (artefact, keys) in aws_config_2_copy:
-                with copy_config_file(session, artefact, keys) as tmp_path:
-                    remote_conf_path = os.path.join(aws_conf_dir, artefact)
-                    scp.put(tmp_path, remote_conf_path)
-
-    # Now the wormbase-db-migrate package dependencies are available
-    # and installation can proceed
-    pip_install = 'python3 -m pip install --user '
-    install_cmd = pip_install + archive_filename
-    pip_install_cmds = [pip_install + ' --upgrade pip',
-                        install_cmd]
-    with ssh.connection(ec2_instance) as conn:
-        for cmd in pip_install_cmds:
-            try:
-                out = ssh.exec_command(conn, cmd)
-            except Exception as e:
-                logger.exception(str(e))
-            else:
-                logger.debug(out)
+    deploy_aws_config(ctx, ec2_instance)
+    deploy_myself(ctx, ec2_instance, dev_mode=dev_mode)
 
 
 def aws_userid(session):
@@ -238,18 +265,18 @@ def cloud(ctx):
 @util.option('--keypair-name',
              default='wb-db-migrate',
              help='Name of EC2 KeyPair.')
-@click.argument('sdist_path', metavar='<sdist>')
+@util.option('--dev-mode/--no-dev-mode', default=False)
 @click.argument('ws_data_release', metavar='<WSXXX data release>')
 @util.pass_command_context
 def init(ctx,
-         sdist_path,
          ws_data_release,
          wb_db_migrate_version,
          ami,
          monitoring,
          instance_type,
          keypair_name,
-         dry_run):
+         dry_run,
+         dev_mode):
     """Start the migrate."""
     session = ctx.session
     state = ctx.db_mig_state
@@ -292,7 +319,7 @@ def init(ctx,
     wait_for_sshd(instance)
     util.echo_waiting(
         'Bootstrapping instance with {}'.format(__package__))
-    bootstrap(ctx, instance, wb_db_migrate_version)
+    bootstrap(ctx, instance, wb_db_migrate_version, dev_mode=dev_mode)
     util.echo_sig('done')
     report_status(instance)
     msg = 'ssh -i {} -l ec2-user {}'
