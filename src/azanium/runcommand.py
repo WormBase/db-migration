@@ -62,16 +62,18 @@ def acedb_dump(context, tace_dump_options, dump_dir):
 def create_database(context, datomic_path):
     """Creates a Datomic datbase for importing EDN logs into."""
     datomic.configure_transactor(context, datomic_path)
+    pseudoace.create_database(context)
     return 'Created'
 
 
 @run.command('acedb-dump-to-edn-logs',
              short_help='Converts .ace files to EDN logs')
+@util.pass_command_context
 @click.argument('acedb_dump_dir')
 @click.argument('edn_logs_dir')
 def ace_to_edn(context, acedb_dump_dir, edn_logs_dir):
     """Converts ACeDB dump files (.ace) to EDN log files."""
-    pseudoace.acedb_dump_to_edn_logs(context, edn_logs_dir, acedb_dump_dir)
+    pseudoace.acedb_dump_to_edn_logs(context, acedb_dump_dir, edn_logs_dir)
     return edn_logs_dir
 
 
