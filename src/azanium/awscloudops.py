@@ -155,7 +155,6 @@ def deploy_myself(ctx, ec2_instance, dev_mode=False):
     with ssh.connection(ec2_instance) as conn:
         for cmd in pip_install_cmds:
             try:
-                print('Running cmd via ssh: ', cmd)
                 out = ssh.exec_command(conn, cmd)
             except Exception as e:
                 logger.exception(str(e))
