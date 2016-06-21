@@ -136,35 +136,26 @@ def deploy_myself(ctx, ec2_instance, dev_mode=False):
     pip_install = 'python3 -m pip install --user '
     pip_install_cmds = [pip_install + ' --upgrade pip']
     if dev_mode:
-        repo = git.Repo()
-        tracking_branch = repo.head.ref.tracking_branch()
-        if tracking_branch is None or not tracking_branch.is_remote():
-            raise EnvironmentError(
-                'Cannot deploy from a non-tracking branch.\n'
-                'Use:\n'
-                '\tgit branch --setup-upstream-to'
-                'to fix this issue.')
-        # XXX: pip install <url>#branch-name
-        # curr_branch = tracking_branch
-        url = repo.remotes.origin.url.replace(':', '/')
-        url = url[url.find('@') + 1:]
-        url = 'git+ssh://{}url@{}#egg={}[dev]'.format(
-            url,
-            tracking_branch.remote_head,
-            __package__)
-        install_cmd = pip_install + url
-        pip_install_cmds.append(install_cmd)
+        util.local('python setup.py sdist')
+        archive_filename = util.distribution_name() + '.tar.gz'
+        with ssh.connection(ec2_instance) as conn:
+            with SCPClient(conn.get_transport()) as scp:
+                scp.put('dist/' + archive_filename, archive_filename)
+        pip_install_cmds.append(pip_install + archive_filename)
     else:
-        repo = github3.repository('Wormbase', 'db-migration')
+        git_url = git.Repo().remotes.origin.url
+        (org, repo_name) = git_url.rsplit(':')[1].rsplit('.')[0].split('/')
+        repo = github3.repository(org, repo_name)
         release_asset = next(repo.latest_release().assets(), None)
         if release_asset is None:
-            raise EnvironmentError(
-                'No binary files uploaded to latest release')
-        latest_release_url = release_asset.browser_download_url
-        pip_install_cmds.append(pip_install + latest_release_url)
+            raise EnvironmentError('Could not find latest release of ' +
+                                   __package__)
+        github_release_url = release_asset.browser_download_url
+        pip_install_cmds.append(pip_install + github_release_url)
     with ssh.connection(ec2_instance) as conn:
         for cmd in pip_install_cmds:
             try:
+                print('Running cmd via ssh: ', cmd)
                 out = ssh.exec_command(conn, cmd)
             except Exception as e:
                 logger.exception(str(e))
