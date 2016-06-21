@@ -29,6 +29,7 @@ INSTANCE_BASE_PATH = '/media/ephemeral0/wormbase'
 @click.pass_context
 def root_command(ctx, log_level, base_path, profile, assume_role):
     """WormBase DB Migration Command Line Tool."""
+    os.makedirs(base_path, exist_ok=True)
     command_context = util.CommandContext(base_path, profile, assume_role)
     session = awsiam.make_session(profile_name=command_context.profile)
     iam = session.resource('iam')
