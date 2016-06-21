@@ -8,13 +8,16 @@ from . import awsiam
 from . import config
 from . import log
 from . import notifications
+from . import params
 from . import util
 
+INSTANCE_BASE_PATH = '/media/ephemeral0/wormbase'
 
 @util.command_group()
 @util.log_level_option()
 @util.option('-b', '--base-path',
-             default='/media/ephemeral0/wormbase',
+             default=INSTANCE_BASE_PATH,
+             type=params.PlatformAwareDirectory(),
              help=('The default base directory all software and data '
                    'will be installed into.'))
 @util.option('--profile',

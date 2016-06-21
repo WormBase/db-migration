@@ -75,16 +75,17 @@ class VerbosePrettyLogger(Logger):
 
 
 def setup_logging(log_dir, log_level=logging.INFO):
-    os.makedirs(log_dir, exist_ok=True)
     log_filename = __package__ + '.log'
-    logging.basicConfig(filename=log_filename,
+    os.makedirs(log_dir, exist_ok=True)
+    log_path = os.path.join(log_dir, log_filename)
+    logging.basicConfig(filename=log_path,
                         format='{asctime:12s} {levelname:5s} {name} {message}',
                         style='{',
                         level=log_level)
     root_logger = get_logger(__package__)
     root_logger.setLevel(log_level)
     root_logger.debug('Logging to {} at level {}',
-                      log_filename,
+                      log_path,
                       logging.getLevelName(root_logger.logger.level))
 
 
