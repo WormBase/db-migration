@@ -88,6 +88,7 @@ def around(func, config, headline, message, pre_kw=None, post_kw=None):
 
 
 class Attachment(collections.Mapping):
+    """Represents an attachment for a slack webhook."""
 
     def __init__(self, title, **kw):
         self.title = title
