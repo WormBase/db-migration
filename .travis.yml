@@ -9,7 +9,7 @@ install:
 
 
 script:
-  - travis-sphinx --source=docs build
+  - travis-sphinx --source=docs --branches=master build
 
 after_success:
   - travis-sphinx deploy
