@@ -2,6 +2,7 @@ include requirements.txt
 include LICENSE
 include Makefile
 include *.rst
+include docs/_static
 recursive-include docs *.py
 recursive-include docs Makefile *.rst
 recursive-exclude src *~ *.pyc
