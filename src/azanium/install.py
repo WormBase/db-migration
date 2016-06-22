@@ -24,7 +24,7 @@ from .util import local
 from .util import make_executable
 from .util import option
 from .util import pass_command_context
-
+from .util import touch_dir
 
 logger = get_logger(__name__)
 
@@ -151,6 +151,7 @@ def acedb_database(meta,
     with open(passwd_path, 'a') as fp:
         logger.info('Adding {} to {}', username, passwd_path)
         fp.write(username + os.linesep)
+    touch_dir(meta.install_dir)
     return meta.install_dir
 
 
@@ -174,6 +175,7 @@ def tace(meta, url_template):
     with tarfile.open(local_path) as tf:
         tf.extract('./tace', path=meta.install_dir)
     tace_path = os.path.join(meta.install_dir, 'tace')
+    touch_dir(meta.install_dir)
     make_executable(tace_path, logger)
     return tace_path
 
@@ -197,7 +199,7 @@ def datomic_free(meta, url_template):
         zf.extractall(tmpdir)
     os.rmdir(install_dir)
     shutil.move(os.path.join(tmpdir, fullname), install_dir)
-    os.rmdir(tmpdir)
+    touch_dir(install_dir)
     logger.info('Installed {} into {}', fullname, install_dir)
     logger.info('Setting environment variable DATOMIC_HOME={}', install_dir)
     bin_dir = os.path.join(install_dir, 'bin')
@@ -235,6 +237,7 @@ def pseudoace(meta):
     os.rename(tmp_src_path, src_path)
     shutil.rmtree(install_dir)
     shutil.move(src_path, install_dir)
+    touch_dir(install_dir)
     logger.info('Extracted {} to {}', archive_filename, install_dir)
     return install_dir
 

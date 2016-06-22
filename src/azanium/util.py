@@ -11,6 +11,7 @@ import re
 import shelve
 import subprocess
 import stat
+import tempfile
 
 from pkg_resources import resource_filename
 import click
@@ -313,3 +314,16 @@ pass_command_context = click.make_pass_decorator(CommandContext)
 command_group = functools.partial(click.group, context_settings={
     'help_option_names': ['-h', '--help']
 })
+
+
+def touch_dir(path):
+    """Updates access + modified times for a directory.
+
+    Done by writing and immediately removing a temporary file within `dirpath`.
+
+    :param path: Path to a directory.
+    :type: str
+    """
+    assert os.path.isdir(path)
+    with tempfile.NamedTemporaryFile(dir=path, suffix='azanium', mode='wb'):
+        pass

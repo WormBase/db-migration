@@ -39,5 +39,8 @@ admin-docs: $(call print-help,admin-docs,Builds the documentation for admins)
 
 docs-all: $(call print-help,docs-all,Builds all documentation) dev-docs admin-docs user-docs
 
+docs: $(call print-help,docs,Builds all documentation)
+	@cd docs; make clean html man text
 
-.PHONY: dev install uninstall clean admin-docs dev-docs docs-all user-docs
+
+.PHONY: dev install uninstall clean admin-docs dev-docs docs-all user-docs docs
