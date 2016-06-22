@@ -41,14 +41,14 @@ Mac OSX
 
 :term:`AWS` :term:`CLI` Installation
 ====================================
+In the instructions below, `PATH-TO-AZANIUM-TARBALL` should be
+the gun-zipped tarfile located on this repository's `latest release page`_.
 
 .. code-block:: bash
 
    pip3 install --user awscli
    pip3 install --user <PATH-TO-AZANIUM-TARBALL>
 
-
-TBD: In the above, PATH-TO-AZANIUM-TARBALL needs to be defined.
 
 
 :term:`AWS` Configuration
@@ -94,3 +94,4 @@ this file must be copied to all computers from which you run commands.
 .. _`Python 3`: https://www.python.org/downloads/
 .. _pip: https://en.wikipedia.org/wiki/Pip_(package_manager)
 .. _`AWS region`: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
+.. _`latest release page`: https://github.com/Wormbase/db-migration/releases/latest
