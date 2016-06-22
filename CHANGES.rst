@@ -20,6 +20,6 @@
 ================
 - Fix docs-build on travis.
 
-0.4.dev0 (un-released)
-======================
+0.4.dev0 (2016-06-22)
+=====================
 - Fixed issue with sphinx build (missing `docs/_static` directory).
