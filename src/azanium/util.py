@@ -41,17 +41,23 @@ aws_state = functools.partial(shelve.open,
                               os.path.join(os.getcwd(), '.db-migration.db'))
 
 
-def echo_warning(message, prefix='⚠ WARNING!:', fg='yellow', bold=True, **kw):
-    notifications.notify_threaded(message,
-                                  icon_emoji=':warning',
-                                  color='warning')
+def echo_warning(message,
+                 prefix='⚠ WARNING!:',
+                 fg='yellow',
+                 bold=True,
+                 notify=True) :
+    if notify:
+        notifications.notify_threaded(message,
+                                      icon_emoji=':warning',
+                                      color='warning')
     return _secho(message, prefix=prefix, fg=fg, bold=bold)
 
 
-def echo_error(message, err=True, fg='red', bold=True):
-    notifications.notify_threaded(message,
-                                  icon_emoji=':fire:',
-                                  color='warning')
+def echo_error(message, err=True, fg='red', bold=True, notify=True):
+    if notify:
+        notifications.notify_threaded(message,
+                                      icon_emoji=':fire:',
+                                      color='warning')
     return _secho(message, err=err, fg=fg, bold=bold)
 
 
