@@ -67,6 +67,6 @@ The following steps should be executed in order.
 Should all steps complete successfully, the migration process is now
 complete.
 
-If you stopped after :ref:`Step 4 <db-migration-step-4>` due to data
+If you stopped after :ref:`Step 4 <db-migration-step-2>` due to data
 inconsistency, or an error occurred during any of the other steps,
-please ensure to eventually run :ref:`Step 5 <db-migration-step-5>`.
+please ensure to eventually run :ref:`Step 5 <db-migration-step-3>`.
