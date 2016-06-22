@@ -36,7 +36,12 @@ Example 3 - Vuew the generated HTML user documentation
 
 Distributing
 ============
-TBD (github pages?)
+This documentation is deployed on github-pages for this repository.
+
+Commits or tags pushed to the `master` branch will cause documentation
+to be automatically built and deployed using `travis-sphix`.
+
+
 
 .. _reStructuredText: http://www.sphinx-doc.org/en/stable/rest.html
 .. _Sphinx: http://www.sphinx-doc.org/en/stable/

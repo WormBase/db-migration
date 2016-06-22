@@ -1,0 +1,15 @@
+language: python
+python:
+  - "3.4"
+  - "3.5"
+
+install:
+  - pip install --upgrade pip
+  - pip install --editable ".[dev]"
+
+
+script:
+  - travis-sphinx build --source=docs
+
+after_success:
+  - travis-sphinx deploy
