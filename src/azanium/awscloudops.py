@@ -118,14 +118,14 @@ def deploy_aws_config(ctx, ec2_instance):
     conf_filename = os.path.basename(config.PATH)
     aws_config_2_copy = (
         ('credentials', [ctx.user_profile]),
-        ('config', ['profile ' + ctx.user_profile,
-                    'profile ' + ctx.assumed_profile])
+        ('config', [
+            awsiam.profile_key(ctx.user_profile),
+            'profile ' + ctx.assumed_profile])
     )
     with ssh.connection(ec2_instance) as conn:
         ssh.exec_command(conn, 'mkdir ' + aws_conf_dir)
         with SCPClient(conn.get_transport()) as scp:
             scp.put(config.PATH, conf_filename)
-
             for (artefact, keys) in aws_config_2_copy:
                 with copy_config_file(session, artefact, keys) as tmp_path:
                     remote_conf_path = os.path.join(aws_conf_dir, artefact)

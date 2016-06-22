@@ -36,6 +36,10 @@ DB_MIG_ROLE_POLICIES = {
 logger = get_logger(namespace=__name__)
 
 
+def profile_key(name):
+    return name if name == 'default' else 'profile ' + name
+
+
 def make_session(profile_name):
     try:
         sess = boto3.Session(profile_name=profile_name)

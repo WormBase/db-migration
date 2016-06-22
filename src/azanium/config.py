@@ -12,7 +12,7 @@ def parse(path=PATH, section=None):
     """Parse configuraion for this package.
 
     Keys in the configuration are in "dotted notation".
-    e.g: azanium.config
+    e.g: `azanium.config`
 
     :param path: The path to the configuration file.
     :type path: str
