@@ -10,20 +10,18 @@ commands), and on the EC2 instance (Running commands).
 The installation procedure "bootstraps" the instance with a distribution
 of this package.
 
-The following command pipeline simplifies this re-building process.
-
-Within an active virtualenv_:
+When manually testing, please pass the ``--dev-mode`` flag to
+``azanium cloud`` command, e.g:
 
 .. code-block:: bash
 
-   # All the following commands are intended to be run from the project root.
-   rebuild='pip uninstall -y azanium && \
-	    rm -rf ./dist ./build && \
-	    python setup.py sdist && \
-	    pip install \
-            dist/azanium-0.1.tar.gz'
-   rebuild
-   # run a command line tool command to test any change, for example:
-   azanium install pseudoace 0.4.4
+   azanium cloud init --dev-mode WS254
+
+This will bootstrap the instance with the code from your local working
+directory.
+
+Without the ``dev-mode`` flag, the latest release on github will be
+used to bootstrap the instance.
+
 
 .. _virtualenv: http://docs.python-guide.org/en/latest/dev/virtualenvs/
