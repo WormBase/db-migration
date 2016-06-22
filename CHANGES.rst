@@ -5,7 +5,7 @@
 0.6 (unreleased)
 ================
 
-- Nothing changed yet.
+- Fix typo in Sphinx configuration.
 
 0.5 (2016-06-22)
 ================
