@@ -1,14 +1,25 @@
 # -*- coding: utf-8 -*-
+import collections
+import contextlib
+import ftplib
 import functools
+import itertools
+import operator
 import os
 import psutil
+import re
 import shelve
 import subprocess
+import stat
+import tempfile
 
 from pkg_resources import resource_filename
 import click
 import configobj
 import requests
+
+from . import config
+from . import notifications
 
 
 def _secho(message, prefix='🐛  ', **kw):
@@ -22,15 +33,7 @@ echo_sig = functools.partial(click.secho, fg='green', bold=True)
 
 echo_waiting = functools.partial(_secho, nl=False)
 
-echo_warning = functools.partial(_secho,
-                                 prefix='⚠ WARNING!:', fg='yellow', bold=True)
-
 echo_retry = functools.partial(click.secho, fg='cyan')
-
-echo_error = functools.partial(_secho,
-                               err=True,
-                               fg='red',
-                               bold=True)
 
 pkgpath = functools.partial(resource_filename, __package__)
 
@@ -39,8 +42,62 @@ aws_state = functools.partial(shelve.open,
                               os.path.join(os.getcwd(), '.db-migration.db'))
 
 
+def echo_warning(message,
+                 prefix='⚠ WARNING!:',
+                 fg='yellow',
+                 bold=True,
+                 notify=True) :
+    if notify:
+        notifications.notify_threaded(message,
+                                      icon_emoji=':warning',
+                                      color='warning')
+    return _secho(message, prefix=prefix, fg=fg, bold=bold)
+
+
+def echo_error(message, err=True, fg='red', bold=True, notify=True):
+    if notify:
+        notifications.notify_threaded(message,
+                                      icon_emoji=':fire:',
+                                      color='warning')
+    return _secho(message, err=err, fg=fg, bold=bold)
+
+
+def echo_exc(message, err=True, fg='red', bold=True):
+    return _secho(message, err=err, fg=fg, bold=bold)
+
+
 class LocalCommandError(Exception):
     """Raised for commands that produce output on stderr."""
+
+
+def markdown_table(rows):
+    column_matrix = list(map(list, itertools.zip_longest(*rows)))
+    len_matrix = map(list, (map(len, columns) for columns in column_matrix))
+    col_max_lens = list(max(lens) for lens in len_matrix)
+    divider = []
+    matrix = collections.deque(rows)
+    header_row = matrix.popleft()
+    # cls_rows = tuple(set(map(tuple, matrix)))
+
+    cls_rows = tuple(set((row[0],) + tuple(map(int, row[1:]))
+                         for row in matrix))
+    matrix = sorted(cls_rows, key=operator.itemgetter(1), reverse=True)
+    matrix.insert(0, header_row)
+    matrix = list(map(str, row) for row in matrix)
+    # matrix.sort(key=operator.itemgetter(0))
+    # matrix = [matrix[0]] + sorted(tuple(set(tuple(map(tuple, matrix[1:])))),
+    #                               key=operator.itemgetter(0))
+    for i, columns in enumerate(column_matrix):
+        divider.append('-' * col_max_lens[i])
+    matrix.insert(1, divider)
+    lines = []
+    for i, row in enumerate(matrix):
+        line = ['| ']
+        for j, cell in enumerate(row):
+            line.append(' {} '.format(cell.rjust(col_max_lens[j])))
+            line.append(' |')
+        lines.append(''.join(line))
+    return os.linesep.join(lines)
 
 
 def local(cmd,
@@ -134,6 +191,36 @@ def download(url, local_filename, chunk_size=1024 * 10):
     return fp.name
 
 
+@contextlib.contextmanager
+def ftp_connection(host, logger):
+    logger.info('Connecting to {}', host)
+    ftp = ftplib.FTP(host=host, user='anonymous')
+    ftp.set_pasv(True)
+    yield ftp
+    logger.info('Disconnecting from {}', host)
+    ftp.quit()
+
+
+def ftp_download(host,
+                 file_selector_regexp,
+                 download_dir,
+                 logger,
+                 initial_cwd=None):
+    downloaded = []
+    file_selector = functools.partial(re.match, file_selector_regexp)
+    with ftp_connection(host, logger) as ftp:
+        if initial_cwd is not None:
+            ftp.cwd(initial_cwd)
+        filenames = filter(file_selector, ftp.nlst('.'))
+        for filename in filenames:
+            out_path = os.path.join(download_dir, filename)
+            logger.info('Saving {} to {}', filename, out_path)
+            with open(out_path, 'wb') as fp:
+                ftp.retrbinary('RETR ' + filename, fp.write)
+            downloaded.append(fp.name)
+    return downloaded
+
+
 def get_deploy_versions(purpose='default'):
     path = resource_filename(__package__, 'cloud-config/versions.ini')
     with open(path) as fp:
@@ -151,10 +238,27 @@ def jvm_mem_opts(pct_of_free_mem):
                      '-Xms' + format_Gb(init_heap_size)])
 
 
+def make_executable(path, logger, mode=0o775, symlink_dir='~/.local/bin'):
+    logger.info('Setting permissions on {} to {}',
+                path,
+                stat.filemode(mode))
+    os.chmod(path, mode)
+    if symlink_dir is not None:
+        bin_dirname = os.path.abspath(os.path.expanduser(symlink_dir))
+        bin_filename = os.path.basename(path)
+        bin_path = os.path.join(bin_dirname, bin_filename)
+        if os.path.islink(bin_path):
+            os.unlink(bin_path)
+        os.symlink(path, bin_path)
+        logger.debug('Created symlink from {} to {}', path, bin_path)
+
+
 class CommandContext:
 
-    def __init__(self, base_path):
+    def __init__(self, base_path, profile, assume_role):
         self.base_path = base_path
+        self.profile = profile
+        self.assume_role = assume_role
         self.versions = get_deploy_versions()
 
     @property
@@ -169,6 +273,28 @@ class CommandContext:
     @property
     def data_release_version(self):
         return self.versions['acedb_database']
+
+    def exec_step(self,
+                  step_n,
+                  headline,
+                  message,
+                  step_func,
+                  step_kwargs,
+                  **post_notify_kw):
+        ctx = click.get_current_context()
+        ctx.params = step_kwargs
+        conf = config.parse(section=__name__)
+        notify = functools.partial(notifications.notify, conf)
+        attachments_pre = [notifications.Attachment(title=message)]
+        notify(headline, attachments=attachments_pre)
+        rv = step_func(ctx)
+        notify(headline + ' - *complete*', attachments=rv, **post_notify_kw)
+
+    def install_all_artefacts(self, installers, call):
+        installed = {}
+        for artefact in self.versions:
+            installed[artefact] = call(getattr(installers, artefact))
+        return installed
 
     def path(self, *args):
         return os.path.join(self.base_path, *args)
@@ -188,3 +314,16 @@ pass_command_context = click.make_pass_decorator(CommandContext)
 command_group = functools.partial(click.group, context_settings={
     'help_option_names': ['-h', '--help']
 })
+
+
+def touch_dir(path):
+    """Updates access + modified times for a directory.
+
+    Done by writing and immediately removing a temporary file within `dirpath`.
+
+    :param path: Path to a directory.
+    :type: str
+    """
+    assert os.path.isdir(path)
+    with tempfile.NamedTemporaryFile(dir=path, suffix='azanium', mode='wb'):
+        pass

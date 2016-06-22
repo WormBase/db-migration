@@ -1,8 +1,7 @@
 import collections
-import contextlib
-import ftplib
 import functools
 import getpass
+import gzip
 import os
 import re
 import shutil
@@ -15,43 +14,23 @@ import zipfile
 import click
 
 from . import github
+from . import notifications
 from . import root_command
 from .log import get_logger
 from .util import download
+from .util import ftp_download
 from .util import get_deploy_versions
 from .util import local
+from .util import make_executable
 from .util import option
 from .util import pass_command_context
-
+from .util import touch_dir
 
 logger = get_logger(__name__)
 
 Meta = collections.namedtuple('Meta', ('download_dir',
                                        'install_dir',
                                        'version'))
-
-
-def _make_executable(path, logger, mode=0o775, symlink_to_local_bin=False):
-    logger.info('Setting permissions on {} to {}',
-                path,
-                stat.filemode(mode))
-    os.chmod(path, mode)
-    if symlink_to_local_bin:
-        bin_dirname = os.path.expanduser('~/.local/bin')
-        bin_filename = os.path.basename(path)
-        bin_path = os.path.join(bin_dirname, bin_filename)
-        if os.path.islink(bin_path):
-            os.unlink(bin_path)
-        os.symlink(path, bin_path)
-        logger.debug('Created symlink from {} to {}', path, bin_path)
-
-
-@contextlib.contextmanager
-def _ftp(host):
-    ftp = ftplib.FTP(host=host, user='anonymous')
-    ftp.set_pasv(True)
-    yield ftp
-    ftp.quit()
 
 
 def installer(func):
@@ -99,7 +78,42 @@ def pipeline(installers):
         install_command()
 
 
-@install.command(short_help='Install ACeDB.')
+@install.command(short_help='Installs the ACeDB ID catalog for QA report.')
+@option('--ftp-host',
+        default='ftp.ebi.ac.uk',
+        help='FTP hostname for ACeDB data.')
+@option('--remote-path-template',
+        default='pub/databases/wormbase/releases/{version}/REPORTS',
+        help='Path to the file(s) containing compressed database.')
+@option('--file-selector-regexp',
+        default='all_classes_report.{version}\.txt\.gz$',
+        help='File selection regexp')
+@installer
+def acedb_id_catalog(meta,
+                     ftp_host,
+                     remote_path_template,
+                     file_selector_regexp):
+    """Installs the ACeDB id catalog use by QA report generation."""
+    format_path = remote_path_template.format
+    file_selector_regexp = file_selector_regexp.format(version=meta.version)
+    downloaded = ftp_download(ftp_host,
+                              file_selector_regexp,
+                              meta.download_dir,
+                              logger,
+                              initial_cwd=format_path(version=meta.version))
+    downloaded_path = downloaded[0]
+    with gzip.open(downloaded_path) as gz_fp:
+        filename = re.sub('^(?P<fn>.*)\.gz',
+                          '\g<fn>',
+                          os.path.basename(downloaded_path))
+        out_path = os.path.join(meta.install_dir, filename)
+        with open(out_path, 'wb') as fp:
+            logger.info('Writing {}', fp.name)
+            fp.write(gz_fp.read())
+        return fp.name
+
+
+@install.command(short_help='Installs the ACeDB database.')
 @option('--ftp-host',
         default='ftp.ebi.ac.uk',
         help='FTP hostname for ACeDB data.')
@@ -114,26 +128,20 @@ def acedb_database(meta,
                    ftp_host,
                    remote_path_template,
                    file_selector_regexp):
-    """Install ACeDB."""
-    download_dir = meta.download_dir
-    install_dir = meta.install_dir
+    """Installs the ACeDB database system."""
     format_path = remote_path_template.format
-    file_selector = functools.partial(re.match, file_selector_regexp)
     version = meta.version
-    logger.info('Connecting to {}', ftp_host)
-    with _ftp(ftp_host) as ftp:
-        ftp.cwd(format_path(version=version))
-        filenames = filter(file_selector, ftp.nlst('.'))
-        for filename in filenames:
-            out_path = os.path.join(download_dir, filename)
-            logger.info('Saving {} to {}', filename, out_path)
-            with open(out_path, 'wb') as fp:
-                ftp.retrbinary('RETR ' + filename, fp.write)
-            with tarfile.open(fp.name) as tf:
-                logger.info('Extracting {} to {}', fp.name, install_dir)
-                tf.extractall(path=install_dir)
+    downloaded = ftp_download(ftp_host,
+                              file_selector_regexp,
+                              meta.download_dir,
+                              logger,
+                              initial_cwd=format_path(version=version))
+    for path in downloaded:
+        with tarfile.open(path) as tf:
+            logger.info('Extracting {} to {}', path, meta.install_dir)
+            tf.extractall(path=meta.install_dir)
     # Enable the Dump command
-    passwd_path = os.path.join(install_dir, 'wspec', 'passwd.wrm')
+    passwd_path = os.path.join(meta.install_dir, 'wspec', 'passwd.wrm')
     mode = 0o644
     logger.info('Changing permissions of {} to {}',
                 passwd_path,
@@ -143,42 +151,42 @@ def acedb_database(meta,
     with open(passwd_path, 'a') as fp:
         logger.info('Adding {} to {}', username, passwd_path)
         fp.write(username + os.linesep)
+    touch_dir(meta.install_dir)
+    return meta.install_dir
 
 
-@install.command(short_help='Install the ACeDB "tace" binary')
+@install.command(short_help='Installs the ACeDB "tace" binary')
 @option('-t', '--url-template',
         default=('ftp://ftp.sanger.ac.uk/pub/acedb/MONTHLY/'
                  'ACEDB-binaryLINUX_{version}.tar.gz'),
         help='URL for versioned ACeDB binaries')
 @installer
 def tace(meta, url_template):
-    """Install the ACeDB "tace" binary program."""
-    install_dir = meta.install_dir
-    download_dir = meta.download_dir
+    """Installs the ACeDB "tace" binary program."""
     version = meta.version
     url = url_template.format(version=version)
     pr = urllib.parse.urlparse(url)
-    with _ftp(pr.netloc) as ftp:
-        ftp.cwd(os.path.dirname(pr.path))
-        filename = os.path.basename(pr.path)
-        local_filename = os.path.join(download_dir, os.path.basename(pr.path))
-        with open(local_filename, 'wb') as fp:
-            logger.info('Downloading {}', filename)
-            ftp.retrbinary('RETR ' + filename, fp.write)
-    with tarfile.open(local_filename) as tf:
-        tf.extract('./tace', path=install_dir)
-    _make_executable(os.path.join(install_dir, 'tace'),
-                     logger,
-                     symlink_to_local_bin=True)
+    downloaded = ftp_download(pr.netloc,
+                              os.path.basename(pr.path),
+                              meta.download_dir,
+                              logger,
+                              initial_cwd=os.path.dirname(pr.path))
+    local_path = downloaded[0]
+    with tarfile.open(local_path) as tf:
+        tf.extract('./tace', path=meta.install_dir)
+    tace_path = os.path.join(meta.install_dir, 'tace')
+    touch_dir(meta.install_dir)
+    make_executable(tace_path, logger)
+    return tace_path
 
 
-@install.command(short_help='Install datomic-free')
+@install.command(short_help='Installs datomic-free')
 @option('-t', '--url-template',
         default='https://my.datomic.com/downloads/free/{version}',
         help='URL template for Datomic Free version')
 @installer
 def datomic_free(meta, url_template):
-    """Install Datomic (free version)."""
+    """Installs Datomic (free version)."""
     install_dir = meta.install_dir
     version = meta.version
     url = url_template.format(version=version)
@@ -191,25 +199,26 @@ def datomic_free(meta, url_template):
         zf.extractall(tmpdir)
     os.rmdir(install_dir)
     shutil.move(os.path.join(tmpdir, fullname), install_dir)
-    os.rmdir(tmpdir)
+    touch_dir(install_dir)
     logger.info('Installed {} into {}', fullname, install_dir)
     logger.info('Setting environment variable DATOMIC_HOME={}', install_dir)
     bin_dir = os.path.join(install_dir, 'bin')
     for filename in os.listdir(bin_dir):
         bin_path = os.path.join(bin_dir, filename)
-        _make_executable(bin_path, logger)
+        make_executable(bin_path, logger, symlink_dir=None)
     os.chdir(install_dir)
     mvn_install = os.path.join('bin', 'maven-install')
     logger.info('Installing datomic via {}', os.path.abspath(mvn_install))
     mvn_install_out = local(mvn_install)
     logger.info('Installed datomic_free')
     logger.debug(mvn_install_out)
+    return install_dir
 
 
-@install.command(short_help='Install pseudoace')
+@install.command(short_help='Installs pseudoace')
 @installer
 def pseudoace(meta):
-    """Install pseudoace."""
+    """Installs pseudoace."""
     download_dir = meta.download_dir
     install_dir = meta.install_dir
     tag = meta.version
@@ -221,10 +230,38 @@ def pseudoace(meta):
     tempdir = tempfile.mkdtemp()
     with tarfile.open(dl_path) as tf:
         tf.extractall(path=tempdir)
-    fullname = 'pseudoace-' + tag
+    archive_filename = os.path.split(dl_path)[-1]
+    fullname = archive_filename.rsplit('.', 2)[0]
     tmp_src_path = os.path.join(tempdir, fullname)
     src_path = tmp_src_path.rstrip('-' + tag)
     os.rename(tmp_src_path, src_path)
     shutil.rmtree(install_dir)
     shutil.move(src_path, install_dir)
-    logger.info('Extracted pseudoace-{} to {}', tag, install_dir)
+    touch_dir(install_dir)
+    logger.info('Extracted {} to {}', archive_filename, install_dir)
+    return install_dir
+
+
+@install.command('all', short_help='Installs everything')
+@pass_command_context
+def all(context):
+    """Installs all software and data."""
+    # Invoke all commands via the install group command chain.
+    # This has the same effect as if run on command line, e.g:
+    # azanium install dataomic_free pseudoace acedb_database ..
+    ctx = click.get_current_context()
+    install_cmd_names = sorted(context.versions)
+    orig_protected_args = ctx.protected_args[:]
+    ctx.protected_args.extend(install_cmd_names)
+    try:
+        install.invoke(ctx)
+    finally:
+        ctx.protected_args[:] = orig_protected_args
+    attachments = []
+    for name in install_cmd_names:
+        version = context.versions[name]
+        title = 'Installed {} (version: {})'.format(name, version)
+        ts = os.path.getmtime(context.path(name))
+        attachment = notifications.Attachment(title, ts=ts)
+        attachments.append(attachment)
+    return attachments

@@ -49,7 +49,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'azanium - WormBase DB Migration Tools'
+project = 'azanium - WormBase DB Migration'
 copyright = '2016, Matt Russell'
 author = 'Matt Russell <matthew.russell@wormbase.org>'
 

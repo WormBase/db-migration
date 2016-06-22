@@ -1,7 +1,8 @@
 import functools
+import importlib
 import logging
 import os
-import sys
+import traceback
 
 from . import util
 
@@ -20,6 +21,14 @@ class Logger(logging.LoggerAdapter):
 
     def __init__(self, logger, extra=None):
         super(Logger, self).__init__(logger, extra or {})
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, tb):
+        if exc_type is not None:
+            self.exception(str(exc_value))
+            raise exc_value
 
     def log(self, level, msg, *args, **kw):
         if self.isEnabledFor(level):
@@ -52,18 +61,31 @@ class VerbosePrettyLogger(Logger):
     info = VerboseLogMethod('info', util.echo_info)
     warning = VerboseLogMethod('warning', util.echo_warning)
 
+    def exception(self, msg, *args, **kw):
+        # avoid circular import
+        notifications = importlib.import_module(__package__ + '.notifications')
+        att = notifications.Attachment(str(msg),
+                                       preface='An unexpected error occurred')
+        att.add_content(traceback.format_exc())
+        notifications.notify_threaded('*Looks like we have a bug here...*',
+                                      attachments=[att],
+                                      color='danger',
+                                      icon_emoji=':bug:')
+        return super(VerbosePrettyLogger, self).exception(msg, *args, **kw)
+
 
 def setup_logging(log_dir, log_level=logging.INFO):
-    os.makedirs(log_dir, exist_ok=True)
     log_filename = __package__ + '.log'
-    logging.basicConfig(filename=log_filename,
+    os.makedirs(log_dir, exist_ok=True)
+    log_path = os.path.join(log_dir, log_filename)
+    logging.basicConfig(filename=log_path,
                         format='{asctime:12s} {levelname:5s} {name} {message}',
                         style='{',
                         level=log_level)
     root_logger = get_logger(__package__)
     root_logger.setLevel(log_level)
     root_logger.debug('Logging to {} at level {}',
-                      log_filename,
+                      log_path,
                       logging.getLevelName(root_logger.logger.level))
 
 

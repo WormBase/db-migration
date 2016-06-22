@@ -4,13 +4,10 @@ import json
 import click
 from botocore.exceptions import ClientError
 
-from . import root_command
 from . import awsiam
 from . import log
+from . import root_command
 from . import util
-
-
-logger = log.get_logger(__name__)
 
 
 AWSMeta = collections.namedtuple('AWSMeta', (
@@ -115,6 +112,7 @@ def setup(session):
 @pass_admin_session
 def add_user(session, username):
     """Add a (pre-existing) IAM user to the database migration group."""
+    logger = log.get_logger(namespace=__name__)
     iam = session.resource('iam')
     try:
         user = awsiam.ensure_user(iam, username)
