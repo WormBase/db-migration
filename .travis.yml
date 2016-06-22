@@ -4,7 +4,8 @@ python:
   - "3.5"
 
 install:
-  - pip install --user ".[dev]"
+  - pip install --upgrade pip
+  - pip install --editable ".[dev]"
 
 
 script:
