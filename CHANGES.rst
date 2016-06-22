@@ -22,4 +22,4 @@
 
 0.4.dev0 (un-released)
 ======================
-- Nothing changed yet.
+- Fixed issue with sphinx build (missing `docs/_static` directory).
