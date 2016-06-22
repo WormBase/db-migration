@@ -1,6 +1,6 @@
-==============================================
-WormBase - ACeDB to Datomic database migration
-==============================================
+=====
+Usage
+=====
 
 Contents:
 
@@ -10,8 +10,3 @@ Contents:
    overview
    setup
    db-migration-procedure
-
-.. toctree::
-   :hidden:
-
-   glossary
