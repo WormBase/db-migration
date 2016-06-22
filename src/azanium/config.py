@@ -1,8 +1,7 @@
+import importlib
 import os
 
 from configobj import ConfigObj
-
-from . import log
 
 
 PATH = os.path.expanduser('~/.azanium.conf')
@@ -23,6 +22,8 @@ def parse(path=PATH, section=None):
         with open(path) as fp:
             conf = ConfigObj(infile=fp)
     except FileNotFoundError:
+        # avoid circular import
+        log = importlib.import_module(__package__ + '.log')
         logger = log.get_logger(namespace=__name__)
         logger.error(__package__ + ' has not been configured.')
         return None

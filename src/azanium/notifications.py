@@ -6,7 +6,6 @@ import threading
 
 import requests
 
-from . import log
 from . import params
 
 DEFAULTS = dict(icon_emoji=':wormbase-db-dev:')
@@ -17,6 +16,7 @@ SLACK_HOOK_URL = params.URL(human_readable_name='Slack webhook URL',
                             path='/services/\w+/\w+/\w+')
 
 def _notify_noop(*args, **kw):
+    log = importlib.import_module(__package__ + '.log')
     logger = log.get_logger(__name__)
     logger.warn('Notifications are not going to sent - '
                 'azanium not configured with slack URL')
