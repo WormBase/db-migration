@@ -13,7 +13,7 @@ def backup_db(context, db):
     from_uri = context.datomic_url(db)
     to_uri = 's3://wb-datomic-backups/' + db
     cmd = ['bin/datomic', util.jvm_mem_opts(0.20), from_uri, to_uri]
-    cwd = util.install_path('datomic_free')
+    cwd = context.path('datomic_free')
     logger.info('Backing up database {} to {}', from_uri, to_uri)
     util.local(cmd, cwd=cwd)
     logger.info('Database backup complete')
