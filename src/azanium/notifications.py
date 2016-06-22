@@ -33,8 +33,6 @@ def _notify(conf,
     logger = log.get_logger(namespace=__name__)
     data = dict(text=message)
 
-    # XXX: remove - debugging!
-    channel = 'test-webhook-for-mig'
     if attachments is not None:
         if isinstance(attachments, Attachment):
             attachments = [attachments]
