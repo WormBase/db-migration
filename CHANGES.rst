@@ -2,7 +2,7 @@
  Changelog for azanium
 =======================
 
-0.6 (unreleased)
+0.6 (2016-06-22)
 ================
 
 - Fix typo in Sphinx configuration.
