@@ -5,7 +5,7 @@
 0.7 (unreleased)
 ================
 
-- Nothing changed yet.
+- Pass correct flags to `travis-sphinx` to get HTML docs built and deployed.
 
 
 0.6 (2016-06-22)
