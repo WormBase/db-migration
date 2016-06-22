@@ -1,0 +1,249 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Glossary &mdash; azanium - WormBase DB Migration</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="azanium - WormBase DB Migration" href="index.html"/>
+        <link rel="prev" title="Design decisions and other miscellaneous factoids" href="dev/misc.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> azanium
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8.dev0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="user/index.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="admin/index.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev/index.html">Development</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Glossary</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">azanium</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Glossary</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/glossary.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="glossary">
+<span id="id1"></span><h1>Glossary<a class="headerlink" href="#glossary" title="Permalink to this headline">¶</a></h1>
+<dl class="glossary docutils">
+<dt id="term-acedb">ACeDB</dt>
+<dd>The current, legacy database technology.</dd>
+<dt id="term-arn">ARN</dt>
+<dd><a class="reference external" href="http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html">Amazon Resource Name</a></dd>
+<dt id="term-aws">AWS</dt>
+<dd>Amazon Web Services - the umbrella term for all of the Amazon
+services described in this project.</dd>
+<dt id="term-azanium">azanium</dt>
+<dd>The name of this software package.</dd>
+<dt id="term-azanium-admin"><cite>azanium admin</cite></dt>
+<dd>The <a class="reference internal" href="#term-azanium"><span class="xref std std-term">azanium</span></a> sub-command used to administer WormBase AWS
+accounts for the database migration.</dd>
+<dt id="term-azanium-cloud"><cite>azanium cloud</cite></dt>
+<dd>The <a class="reference internal" href="#term-azanium"><span class="xref std std-term">azanium</span></a> sub-command used from a client machine to
+interact with <a class="reference internal" href="#term-aws"><span class="xref std std-term">AWS</span></a>.</dd>
+<dt id="term-azanium-run"><cite>azanium run</cite></dt>
+<dd>The <a class="reference internal" href="#term-azanium"><span class="xref std std-term">azanium</span></a> sub-command used on an <a class="reference internal" href="#term-aws"><span class="xref std std-term">AWS</span></a>
+<a class="reference internal" href="#term-ec2"><span class="xref std std-term">EC2</span></a> instance in order to perform the database migration.</dd>
+<dt id="term-circusd">circusd</dt>
+<dd>A daemon that runs the <a class="reference external" href="https://circus.readthedocs.io/en/latest/">circus</a> process watcher.</dd>
+<dt id="term-cli">CLI</dt>
+<dd>Command Line Interface.</dd>
+<dt id="term-client-commands">client commands</dt>
+<dd>Commands issued from a host machine outside of the AWS network.</dd>
+<dt id="term-datomic">Datomic</dt>
+<dd>The new WormBase database technology.</dd>
+<dt id="term-ec2">EC2</dt>
+<dd>Amazon&#8217;s Elastic Compute service.</dd>
+<dt id="term-iam">IAM</dt>
+<dd><a class="reference external" href="http://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html">Amazon Identity and Access Management</a></dd>
+<dt id="term-instance-commands">instance commands</dt>
+<dd>Commands issued on the EC2 instance provisioned for the build.</dd>
+<dt id="term-pseudoace">pseudoace</dt>
+<dd>The name of the software package used to migrate to the Datomic
+database.</dd>
+<dt id="term-s3">S3</dt>
+<dd>Amazon S3 storage service.</dd>
+<dt id="term-screen">screen</dt>
+<dd>The most infamous program used to preserve sessions on remote
+hosts.</dd>
+<dt id="term-tmux">tmux</dt>
+<dd>A newer program used to preserve sessions on remote hosts with
+less irritating key bindings.</dd>
+</dl>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="dev/misc.html" class="btn btn-neutral" title="Design decisions and other miscellaneous factoids" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Matt Russell.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.8.dev0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

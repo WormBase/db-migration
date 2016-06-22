@@ -1,0 +1,273 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Database Migration Procedure &mdash; azanium - WormBase DB Migration</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="azanium - WormBase DB Migration" href="../index.html"/>
+        <link rel="up" title="Usage" href="index.html"/>
+        <link rel="next" title="Administration" href="../admin/index.html"/>
+        <link rel="prev" title="Setup" href="setup.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> azanium
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8.dev0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="setup.html">Setup</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Database Migration Procedure</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">azanium</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">Usage</a> &raquo;</li>
+      
+    <li>Database Migration Procedure</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/user/db-migration-procedure.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="database-migration-procedure">
+<span id="db-migration-steps"></span><h1>Database Migration Procedure<a class="headerlink" href="#database-migration-procedure" title="Permalink to this headline">¶</a></h1>
+<p>The following steps should be executed in order.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You must have <code class="docutils literal"><span class="pre">ssh-agent</span></code> running in your shell session.</p>
+</div>
+<ol class="arabic" id="db-migration-step-1">
+<li><p class="first">Provision and bootstrap an EC2 instance</p>
+<p>The following <a class="reference internal" href="../glossary.html#term-azanium"><span class="xref std std-term">azanium</span></a> sub-command below, when run, will
+print out the ssh commands needed for the next step.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nv">AWS_PROFILE</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">USER</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="nv">WB_DATA_RELEASE</span><span class="o">=</span><span class="s2">&quot;WS254&quot;</span>
+azanium --profile <span class="s2">&quot;</span><span class="si">${</span><span class="nv">USER</span><span class="si">}</span><span class="s2">&quot;</span> cloud init <span class="s2">&quot;</span><span class="si">${</span><span class="nv">WB_DATA_RELEASE</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<ol class="arabic" id="db-migration-step-2" start="2">
+<li><p class="first">Connect to the EC2 instance using ssh, run db-migration commands</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The commands below will emit their current progress to the console,
+and will also print out the location of a log file for more detailed
+output.</p>
+</div>
+<p>Use the <cite>ssh</cite> command printed from step 1 to connect to the EC2 instance.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>You may need to add the identity to <code class="docutils literal"><span class="pre">ssh-agent</span></code> first.</p>
+<div class="last highlight-bash"><div class="highlight"><pre><span></span>ssh-add ~/.ssh/wb-db-migrate.pem
+</pre></div>
+</div>
+</div>
+<p>Then, using either <cite>screen</cite> or <cite>tmux</cite> session, e.g:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>tmux new-session -s azanium-commands
+</pre></div>
+</div>
+<p>issue the following command:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium migrate
+</pre></div>
+</div>
+</li>
+</ol>
+<ol class="arabic" id="db-migration-step-3" start="3">
+<li><p class="first">Terminate the EC2 instance</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The following command will shut down the instance and destroy
+all data.</p>
+</div>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium cloud --profile <span class="nv">$USER</span> terminate
+</pre></div>
+</div>
+</li>
+</ol>
+<p>Should all steps complete successfully, the migration process is now
+complete.</p>
+<p>If you stopped after <a class="reference internal" href="#db-migration-step-2"><span class="std std-ref">Step 4</span></a> due to data
+inconsistency, or an error occurred during any of the other steps,
+please ensure to eventually run <a class="reference internal" href="#db-migration-step-3"><span class="std std-ref">Step 5</span></a>.</p>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../admin/index.html" class="btn btn-neutral float-right" title="Administration" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="setup.html" class="btn btn-neutral" title="Setup" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Matt Russell.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.8.dev0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>🐛 azanium - WormBase Database Migration &mdash; azanium - WormBase DB Migration</title>
+  <title>Usage &mdash; azanium - WormBase DB Migration</title>
   
 
   
@@ -24,17 +24,18 @@
 
   
   
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   
 
   
 
   
-    <link rel="top" title="azanium - WormBase DB Migration" href="#"/>
-        <link rel="next" title="Usage" href="user/index.html"/> 
+    <link rel="top" title="azanium - WormBase DB Migration" href="../index.html"/>
+        <link rel="next" title="Setup" href="setup.html"/>
+        <link rel="prev" title="🐛 azanium - WormBase Database Migration" href="../index.html"/> 
 
   
-  <script src="_static/js/modernizr.min.js"></script>
+  <script src="../_static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -49,7 +50,7 @@
           
 
           
-            <a href="#" class="icon icon-home"> azanium
+            <a href="../index.html" class="icon icon-home"> azanium
           
 
           
@@ -66,7 +67,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -80,13 +81,17 @@
           
             
             
-                <ul>
-<li class="toctree-l1"><a class="reference internal" href="user/index.html">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="admin/index.html">Administration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dev/index.html">Development</a></li>
+                <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="db-migration-procedure.html">Database Migration Procedure</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 </ul>
 
             
@@ -100,7 +105,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="#">azanium</a>
+        <a href="../index.html">azanium</a>
       </nav>
 
 
@@ -115,13 +120,13 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="#">Docs</a> &raquo;</li>
+    <li><a href="../index.html">Docs</a> &raquo;</li>
       
-    <li>🐛 azanium - WormBase Database Migration</li>
+    <li>Usage</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="_sources/index.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/user/index.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -131,21 +136,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="azanium-wormbase-database-migration">
-<h1>🐛 azanium - WormBase Database Migration<a class="headerlink" href="#azanium-wormbase-database-migration" title="Permalink to this headline">¶</a></h1>
-<a class="reference external image-reference" href="https://github.com/Wormbase/db-migration"><img alt="https://travis-ci.org/WormBase/db-migration.svg?branch=master" src="https://travis-ci.org/WormBase/db-migration.svg?branch=master" /></a>
-<p>A Python (3) package providing a set of Command Line Interfaces (CLI)
-for performing tasks to realise the Datomic database migration from
-ACeDB to Datomic, on a dedicated ephemeral AWS instance.</p>
+  <div class="section" id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<p>The following documentation serves as a guide for users who perform
+the <a class="reference internal" href="../glossary.html#term-acedb"><span class="xref std std-term">ACeDB</span></a> to <a class="reference internal" href="../glossary.html#term-datomic"><span class="xref std std-term">Datomic</span></a> migration commands.</p>
 <p>Contents:</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="user/index.html">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="admin/index.html">Administration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dev/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="db-migration-procedure.html">Database Migration Procedure</a></li>
 </ul>
-</div>
-<div class="toctree-wrapper compound">
 </div>
 </div>
 
@@ -156,8 +156,10 @@ ACeDB to Datomic, on a dedicated ephemeral AWS instance.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="user/index.html" class="btn btn-neutral float-right" title="Usage" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="setup.html" class="btn btn-neutral float-right" title="Setup" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
+      
+        <a href="../index.html" class="btn btn-neutral" title="🐛 azanium - WormBase Database Migration" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -187,22 +189,22 @@ ACeDB to Datomic, on a dedicated ephemeral AWS instance.</p>
 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
+            URL_ROOT:'../',
             VERSION:'0.8.dev0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
         };
     </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
 
   
 
   
   
-    <script type="text/javascript" src="_static/js/theme.js"></script>
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
   
 
   

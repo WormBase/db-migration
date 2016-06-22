@@ -1,0 +1,279 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>System requirements &mdash; azanium - WormBase DB Migration</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="azanium - WormBase DB Migration" href="../index.html"/>
+        <link rel="up" title="Development" href="index.html"/>
+        <link rel="next" title="Installation" href="install.html"/>
+        <link rel="prev" title="Development" href="index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> azanium
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8.dev0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Administration</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Development</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">System requirements</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#packages">Packages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#python3-4-amazon-ami">Python3.4 (Amazon AMI)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#python3-5-ubuntu">Python3.5 (ubuntu)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coding-style.html">Coding style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releases.html">Releases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Design decisions and other miscellaneous factoids</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">azanium</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">Development</a> &raquo;</li>
+      
+    <li>System requirements</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/dev/system-requirements.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="system-requirements">
+<h1>System requirements<a class="headerlink" href="#system-requirements" title="Permalink to this headline">¶</a></h1>
+<p>This code was developed against Python3.5 on ubuntu, and has been verified
+to work with Python3.4 on Amazon Linux (AWS AMI).</p>
+<p>Install your system&#8217;s  Development tool-chain:</p>
+<blockquote>
+<div><p>yum (Amazon AMI, RedHat, Centos)</p>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>sudo yum groupinstall -y <span class="s2">&quot;Development Tools&quot;</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>apt (Debian, Ubuntu, Mint)</p>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>sudo apt-get install -y build-essential
+</pre></div>
+</div>
+</div></blockquote>
+<p>MacOSX - xcode</p>
+<blockquote>
+<div>TBD</div></blockquote>
+</div></blockquote>
+<div class="section" id="packages">
+<h2>Packages<a class="headerlink" href="#packages" title="Permalink to this headline">¶</a></h2>
+<p>The following package list is for yum based systems (AWS linux, RedHat et al),
+using Python 3.4:</p>
+<div class="section" id="python3-4-amazon-ami">
+<h3>Python3.4 (Amazon AMI)<a class="headerlink" href="#python3-4-amazon-ami" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>sudo yum install -y
+             libffi-devel <span class="se">\</span>
+             openssl-devel <span class="se">\</span>
+             readline-devel <span class="se">\</span>
+             java-1.8.0-openjdk-headless <span class="se">\</span>
+             python34 <span class="se">\</span>
+             python34-pip <span class="se">\</span>
+             python34-tools <span class="se">\</span>
+             python34-libs <span class="se">\</span>
+             python34-virtualenv
+</pre></div>
+</div>
+</div>
+<div class="section" id="python3-5-ubuntu">
+<h3>Python3.5 (ubuntu)<a class="headerlink" href="#python3-5-ubuntu" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>sudo apt-get install -y <span class="se">\</span>
+             libffi-dev <span class="se">\</span>
+             libssl-dev <span class="se">\</span>
+             libreadline-dev <span class="se">\</span>
+             python3-dev <span class="se">\</span>
+             python3-pip <span class="se">\</span>
+             python3-venv <span class="se">\</span>
+             openjdk-8-jdk-headless
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="install.html" class="btn btn-neutral float-right" title="Installation" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Development" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Matt Russell.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.8.dev0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
