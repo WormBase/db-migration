@@ -17,6 +17,7 @@ import click
 import configobj
 import requests
 
+from . import config
 from . import notifications
 
 
@@ -275,12 +276,12 @@ class CommandContext:
                   **post_notify_kw):
         ctx = click.get_current_context()
         ctx.params = step_kwargs
+        conf = config.parse(section=__name__)
+        notify = functools.partial(notifications.notify, conf)
         attachments_pre = [notifications.Attachment(title=message)]
-        notifications.notify(headline, attachments=attachments_pre)
+        notify(headline, attachments=attachments_pre)
         rv = step_func(ctx)
-        notifications.notify(headline + ' - *complete*',
-                             attachments=rv,
-                             **post_notify_kw)
+        notify(headline + ' - *complete*', attachments=rv, **post_notify_kw)
 
     def install_all_artefacts(self, installers, call):
         installed = {}

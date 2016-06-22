@@ -6,12 +6,13 @@ from functools import partial
 import click
 
 from . import awscloudops
-from . import root_command
+from . import config
 from . import datomic
 from . import install
 from . import log
 from . import notifications
 from . import pseudoace
+from . import root_command
 from . import util
 
 
@@ -131,9 +132,9 @@ def backup_db_to_s3(context):
     return 'Datomic database transferred to {uri}.'.format(uri=s3_uri)
 
 
-@run.command('all-migration-steps', short_help='Runs all db migration steps')
+@root_command.command(short_help='Runs all db migration steps')
 @util.pass_command_context
-def all_migration_steps(context):
+def migrate(context):
     """Run all database migrations steps.
 
     Steps:
@@ -163,6 +164,7 @@ def all_migration_steps(context):
     id_catalog_path = context.path('acedb_id_catalog')
     headline_fmt = 'Migrating ACeDB {release} to Datomic, *Step {step}*'
     release = context.versions['acedb_database']
+    conf = config.parse(section=notifications.__name__)
     ctx = click.get_current_context()
     steps = []
     step_n = 1
@@ -171,6 +173,7 @@ def all_migration_steps(context):
         command = partial(install.all.invoke, ctx)
         if 0:
             notifications.around(command,
+                                 conf,
                                  headline,
                                  'Installing all software and ACeDB')
     step_n += 1
@@ -215,4 +218,8 @@ def all_migration_steps(context):
                 post_kw = dict(icon_emoji=':fireworks:')
             else:
                 post_kw = {}
-            notifications.around(command, headline, message, post_kw=post_kw)
+            notifications.around(command,
+                                 conf,
+                                 headline,
+                                 message,
+                                 post_kw=post_kw)

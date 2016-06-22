@@ -6,7 +6,7 @@ import threading
 
 import requests
 
-from . import config
+from . import log
 from . import params
 
 DEFAULTS = dict(icon_emoji=':wormbase-db-dev:')
@@ -16,15 +16,19 @@ SLACK_HOOK_URL = params.URL(human_readable_name='Slack webhook URL',
                             netloc='hooks.slack.com',
                             path='/services/\w+/\w+/\w+')
 
+def _notify_noop(*args, **kw):
+    logger = log.get_logger(__name__)
+    logger.warn('Notifications are not going to sent - '
+                'azanium not configured with slack URL')
 
-def notify(message,
-           attachments=None,
-           icon_emoji=None,
-           channel=None,
-           username=None,
-           color=None,
-           n_retries=3):
-    conf = config.parse(section=__name__)
+def _notify(conf,
+            message,
+            attachments=None,
+            icon_emoji=None,
+            channel=None,
+            username=None,
+            color=None,
+            n_retries=3):
     log = importlib.import_module(__package__ + '.log')
     logger = log.get_logger(namespace=__name__)
     data = dict(text=message)
@@ -62,18 +66,23 @@ def notify(message,
         logger.info('Notificaiton data: {}', repr(data))
 
 
+def notify(config, *args, **kw):
+    delegate = _notify if config else _notify_noop
+    return delegate(config, *args, **kw)
+
+
 def notify_threaded(*args, **kw):
     t = threading.Thread(target=notify, args=args, kwargs=kw)
     t.start()
     t.join()
 
 
-def around(func, headline, message, pre_kw=None, post_kw=None):
+def around(func, config, headline, message, pre_kw=None, post_kw=None):
     pre_kw = pre_kw if pre_kw else {}
     post_kw = post_kw if post_kw else {}
     post_kw.setdefault('color', 'good')
     attachments_pre = [Attachment(title=message)]
-    notify(headline, attachments=attachments_pre, **pre_kw)
+    notify(config, headline, attachments=attachments_pre, **pre_kw)
     result = func()
     notify(headline + ' - *complete*', attachments=result, **post_kw)
 
