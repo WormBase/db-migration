@@ -1,3 +1,9 @@
+0.3 (unreleased)
+================
+
+- Nothing changed yet.
+
+
 0.2 (2016-06-22)
 ================
 - Initial revision.
