@@ -3,6 +3,6 @@ include LICENSE
 include Makefile
 include *.rst
 recursive-include docs *.py
-recursive-include docs Makefile *.rst
+recursive-include docs Makefile *.rst *.css
 recursive-exclude src *~ *.pyc
 recursive-include src *.py *.cfg *.txt *.json *.yaml *.ini *.template *.sh

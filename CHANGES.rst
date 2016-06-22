@@ -1,16 +1,9 @@
-0.4 (unreleased)
+0.1 (2016-06-22)
 ================
-
-- Nothing changed yet.
-
-
-0.3 (2016-06-22)
-================
-- Initial revision.
-
+- Initial version.
 
 0.2 (2016-06-22)
-=================
+================
 - Unified documentation.
 - Unified all build steps into a single command `azanium migrate`.
 - Add slack notifications for build progress.
@@ -20,6 +13,10 @@
 ================
 - Fix docs-build on travis.
 
-0.4.dev0 (un-released)
+0.4 (2016-06-22)
+===================
+- Fixed issue with sphinx build (missing `docs/_static`)
+
+0.5.dev0 (un-released)
 ======================
-- Fixed issue with sphinx build (missing `docs/_static` directory).
+- Nothing changed yet.
