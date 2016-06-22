@@ -3,8 +3,8 @@
 - Initial revision.
 
 
-0.2 (un-released)
-=================
+0.2.dev0 (un-released)
+======================
 - Unified documentation.
 - Unified all build steps into a single command `azanium migrate`.
 - Add slack notifications for build progress.
