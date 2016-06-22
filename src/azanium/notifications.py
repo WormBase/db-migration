@@ -84,7 +84,7 @@ def around(func, config, headline, message, pre_kw=None, post_kw=None):
     attachments_pre = [Attachment(title=message)]
     notify(config, headline, attachments=attachments_pre, **pre_kw)
     result = func()
-    notify(headline + ' - *complete*', attachments=result, **post_kw)
+    notify(config, headline + ' - *complete*', attachments=result, **post_kw)
 
 
 class Attachment(collections.Mapping):
