@@ -271,6 +271,10 @@ def init(ctx,
     session = ctx.session
     state = ctx.db_mig_state
     ec2 = session.resource('ec2')
+    if not os.path.isfile(config.PATH):
+        util.echo_error('azanium is not configured, run:', notify=False)
+        util.echo_error('\tazanium configure', notify=False)
+        click.get_current_context().abort()
     (key_pair, key_pair_path) = ssh.recycle_key_pair(ec2, keypair_name)
     with open(USER_DATA_PATH) as fp:
         user_data = fp.read()
