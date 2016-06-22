@@ -28,19 +28,8 @@ clean: $(call print-help,clean,Cleans build artefacts)
 	@rm -rf build dist
 	@find . -type f \( -name '*~' -or -name '*.pyc'  \) -delete
 
-dev-docs: $(call print-help,dev-docs,Builds the documentation for users)
-	@cd docs/dev; make clean html man text
-
-user-docs: $(call print-help,user-docs,Builds the documentation for developers)
-	@cd docs/user; make clean html man text latexpdf
-
-admin-docs: $(call print-help,admin-docs,Builds the documentation for admins)
-	@cd docs/admin; make clean html man text
-
-docs-all: $(call print-help,docs-all,Builds all documentation) dev-docs admin-docs user-docs
-
 docs: $(call print-help,docs,Builds all documentation)
 	@cd docs; make clean html man text
 
 
-.PHONY: dev install uninstall clean admin-docs dev-docs docs-all user-docs docs
+.PHONY: dev install uninstall clean docs
