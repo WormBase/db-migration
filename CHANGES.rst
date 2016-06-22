@@ -2,7 +2,7 @@
  Changelog for azanium
 =======================
 
-0.7 (unreleased)
+0.7 (2016-06-22)
 ================
 
 - Pass correct flags to `travis-sphinx` to get HTML docs built and deployed.
