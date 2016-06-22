@@ -1,7 +1,9 @@
+import contextlib
 import functools
 import json
 import operator
 import os
+import tempfile
 
 import boto3
 import click
@@ -20,8 +22,6 @@ DB_MIG_GROUP_POLICIES = {
     'IAMReadOnlyAccess',
 }
 
-logger = get_logger(__name__)
-
 DB_MIG_ROLE_POLICIES = {
     'DecodeAuthorizationMessages',
     'IAMReadOnlyAccess',
@@ -32,6 +32,12 @@ DB_MIG_ROLE_POLICIES = {
     'ec2-tagging',
     's3-datomic-backups-full-access'
 }
+
+logger = get_logger(namespace=__name__)
+
+
+def profile_key(name):
+    return name if name == 'default' else 'profile ' + name
 
 
 def make_session(profile_name):
@@ -53,11 +59,11 @@ def ensure_set(config, section, opt, new_value):
 
 
 def ensure_config(ctx, session, role):
-    assume_role_profile_name = '{.name}-assumer'.format(role)
     p_session = session._session
     config_file = p_session.get_config_variable('config_file')
     config_path = os.path.expanduser(config_file)
     config = configobj.ConfigObj(config_path, raise_errors=True)
+    assume_role_profile_name = role.name
     section = 'profile ' + assume_role_profile_name
     if section not in set(config):
         config.setdefault(section, {})
@@ -66,7 +72,7 @@ def ensure_config(ctx, session, role):
     for (prop, val) in [('region', session.region_name),
                         ('role_arn', role.arn),
                         ('source_profile', session.profile_name),
-                        ('role_session_name', '{.name}-assumed'.format(role))]:
+                        ('role_session_name', '{.name}'.format(role))]:
         changes.append(ensure_set_val(prop, val))
     if any(changes):
         config.write()
@@ -79,6 +85,23 @@ def ensure_config(ctx, session, role):
         config.write()
         profile_name = None
     return (sess.profile_name, profile_name)
+
+
+def get_conf_var(session, varname):
+    return os.path.expanduser(session._session.get_config_variable(varname))
+
+
+@contextlib.contextmanager
+def copy_config_file(session, artefact, keys):
+    src = configobj.ConfigObj(get_conf_var(session, artefact + '_file'))
+    fn_suffix = 'aws-' + artefact + '-copy'
+    with tempfile.NamedTemporaryFile(suffix=fn_suffix) as fp:
+        dest = configobj.ConfigObj(fp.name)
+        for key in keys:
+            dest[key] = src[key]
+        dest['default'] = dest[keys[0]]
+        dest.write()
+        yield fp.name
 
 
 def ensure_role(iam,
