@@ -16,6 +16,10 @@
 - Add slack notifications for build progress.
 - Prepare automation of documentation build to github pages.
 
-0.3.dev0 (2016-06-22)
-=====================
+0.3 (2016-06-22)
+================
 - Fix docs-build on travis.
+
+0.4.dev0 (un-released)
+======================
+- Nothing changed yet.
