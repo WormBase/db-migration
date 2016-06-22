@@ -19,4 +19,4 @@
 
 0.5.dev0 (un-released)
 ======================
-- Nothing changed yet.
+- Use Sphinx's builtin githubpages extension.
