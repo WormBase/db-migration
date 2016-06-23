@@ -5,7 +5,8 @@
 0.8 (unreleased)
 ================
 
-- Nothing changed yet.
+- Re-worked documentation to use `ghp-import` instead of travis-sphinx.
+- Add post-release hook to deploy documentation via make-file.
 
 
 0.7 (2016-06-22)

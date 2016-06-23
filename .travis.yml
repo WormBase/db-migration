@@ -7,9 +7,10 @@ install:
   - pip install --upgrade pip
   - pip install --editable ".[dev]"
 
-
 script:
-  - travis-sphinx --nowarn --source=docs --branches=master --out docs/_build/html build
+  # Just run the --help and ensure it returns with zero status
+  # Cannot check sub-commands as we'd need AWS credentials here...
+  - azanium --help
 
 after_success:
-  - travis-sphinx deploy
+  - make deploy-docs

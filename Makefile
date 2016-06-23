@@ -31,5 +31,8 @@ clean: $(call print-help,clean,Cleans build artefacts)
 docs: $(call print-help,docs,Builds all documentation)
 	@cd docs; make clean html man text
 
+deploy-docs: $(call print-help,deploy-docs,Deploy documentation to gh-pages)
+	@cd docs; make clean html
+	@ghp-import -p docs/build/html
 
 .PHONY: dev install uninstall clean docs
