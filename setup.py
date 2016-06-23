@@ -34,7 +34,7 @@ setup(
         'console_scripts': [
             'azanium=azanium.__main__:cli',
         ],
-        'zest.releaser.release.after': [
+        'zest.releaser.releaser.after': [
             'publish_azanium_docs_to_github_pages=azanium.hooks:deploy_release'
         ]
     },

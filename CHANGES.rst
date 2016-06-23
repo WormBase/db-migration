@@ -5,7 +5,7 @@
 0.12 (unreleased)
 =================
 
-- Nothing changed yet.
+- Fix name of entry point `zest.releaser` uses.
 
 
 0.11 (2016-06-23)
