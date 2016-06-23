@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Setup &mdash; azanium - WormBase DB Migration 0.12 documentation</title>
+  <title>Setup &mdash; azanium - WormBase DB Migration 0.13 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium - WormBase DB Migration 0.12 documentation" href="../index.html"/>
+    <link rel="top" title="azanium - WormBase DB Migration 0.13 documentation" href="../index.html"/>
         <link rel="up" title="Usage" href="index.html"/>
         <link rel="next" title="Database Migration Procedure" href="db-migration-procedure.html"/>
         <link rel="prev" title="Usage" href="index.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.12
+                0.13
               </div>
             
           
@@ -182,10 +182,11 @@ a suitable version, or download and install the latest version of
 </div>
 <div class="section" id="aws-cli-installation">
 <h2><a class="reference internal" href="../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> <a class="reference internal" href="../glossary.html#term-cli"><span class="xref std std-term">CLI</span></a> Installation<a class="headerlink" href="#aws-cli-installation" title="Permalink to this headline">¶</a></h2>
-<p>In the instructions below, <cite>PATH-TO-AZANIUM-TARBALL</cite> should be
-the gun-zipped tarfile located on this repository&#8217;s <a class="reference external" href="https://github.com/Wormbase/db-migration/releases/latest">latest release page</a>.</p>
+<p>In the instructions below, <cite>AZANIUM-WHEEL-URL</cite> should be the url of
+the <a class="reference external" href="http://pythonwheels.com/">wheel</a> file (<cite>.whl</cite> extension) listed in the downloads section of
+this repository&#8217;s <a class="reference external" href="https://github.com/Wormbase/db-migration/releases/latest">latest release page</a>.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>pip3 install --user awscli
-pip3 install --user &lt;PATH-TO-AZANIUM-TARBALL&gt;
+pip3 install --user &lt;AZANIUM-WHEEL-URL&gt;
 </pre></div>
 </div>
 </div>
@@ -265,7 +266,7 @@ this file must be copied to all computers from which you run commands.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.12',
+            VERSION:'0.13',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

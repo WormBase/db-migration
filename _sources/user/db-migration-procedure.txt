@@ -19,7 +19,7 @@ The following steps should be executed in order.
 
       AWS_PROFILE="${USER}"
       WB_DATA_RELEASE="WS254"
-      azanium --profile "${USER}" cloud init "${WB_DATA_RELEASE}"
+      azanium cloud --profile "${USER}" init "${WB_DATA_RELEASE}"
 
 .. _db-migration-step-2:
 

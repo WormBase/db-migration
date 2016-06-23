@@ -12,7 +12,7 @@ TODO
 
 Typically:
 
-1. Make changes to the code
+1. Make changes to the code and docs.
 2. Edit the change-log to say what's been changed.
    Leave the header as:
 
@@ -22,13 +22,14 @@ Typically:
 	------------------------------
 	- <Your changelog entry here>
 
-3. From within a virtualenv with the package installed, run:
+3. From the root of the project, run:
 
    ... code-block:: bash
 
-   	fullrelease
+   	make release
 
    Answer yes to most questions unless you are sure that's not what you want.
+   Typically, it's safe to answer "Yes" to all questions.
 
 
 .. _`zest.releaser`: https://zestreleaser.readthedocs.io/en/latest

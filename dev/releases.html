@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Releases &mdash; azanium - WormBase DB Migration 0.12 documentation</title>
+  <title>Releases &mdash; azanium - WormBase DB Migration 0.13 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium - WormBase DB Migration 0.12 documentation" href="../index.html"/>
+    <link rel="top" title="azanium - WormBase DB Migration 0.13 documentation" href="../index.html"/>
         <link rel="up" title="Development" href="index.html"/>
         <link rel="next" title="Design decisions and other miscellaneous factoids" href="misc.html"/>
         <link rel="prev" title="Documentation" href="documentation.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.12
+                0.13
               </div>
             
           
@@ -158,7 +158,7 @@ which can be downloaded by the automated AWS instance build.</dd>
 </dl>
 <p>Typically:</p>
 <ol class="arabic">
-<li><p class="first">Make changes to the code</p>
+<li><p class="first">Make changes to the code and docs.</p>
 </li>
 <li><p class="first">Edit the change-log to say what&#8217;s been changed.
 Leave the header as:</p>
@@ -168,12 +168,13 @@ Leave the header as:</p>
 </pre></div>
 </div>
 </li>
-<li><p class="first">From within a virtualenv with the package installed, run:</p>
+<li><p class="first">From the root of the project, run:</p>
 <p>... code-block:: bash</p>
 <blockquote>
-<div><p>fullrelease</p>
+<div><p>make release</p>
 </div></blockquote>
-<p>Answer yes to most questions unless you are sure that&#8217;s not what you want.</p>
+<p>Answer yes to most questions unless you are sure that&#8217;s not what you want.
+Typically, it&#8217;s safe to answer &#8220;Yes&#8221; to all questions.</p>
 </li>
 </ol>
 </div>
@@ -219,7 +220,7 @@ Leave the header as:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.12',
+            VERSION:'0.13',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
