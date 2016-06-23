@@ -28,3 +28,8 @@ def parse(path=PATH, section=None):
         logger.error(__package__ + ' has not been configured.')
         return None
     return conf[section] if section is not None else conf
+
+
+def write(config):
+    with open(PATH, 'wb') as fp:
+        config.write(fp)
