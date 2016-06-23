@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.13 (unreleased)
+0.13 (2016-06-23)
 =================
 
 - Updated documentation to match release procedure changes.
