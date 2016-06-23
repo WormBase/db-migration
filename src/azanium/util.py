@@ -140,8 +140,12 @@ def local(cmd,
     return out.decode(output_decoding)
 
 
+def setup_py(rest_of_args):
+    return local('python setup.py ' + rest_of_args).strip()
+
+
 def distribution_name():
-    return local('python setup.py --fullname').rstrip()
+    return setup_py(' --fullname')
 
 
 def option(*args, **kw):
