@@ -19,6 +19,8 @@ from . import util
 
 logger = log.get_logger(namespace=__name__)
 
+LAST_STEP_OK_STATE_KEY = 'last-step-ok-idx'
+
 
 @root_command.group()
 @util.pass_command_context
@@ -173,17 +175,10 @@ def migrate(context):
     release = context.versions['acedb_database']
     conf = config.parse(section=notifications.__name__)
     ctx = click.get_current_context()
-    steps = []
-    step_n = 1
-    with logger:
-        headline = headline_fmt.format(release=release, step=step_n)
-        command = partial(install.all.invoke, ctx)
-        notifications.around(command,
-                             conf,
-                             headline,
-                             'Installing all software and ACeDB')
-    step_n += 1
-    steps = [
+    step_idx = int(context.db_mig_state.get(LAST_STEP_OK_STATE_KEY, '0'))
+    steps = [('Installing all software and ACeDB',
+              partial(install.all.invoke, ctx))]
+    meta_steps = [
         ('Dumping all ACeDB files',
          acedb_dump,
          dict(dump_dir=dump_dir)),
@@ -213,17 +208,20 @@ def migrate(context):
          backup_db_to_s3,
          {})
     ]
-    for (step_n, step) in enumerate(steps, start=step_n):
-        (message, step_command, step_kwargs) = step
+    steps.extend(list((msg, partial(ctx.invoke, cmd, **kw))
+                      for (msg, cmd, kw) in meta_steps))
+    step_n = step_idx + 1
+    for (step_n, step) in enumerate(steps[step_idx:], start=step_n):
+        (message, step_command) = step
         headline = headline_fmt.format(release=release, step=step_n)
-        command = partial(ctx.invoke, step_command, **step_kwargs)
         with logger:
-            if step_command is backup_db_to_s3:
+            if step_idx == len(steps):
                 post_kw = dict(icon_emoji=':fireworks:')
             else:
                 post_kw = {}
-            notifications.around(command,
+            notifications.around(step_command,
                                  conf,
                                  headline,
                                  message,
                                  post_kw=post_kw)
+            context.db_mig_state[LAST_STEP_OK_STATE_KEY] = step_n - 1
