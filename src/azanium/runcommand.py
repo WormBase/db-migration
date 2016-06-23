@@ -1,6 +1,7 @@
 import os
 import psutil
 import tempfile
+import time
 from functools import partial
 
 import click
@@ -64,6 +65,8 @@ def acedb_dump(context, dump_dir, tace_dump_options):
 def create_database(context, datomic_path):
     """Creates a Datomic datbase for importing EDN logs into."""
     datomic.configure_transactor(context, datomic_path)
+    # Allow a small amount of time for the transactor to start
+    time.sleep(2)
     pseudoace.create_database(context)
     return 'Created'
 
