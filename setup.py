@@ -51,8 +51,8 @@ setup(
     extras_require={
         'dev': [
             'Sphinx==1.4.3',
+            'ghp-import==0.4.1',
             'sphinx_rtd_theme==0.1.9',
-            'travis-sphinx==1.4.2',
             'zest.releaser[recommended]==6.6.4',
         ]
     }

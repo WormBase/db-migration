@@ -5,7 +5,7 @@
 0.10 (unreleased)
 =================
 
-- Nothing changed yet.
+- Fix dependencies.
 
 
 0.9 (2016-06-23)
