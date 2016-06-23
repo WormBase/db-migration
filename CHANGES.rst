@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.9 (unreleased)
+0.9 (2016-06-23)
 ================
 
 - Make this changelog show up in the docs.
