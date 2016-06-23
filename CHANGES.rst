@@ -2,7 +2,13 @@
  Changelog
 ===========
 
-0.10 (unreleased)
+0.11 (unreleased)
+=================
+
+- Nothing changed yet.
+
+
+0.10 (2016-06-23)
 =================
 
 - Fix dependencies.
