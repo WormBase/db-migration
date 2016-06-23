@@ -1,5 +1,6 @@
 import os
 
+import git
 import github3
 
 
@@ -34,3 +35,15 @@ def download_release_binary(repo_path, tag, to_directory=None):
         raise EnvironmentError(msg.format(asset_tarball_name))
     local_path = os.path.join(to_directory, asset.name)
     return asset.download(path=local_path)
+
+
+def infer_from_local_repo():
+    git_url = git.Repo().remotes.origin.url
+    (org, repo_name) = git_url.rsplit(':')[1].rsplit('.')[0].split('/')
+    return github3.repository(org, repo_name)
+
+
+def publish_release(release_data):
+    """A zest.releaser hook for publishing releases to github."""
+    repo = infer_from_local_repo()
+    return repo

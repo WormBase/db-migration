@@ -13,11 +13,10 @@ from pkg_resources import resource_filename
 from scp import SCPClient
 import click
 import configobj
-import git
-import github3
 
 from . import awsiam
 from . import config
+from . import github
 from . import log
 from . import root_command
 from . import ssh
@@ -143,9 +142,7 @@ def deploy_myself(ctx, ec2_instance, dev_mode=False):
                 scp.put('dist/' + archive_filename, archive_filename)
         pip_install_cmds.append(pip_install + archive_filename)
     else:
-        git_url = git.Repo().remotes.origin.url
-        (org, repo_name) = git_url.rsplit(':')[1].rsplit('.')[0].split('/')
-        repo = github3.repository(org, repo_name)
+        repo = github.infer_from_local_repo()
         release_asset = next(repo.latest_release().assets(), None)
         if release_asset is None:
             raise EnvironmentError('Could not find latest release of ' +
