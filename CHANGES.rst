@@ -6,6 +6,8 @@
 =================
 
 - Fix dependencies.
+- Added `zest.releaser` hook to deploy code/docs to github/github-pages.
+- Made the `migrate` command re-entrant.
 
 
 0.9 (2016-06-23)
