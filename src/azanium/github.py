@@ -82,5 +82,6 @@ def publish_release(reporoot, version, bundle_path):
     if release.is_null():
         release = repo.create_release(version)
     with open(bundle_path, 'rb') as fp:
-        asset = release.upload_asset('application/zip', fp.name, fp)
+        filename = os.path.basename(fp.name)
+        asset = release.upload_asset('application/zip', filename, fp)
     return asset
