@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.11 (unreleased)
+0.11 (2016-06-23)
 =================
 - Fix bug with release hook.
 
