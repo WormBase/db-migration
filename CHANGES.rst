@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.12 (unreleased)
+0.12 (2016-06-23)
 =================
 
 - Fix name of entry point `zest.releaser` uses.
