@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Documentation &mdash; azanium - WormBase DB Migration</title>
+  <title>Documentation &mdash; azanium - WormBase DB Migration 0.10 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium - WormBase DB Migration" href="../index.html"/>
+    <link rel="top" title="azanium - WormBase DB Migration 0.10 documentation" href="../index.html"/>
         <link rel="up" title="Development" href="index.html"/>
         <link rel="next" title="Releases" href="releases.html"/>
         <link rel="prev" title="Testing" href="testing.html"/> 
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> azanium
+            <a href="../index.html" class="icon icon-home"> azanium - WormBase DB Migration
           
 
           
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.8.dev0
+                0.10
               </div>
             
           
@@ -102,6 +102,7 @@
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 </ul>
 
             
@@ -115,7 +116,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../index.html">azanium</a>
+        <a href="../index.html">azanium - WormBase DB Migration</a>
       </nav>
 
 
@@ -159,29 +160,27 @@
 </div></blockquote>
 <div class="section" id="generating">
 <h2>Generating<a class="headerlink" href="#generating" title="Permalink to this headline">¶</a></h2>
-<p>For each target audience member (Admins, Developers and Users),
-there is a separate set of documentation.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>make admin-docs dev-docs user-docs
+<div class="highlight-bash"><div class="highlight"><pre><span></span>make docs
 </pre></div>
 </div>
-<p>The commands above will build the documentation in various formats
-(Currently: HTML, man-page, text) in a corresponding sub-directory of
-the current working directory.</p>
+<p>The command above builds the documentation in various formats.
+(Currently: <em>HTML</em>, <em>man-page</em> and <em>text</em>)</p>
 <p>Example 1 - View the generated text documentation for admins:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>less ./docs/admin/_build/text/index.txt
+<div class="highlight-bash"><div class="highlight"><pre><span></span>less ./docs/build/text/index.txt
 </pre></div>
 </div>
 <p>Example 2 - View then generated man page for developers:</p>
 <blockquote>
-<div>man -l ./docs/dev/_build/man/azanium.1</div></blockquote>
+<div>man -l ./docs/build/man/azanium.1</div></blockquote>
 <p>Example 3 - Vuew the generated HTML user documentation</p>
 <blockquote>
-<div>python -m webbrowser ./docs/user/_build/html/index.html</div></blockquote>
+<div>python -m webbrowser ./docs/build/html/index.html</div></blockquote>
 </div>
 <div class="section" id="distributing">
 <h2>Distributing<a class="headerlink" href="#distributing" title="Permalink to this headline">¶</a></h2>
-<p>This documentation is deployed on github-pages for this repository via
-the <cite>Makefile</cite> <code class="docutils literal"><span class="pre">gh-pages</span></code> part in the top-level <code class="docutils literal"><span class="pre">docs</span></code> directory.</p>
+<p>This documentation is automatically deployed to github-pages when a
+release is made (push and/or tag made on the <cite>master</cite> branch), via a
+<a class="reference external" href="https://zestreleaser.readthedocs.io/en/latest/entrypoints.html">zest.releaser entry-point</a>.</p>
 </div>
 </div>
 
@@ -226,7 +225,7 @@ the <cite>Makefile</cite> <code class="docutils literal"><span class="pre">gh-pa
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.8.dev0',
+            VERSION:'0.10',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

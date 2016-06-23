@@ -15,3 +15,4 @@ Contents:
    :hidden:
 
    glossary
+   changelog

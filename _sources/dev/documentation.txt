@@ -8,37 +8,36 @@ As is common in most Python projects ;-
 
 Generating
 ==========
-For each target audience member (Admins, Developers and Users),
-there is a separate set of documentation.
 
 .. code-block:: bash
 
-   make admin-docs dev-docs user-docs
+   make docs
 
-The commands above will build the documentation in various formats
-(Currently: HTML, man-page, text) in a corresponding sub-directory of
-the current working directory.
+The command above builds the documentation in various formats.
+(Currently: *HTML*, *man-page* and *text*)
 
 Example 1 - View the generated text documentation for admins:
 
 .. code-block:: bash
 
-   less ./docs/admin/_build/text/index.txt
+   less ./docs/build/text/index.txt
 
 Example 2 - View then generated man page for developers:
 
-   man -l ./docs/dev/_build/man/azanium.1
+   man -l ./docs/build/man/azanium.1
 
 Example 3 - Vuew the generated HTML user documentation
 
-   python -m webbrowser ./docs/user/_build/html/index.html
+   python -m webbrowser ./docs/build/html/index.html
 
 
 Distributing
 ============
-This documentation is deployed on github-pages for this repository via
-the `Makefile` ``gh-pages`` part in the top-level ``docs`` directory.
+This documentation is automatically deployed to github-pages when a
+release is made (push and/or tag made on the `master` branch), via a
+`zest.releaser entry-point`_.
 
 
 .. _reStructuredText: http://www.sphinx-doc.org/en/stable/rest.html
 .. _Sphinx: http://www.sphinx-doc.org/en/stable/
+.. _`zest.releaser entry-point`: https://zestreleaser.readthedocs.io/en/latest/entrypoints.html
