@@ -2,6 +2,12 @@
  Changelog for azanium
 =======================
 
+0.9 (unreleased)
+================
+
+- Nothing changed yet.
+
+
 0.8 (2016-06-23)
 ================
 
