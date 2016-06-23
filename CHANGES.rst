@@ -4,8 +4,7 @@
 
 0.11 (unreleased)
 =================
-
-- Nothing changed yet.
+- Fix bug with release hook.
 
 
 0.10 (2016-06-23)
