@@ -5,7 +5,7 @@
 0.13 (unreleased)
 =================
 
-- Nothing changed yet.
+- Updated documentation to match release procedure changes.
 
 
 0.12 (2016-06-23)

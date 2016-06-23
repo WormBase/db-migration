@@ -41,13 +41,14 @@ Mac OSX
 
 :term:`AWS` :term:`CLI` Installation
 ====================================
-In the instructions below, `PATH-TO-AZANIUM-TARBALL` should be
-the gun-zipped tarfile located on this repository's `latest release page`_.
+In the instructions below, `AZANIUM-WHEEL-URL` should be the url of
+the wheel_ file (`.whl` extension) listed in the downloads section of
+this repository's `latest release page`_.
 
 .. code-block:: bash
 
    pip3 install --user awscli
-   pip3 install --user <PATH-TO-AZANIUM-TARBALL>
+   pip3 install --user <AZANIUM-WHEEL-URL>
 
 
 
@@ -95,3 +96,4 @@ this file must be copied to all computers from which you run commands.
 .. _pip: https://en.wikipedia.org/wiki/Pip_(package_manager)
 .. _`AWS region`: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
 .. _`latest release page`: https://github.com/Wormbase/db-migration/releases/latest
+.. _wheel: http://pythonwheels.com/
