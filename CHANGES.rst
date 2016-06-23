@@ -1,11 +1,11 @@
-=======================
- Changelog for azanium
-=======================
+===========
+ Changelog
+===========
 
 0.9 (unreleased)
 ================
 
-- Nothing changed yet.
+- Make this changelog show up in the docs.
 
 
 0.8 (2016-06-23)
