@@ -25,7 +25,7 @@ uninstall: $(call print-help,uninstall,un-installs the Python package)
 	${PIP} uninstall -y "${PKG}"
 
 clean: $(call print-help,clean,Cleans build artefacts)
-	@rm -rf build dist
+	@rm -rf build dist docs/build
 	@find . -type f \( -name '*~' -or -name '*.pyc'  \) -delete
 
 docs: $(call print-help,docs,Builds all documentation)
@@ -34,5 +34,8 @@ docs: $(call print-help,docs,Builds all documentation)
 deploy-docs: $(call print-help,deploy-docs,Deploy documentation to gh-pages)
 	@cd docs; make clean html
 	@ghp-import -p docs/build/html
+
+release: $(call print-help,release,Make code release, deploy docs to gh-pages) clean
+	@fullrelease
 
 .PHONY: dev install uninstall clean docs
