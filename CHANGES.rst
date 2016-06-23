@@ -2,7 +2,19 @@
  Changelog
 ===========
 
-0.11 (unreleased)
+0.13 (unreleased)
+=================
+
+- Nothing changed yet.
+
+
+0.12 (2016-06-23)
+=================
+
+- Fix name of entry point `zest.releaser` uses.
+
+
+0.11 (2016-06-23)
 =================
 - Fix bug with release hook.
 
