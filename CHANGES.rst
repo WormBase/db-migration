@@ -5,8 +5,8 @@
 0.14 (unreleased)
 =================
 
-- Nothing changed yet.
-
+- Store application logfile in S3 at the end of each build step.
+- Improved docs.
 
 0.13 (2016-06-23)
 =================
