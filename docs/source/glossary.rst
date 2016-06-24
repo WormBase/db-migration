@@ -68,6 +68,10 @@ Glossary
       The name of the software package used to migrate to the Datomic
       database.
 
+   Slack
+      The messaging service used for WormBase inter-team communications.
+
+
 
 .. _`Amazon Resource Name`: http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
 .. _`Amazon Identity and Access Management`: http://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html

@@ -110,12 +110,12 @@ to the role to be assumed:
 
 .. note::
 
-   The `ec2-run-db-migration-instances` policy is a copy of the
-   custom WormBase policy `ec2-run-instances`;
-   the difference between this policy and the original is that the
-   value in the conditions that prevent users from touching others'
-   resources uses `aws:user_id` as opposed to `aws:username`, since
-   the later is not available when using the ``AssumeRole`` API.
+   The `ec2-run-db-migration-instances` policy is a copy of the custom
+   WormBase policy `ec2-run-instances`; the difference between this
+   policy and the original is that the value in the conditions that
+   prevent users from touching others' resources; the newly introduced
+   policy uses `aws:user_id, ` as opposed to `aws:username`, which is
+   not available when using the ``AssumeRole`` API.
 
 
 Configure the Role's trust relationships
@@ -143,9 +143,9 @@ assigned to the role:
      }]
    }
 
-Adding or updating this trust relationship can be done via the AWS web console,
-or via the CLI. When doing so via the CLI, the ARN for each policy must be used,
-so this is not shown here.
+Adding or updating this trust relationship can be done via the AWS web
+console, or via the CLI. When doing so via the CLI, the fully
+qualified :term:`ARN` for each policy must be used (not shown here).
 
 
 .. code-block:: bash
