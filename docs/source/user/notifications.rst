@@ -4,8 +4,7 @@
 Notifications
 =============
 The database migration processes will send notifications to the
-`#wb-db-migration-events` channel on the wormbase-db-dev :term:`slack`
-channel.
+`#wb-db-migration-events` channel (:term:`Slack` team: wormbase-db-dev).
 
 Notifications are sent before and after each build step; at the end of
 the process a notification will sent to confirm the migrated Datomic

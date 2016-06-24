@@ -19,6 +19,6 @@ the migration process.
    :maxdepth: 1
 
    prerequisites
-   notifications
    setup
+   notifications
    commands
