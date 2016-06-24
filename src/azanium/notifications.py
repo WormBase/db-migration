@@ -6,6 +6,7 @@ import threading
 
 import requests
 
+from . import config
 from . import params
 
 DEFAULTS = dict(icon_emoji=':wormbase-db-dev:')
@@ -15,7 +16,7 @@ SLACK_HOOK_URL = params.URL(human_readable_name='Slack webhook URL',
                             netloc='hooks.slack.com',
                             path='/services/\w+/\w+/\w+')
 
-def _notify_noop(*args, **kw):
+def _notify_noop(config, *args, **kw):
     log = importlib.import_module(__package__ + '.log')
     logger = log.get_logger(__name__)
     logger.warn('Notifications are not going to sent - '
@@ -70,6 +71,7 @@ def notify(config, *args, **kw):
 
 
 def notify_threaded(*args, **kw):
+    args = (config.parse(section=__name__),) + args
     t = threading.Thread(target=notify, args=args, kwargs=kw)
     t.start()
     t.join()

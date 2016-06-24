@@ -112,7 +112,7 @@ def setup(session):
 @pass_admin_session
 def add_user(session, username):
     """Add a (pre-existing) IAM user to the database migration group."""
-    logger = log.get_logger(namespace=__name__)
+    logger = log.get_logger(namespace=__name__, notify=False)
     iam = session.resource('iam')
     try:
         user = awsiam.ensure_user(iam, username)

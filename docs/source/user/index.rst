@@ -1,13 +1,24 @@
-=====
-Usage
-=====
-The following documentation serves as a guide for users who perform
-the :term:`ACeDB` to :term:`Datomic` migration commands.
+============================
+Database Migration Procedure
+============================
+The database migration will be performed on an ephemeral :term:`EC2`
+instance.  Upon successful completion, the migrated Datomic database
+will be stored in :term:`S3` storage.
 
-Contents:
+The migration process will take approximately 3½ days to complete.
+
+`Notications <notications>` will be sent before and after each step of
+the migration process.
+
+*Any* person having a WormBase Amazon :term:`AWS` account will be
+ capable of performing the migration procedure.
+
 
 .. toctree::
+   :hidden:
    :maxdepth: 1
 
+   prerequisites
    setup
-   db-migration-procedure
+   notifications
+   commands
