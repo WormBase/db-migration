@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.14 (unreleased)
+0.14 (2016-06-24)
 =================
 
 - Store application logfile in S3 at the end of each build step.
