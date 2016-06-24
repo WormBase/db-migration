@@ -178,6 +178,11 @@ def migrate(context):
     step_idx = int(context.db_mig_state.get(LAST_STEP_OK_STATE_KEY, '0'))
     steps = [('Installing all software and ACeDB',
               partial(install.all.invoke, ctx))]
+    logfile_name = os.path.basename(context.logfile_path)
+    upload_log_file = partial(ctx.invoke,
+                              awscloudops.upload_file,
+                              path_to_upload=context.logfile_path,
+                              path_in_bucket=logfile_name)
     meta_steps = [
         ('Dumping all ACeDB files',
          acedb_dump,
@@ -219,9 +224,12 @@ def migrate(context):
                 post_kw = dict(icon_emoji=':fireworks:')
             else:
                 post_kw = {}
-            notifications.around(step_command,
-                                 conf,
-                                 headline,
-                                 message,
-                                 post_kw=post_kw)
+            try:
+                notifications.around(step_command,
+                                     conf,
+                                     headline,
+                                     message,
+                                     post_kw=post_kw)
+            finally:
+                upload_log_file()
             context.db_mig_state[LAST_STEP_OK_STATE_KEY] = step_n - 1
