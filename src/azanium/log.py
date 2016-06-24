@@ -4,6 +4,7 @@ import logging
 import os
 import traceback
 
+from . import config
 from . import util
 
 
@@ -61,16 +62,25 @@ class VerbosePrettyLogger(Logger):
     info = VerboseLogMethod('info', util.echo_info)
     warning = VerboseLogMethod('warning', util.echo_warning)
 
+    def __init__(self, *args, **kw):
+        self._notify = kw.pop('notify', False)
+        Logger.__init__(self, *args, **kw)
+
     def exception(self, msg, *args, **kw):
-        # avoid circular import
-        notifications = importlib.import_module(__package__ + '.notifications')
-        att = notifications.Attachment(str(msg),
-                                       preface='An unexpected error occurred')
-        att.add_content(traceback.format_exc())
-        notifications.notify_threaded('*Looks like we have a bug here...*',
-                                      attachments=[att],
-                                      color='danger',
-                                      icon_emoji=':bug:')
+        if self._notify:
+            # avoid circular import
+            notifications = importlib.import_module(__package__ +
+                                                    '.notifications')
+            att = notifications.Attachment(
+                str(msg),
+                preface='An unexpected error occurred')
+            att.add_content(traceback.format_exc())
+            notifications.notify_threaded(
+                config.parse(),
+                '*Looks like we have a bug here...*',
+                attachments=[att],
+                color='danger',
+                icon_emoji=':bug:')
         return super(VerbosePrettyLogger, self).exception(msg, *args, **kw)
 
 
@@ -89,6 +99,6 @@ def setup_logging(log_dir, log_level=logging.INFO):
                       logging.getLevelName(root_logger.logger.level))
 
 
-def get_logger(namespace=None, verbose=True):
+def get_logger(namespace=None, verbose=True, notify=True):
     adapter = VerbosePrettyLogger if verbose else Logger
-    return adapter(logging.getLogger(namespace))
+    return adapter(logging.getLogger(namespace), notify=notify)
