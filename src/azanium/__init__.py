@@ -56,7 +56,9 @@ def root_command(ctx, log_level, base_path, profile, assume_role):
     command_context.user_profile = profile
     command_context.db_mig_state = util.aws_state()
     ctx.obj = command_context
-    log.setup_logging(os.path.join(base_path, 'logs'), log_level=log_level)
+    logfile_path = os.path.join(base_path, 'logs')
+    command_context.logfile_path = logfile_path
+    log.setup_logging(logfile_path, log_level=log_level)
 
 
 @root_command.command()

@@ -264,6 +264,7 @@ class CommandContext:
         self.profile = profile
         self.assume_role = assume_role
         self.versions = get_deploy_versions()
+        self.logfile_path = ''
 
     @property
     def java_cmd(self):
