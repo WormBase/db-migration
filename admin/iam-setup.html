@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>AWS IAM setup &mdash; azanium - WormBase DB Migration 0.13 documentation</title>
+  <title>AWS IAM setup &mdash; azanium 0.14 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium - WormBase DB Migration 0.13 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.14 documentation" href="../index.html"/>
         <link rel="up" title="Administration" href="index.html"/>
         <link rel="next" title="Development" href="../dev/index.html"/>
         <link rel="prev" title="Administration" href="index.html"/> 
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> azanium - WormBase DB Migration
+            <a href="../index.html" class="icon icon-home"> azanium
           
 
           
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.13
+                0.14
               </div>
             
           
@@ -83,7 +83,7 @@
             
             
                 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../user/index.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">Database Migration Procedure</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Administration</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">AWS IAM setup</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#iam-admin-tool-azanium-admin">IAM admin tool (<cite>azanium admin</cite>)</a></li>
@@ -99,8 +99,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development</a></li>
-</ul>
-<ul>
 <li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 </ul>
@@ -116,7 +114,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../index.html">azanium - WormBase DB Migration</a>
+        <a href="../index.html">azanium</a>
       </nav>
 
 
@@ -247,12 +245,12 @@ to the role to be assumed:</p>
 </dl>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">The <cite>ec2-run-db-migration-instances</cite> policy is a copy of the
-custom WormBase policy <cite>ec2-run-instances</cite>;
-the difference between this policy and the original is that the
-value in the conditions that prevent users from touching others&#8217;
-resources uses <cite>aws:user_id</cite> as opposed to <cite>aws:username</cite>, since
-the later is not available when using the <code class="docutils literal"><span class="pre">AssumeRole</span></code> API.</p>
+<p class="last">The <cite>ec2-run-db-migration-instances</cite> policy is a copy of the custom
+WormBase policy <cite>ec2-run-instances</cite>; the difference between this
+policy and the original is that the value in the conditions that
+prevent users from touching others&#8217; resources; the newly introduced
+policy uses <cite>aws:user_id, ` as opposed to `aws:username</cite>, which is
+not available when using the <code class="docutils literal"><span class="pre">AssumeRole</span></code> API.</p>
 </div>
 </div>
 <div class="section" id="configure-the-role-s-trust-relationships">
@@ -277,9 +275,9 @@ assigned to the role:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Adding or updating this trust relationship can be done via the AWS web console,
-or via the CLI. When doing so via the CLI, the ARN for each policy must be used,
-so this is not shown here.</p>
+<p>Adding or updating this trust relationship can be done via the AWS web
+console, or via the CLI. When doing so via the CLI, the fully
+qualified <a class="reference internal" href="../glossary.html#term-arn"><span class="xref std std-term">ARN</span></a> for each policy must be used (not shown here).</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>iam attach-role-policy --policy
 </pre></div>
 </div>
@@ -341,7 +339,7 @@ allows them to assume this role.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.13',
+            VERSION:'0.14',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

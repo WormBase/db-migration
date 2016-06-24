@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Setup &mdash; azanium - WormBase DB Migration 0.13 documentation</title>
+  <title>Setup &mdash; azanium 0.14 documentation</title>
   
 
   
@@ -30,10 +30,10 @@
   
 
   
-    <link rel="top" title="azanium - WormBase DB Migration 0.13 documentation" href="../index.html"/>
-        <link rel="up" title="Usage" href="index.html"/>
-        <link rel="next" title="Database Migration Procedure" href="db-migration-procedure.html"/>
-        <link rel="prev" title="Usage" href="index.html"/> 
+    <link rel="top" title="azanium 0.14 documentation" href="../index.html"/>
+        <link rel="up" title="Database Migration Procedure" href="index.html"/>
+        <link rel="next" title="Notifications" href="notifications.html"/>
+        <link rel="prev" title="Prerequisites" href="prerequisites.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> azanium - WormBase DB Migration
+            <a href="../index.html" class="icon icon-home"> azanium
           
 
           
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.13
+                0.14
               </div>
             
           
@@ -83,7 +83,8 @@
             
             
                 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Usage</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Database Migration Procedure</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="prerequisites.html">Prerequisites</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Setup</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#installation-requirements">Installation requirements</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#python-package-management">Python package management</a></li>
@@ -92,16 +93,14 @@
 <li class="toctree-l3"><a class="reference internal" href="#aws-cli-installation"><code class="docutils literal"><span class="pre">AWS</span></code> <code class="docutils literal"><span class="pre">CLI</span></code> Installation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#aws-configuration"><code class="docutils literal"><span class="pre">AWS</span></code> Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#environment-limitations">Environment limitations</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#advanced-usage">Advanced usage</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="db-migration-procedure.html">Database Migration Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notifications.html">Notifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html">Commands</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Administration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development</a></li>
-</ul>
-<ul>
 <li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 </ul>
@@ -117,7 +116,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../index.html">azanium - WormBase DB Migration</a>
+        <a href="../index.html">azanium</a>
       </nav>
 
 
@@ -134,7 +133,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
       
-          <li><a href="index.html">Usage</a> &raquo;</li>
+          <li><a href="index.html">Database Migration Procedure</a> &raquo;</li>
       
     <li>Setup</li>
       <li class="wy-breadcrumbs-aside">
@@ -161,12 +160,13 @@ To test if your system has this version or higher:</p>
 </div>
 <p>If your system does not already contain Python &gt;= 3.4, then please use
 your operating system&#8217;s package manager (e.g apt, yum, brew) to obtain
-a suitable version, or download and install the latest version of
+a suitable version, or download and install throm e latest version of
 <a class="reference external" href="https://www.python.org/downloads/">Python 3</a> from the Python website.</p>
 <div class="section" id="python-package-management">
 <h3>Python package management<a class="headerlink" href="#python-package-management" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="https://en.wikipedia.org/wiki/Pip_(package_manager)">pip</a> is used to manage Python packages.</p>
-<p>The <code class="docutils literal"><span class="pre">--user</span></code> flag instructs pip to install pip in your home directory.</p>
+<p>The <code class="docutils literal"><span class="pre">--user</span></code> flag instructs pip to install packages in your home
+directory.</p>
 <p>The installation locations for all Python packages when using the
 <code class="docutils literal"><span class="pre">--user</span></code> flag are:</p>
 <dl class="docutils">
@@ -175,7 +175,13 @@ a suitable version, or download and install the latest version of
 <dt>Mac OSX</dt>
 <dd><code class="docutils literal"><span class="pre">${HOME}/Library</span></code></dd>
 </dl>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>python3 -m pip install --upgrade --user pip
+<p>Check to make sure you have <code class="docutils literal"><span class="pre">pip3</span></code> available:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ which pip3
+</pre></div>
+</div>
+<p>Otherwise, for the purpose of following along with this documentation;
+set a shell alias:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">alias</span> <span class="nv">pip3</span><span class="o">=</span><span class="s2">&quot;python3 -m pip&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -209,19 +215,23 @@ WormBase services are operated from).</p>
 </div>
 <div class="section" id="environment-limitations">
 <h2>Environment limitations<a class="headerlink" href="#environment-limitations" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="../glossary.html#term-client-commands"><span class="xref std std-term">client commands</span></a> used to interact with <a class="reference internal" href="../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> must be
-invoked from the same working directory, from the same computer the
-initial commands are run from.</p>
-</div>
-<div class="section" id="advanced-usage">
-<h2>Advanced usage<a class="headerlink" href="#advanced-usage" title="Permalink to this headline">¶</a></h2>
-<p>This database migration program stores the state of migration process
-in the current working directory, in the file:</p>
+<p>The <a class="reference internal" href="../glossary.html#term-client-commands"><span class="xref std std-term">client commands</span></a> used to interact with <a class="reference internal" href="../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> expects
+that all <cite>azanium cloud</cite> commands to be invoked from the same working
+directory, from the same computer the initial commands are run from.</p>
+<p>If for some reason, its desired to run this command from a different machine,
+the following files must be copied (in addition to installing the software):</p>
 <blockquote>
-<div><code class="docutils literal"><span class="pre">.db-migration.shelve</span></code></div></blockquote>
-<p>In order to interact with commands that use the EC2 instance
-provisioned by <a class="reference internal" href="db-migration-procedure.html#db-migration-step-1"><span class="std std-ref">the first migration step</span></a>,
-this file must be copied to all computers from which you run commands.</p>
+<div><div class="highlight-text"><div class="highlight"><pre><span></span>~/.db-migration.db
+~/.azanium.conf
+~/.aws/credentials
+~/.aws/config
+</pre></div>
+</div>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The above assumes you&#8217;ve run all commands from your <cite>$HOME</cite> directory.</p>
+</div>
 </div>
 </div>
 
@@ -232,10 +242,10 @@ this file must be copied to all computers from which you run commands.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="db-migration-procedure.html" class="btn btn-neutral float-right" title="Database Migration Procedure" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="notifications.html" class="btn btn-neutral float-right" title="Notifications" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="Usage" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="prerequisites.html" class="btn btn-neutral" title="Prerequisites" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -266,7 +276,7 @@ this file must be copied to all computers from which you run commands.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.13',
+            VERSION:'0.14',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Database Migration Procedure &mdash; azanium - WormBase DB Migration 0.13 documentation</title>
+  <title>Commands &mdash; azanium 0.14 documentation</title>
   
 
   
@@ -30,10 +30,10 @@
   
 
   
-    <link rel="top" title="azanium - WormBase DB Migration 0.13 documentation" href="../index.html"/>
-        <link rel="up" title="Usage" href="index.html"/>
+    <link rel="top" title="azanium 0.14 documentation" href="../index.html"/>
+        <link rel="up" title="Database Migration Procedure" href="index.html"/>
         <link rel="next" title="Administration" href="../admin/index.html"/>
-        <link rel="prev" title="Setup" href="setup.html"/> 
+        <link rel="prev" title="Notifications" href="notifications.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> azanium - WormBase DB Migration
+            <a href="../index.html" class="icon icon-home"> azanium
           
 
           
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.13
+                0.14
               </div>
             
           
@@ -83,15 +83,15 @@
             
             
                 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Usage</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Database Migration Procedure</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="prerequisites.html">Prerequisites</a></li>
 <li class="toctree-l2"><a class="reference internal" href="setup.html">Setup</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Database Migration Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notifications.html">Notifications</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Commands</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Administration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development</a></li>
-</ul>
-<ul>
 <li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 </ul>
@@ -107,7 +107,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../index.html">azanium - WormBase DB Migration</a>
+        <a href="../index.html">azanium</a>
       </nav>
 
 
@@ -124,13 +124,13 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
       
-          <li><a href="index.html">Usage</a> &raquo;</li>
+          <li><a href="index.html">Database Migration Procedure</a> &raquo;</li>
       
-    <li>Database Migration Procedure</li>
+    <li>Commands</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/user/db-migration-procedure.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/user/commands.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -140,16 +140,18 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="database-migration-procedure">
-<span id="db-migration-steps"></span><h1>Database Migration Procedure<a class="headerlink" href="#database-migration-procedure" title="Permalink to this headline">¶</a></h1>
-<p>The following steps should be executed in order.</p>
+  <div class="section" id="commands">
+<span id="db-migration-steps"></span><h1>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h1>
+<p>The following steps below will migrate the ACeDB database to Datomic.
+Then end result will be a Datomic database stored on Amazon <a class="reference internal" href="../glossary.html#term-s3"><span class="xref std std-term">S3</span></a>,
+which can be restored using any recent version of <a class="reference internal" href="../glossary.html#term-datomic"><span class="xref std std-term">Datomic</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">You must have <code class="docutils literal"><span class="pre">ssh-agent</span></code> running in your shell session.</p>
 </div>
 <ol class="arabic" id="db-migration-step-1">
-<li><p class="first">Provision and bootstrap an EC2 instance</p>
-<p>The following <a class="reference internal" href="../glossary.html#term-azanium"><span class="xref std std-term">azanium</span></a> sub-command below, when run, will
+<li><p class="first"><strong>Provision and bootstrap an EC2 instance</strong></p>
+<p>The following <a class="reference internal" href="../glossary.html#term-azanium"><span class="xref std std-term">azanium</span></a> sub-command below will
 print out the ssh commands needed for the next step.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nv">AWS_PROFILE</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">USER</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="nv">WB_DATA_RELEASE</span><span class="o">=</span><span class="s2">&quot;WS254&quot;</span>
@@ -159,13 +161,10 @@ azanium cloud --profile <span class="s2">&quot;</span><span class="si">${</span>
 </li>
 </ol>
 <ol class="arabic" id="db-migration-step-2" start="2">
-<li><p class="first">Connect to the EC2 instance using ssh, run db-migration commands</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The commands below will emit their current progress to the console,
+<li><p class="first"><strong>Connect to the EC2 instance using ssh - run the migrate command</strong></p>
+<p>The commands below will emit their current progress to the console,
 and will also print out the location of a log file for more detailed
 output.</p>
-</div>
 <p>Use the <cite>ssh</cite> command printed from step 1 to connect to the EC2 instance.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -182,15 +181,34 @@ output.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>azanium migrate
 </pre></div>
 </div>
+<p>This command will execute each step of the build:</p>
+<ol class="arabic">
+<li><p class="first">Extract all .ace files from the ACeDB databsae for the current release.</p>
+</li>
+<li><p class="first">Compress all .ace files</p>
+</li>
+<li><p class="first">Convert .ace files to EDN logs</p>
+</li>
+<li><p class="first">Sort all EDN logs by timestamp</p>
+</li>
+<li><p class="first">Create the Datomic datbase</p>
+</li>
+<li><p class="first">Import the EDN logs into the Datomic database</p>
+</li>
+<li><p class="first">Run a QA report on the database</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Once this step has completed, the user is prompted to
+confirm the next step, or abort.</p>
+</div>
+</li>
+<li><p class="first">Transfer the Datomic database to Amazon S3 storage</p>
+</li>
+</ol>
 </li>
 </ol>
 <ol class="arabic" id="db-migration-step-3" start="3">
-<li><p class="first">Terminate the EC2 instance</p>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">The following command will shut down the instance and destroy
-all data.</p>
-</div>
+<li><p class="first"><strong>Terminate the EC2 instance</strong></p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>azanium cloud --profile <span class="nv">$USER</span> terminate
 </pre></div>
 </div>
@@ -198,9 +216,9 @@ all data.</p>
 </ol>
 <p>Should all steps complete successfully, the migration process is now
 complete.</p>
-<p>If you stopped after <a class="reference internal" href="#db-migration-step-2"><span class="std std-ref">Step 4</span></a> due to data
+<p>If you stopped after <a class="reference internal" href="#db-migration-step-2"><span class="std std-ref">Step 2</span></a> due to data
 inconsistency, or an error occurred during any of the other steps,
-please ensure to eventually run <a class="reference internal" href="#db-migration-step-3"><span class="std std-ref">Step 5</span></a>.</p>
+please ensure to eventually run <a class="reference internal" href="#db-migration-step-3"><span class="std std-ref">Step 3</span></a>.</p>
 </div>
 
 
@@ -213,7 +231,7 @@ please ensure to eventually run <a class="reference internal" href="#db-migratio
         <a href="../admin/index.html" class="btn btn-neutral float-right" title="Administration" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="setup.html" class="btn btn-neutral" title="Setup" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="notifications.html" class="btn btn-neutral" title="Notifications" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -244,7 +262,7 @@ please ensure to eventually run <a class="reference internal" href="#db-migratio
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.13',
+            VERSION:'0.14',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

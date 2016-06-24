@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Coding style &mdash; azanium 0.14 documentation</title>
+  <title>Prerequisites &mdash; azanium 0.14 documentation</title>
   
 
   
@@ -31,9 +31,9 @@
 
   
     <link rel="top" title="azanium 0.14 documentation" href="../index.html"/>
-        <link rel="up" title="Development" href="index.html"/>
-        <link rel="next" title="Testing" href="testing.html"/>
-        <link rel="prev" title="Installation" href="install.html"/> 
+        <link rel="up" title="Database Migration Procedure" href="index.html"/>
+        <link rel="next" title="Setup" href="setup.html"/>
+        <link rel="prev" title="Database Migration Procedure" href="index.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -83,18 +83,15 @@
             
             
                 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../user/index.html">Database Migration Procedure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Administration</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Development</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="system-requirements.html">System requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html">Installation</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Coding style</a></li>
-<li class="toctree-l2"><a class="reference internal" href="testing.html">Testing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="releases.html">Releases</a></li>
-<li class="toctree-l2"><a class="reference internal" href="misc.html">Design decisions and other miscellaneous factoids</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Database Migration Procedure</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notifications.html">Notifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html">Commands</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 </ul>
@@ -127,13 +124,13 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
       
-          <li><a href="index.html">Development</a> &raquo;</li>
+          <li><a href="index.html">Database Migration Procedure</a> &raquo;</li>
       
-    <li>Coding style</li>
+    <li>Prerequisites</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/dev/coding-style.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/user/prerequisites.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -143,15 +140,27 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="coding-style">
-<h1>Coding style<a class="headerlink" href="#coding-style" title="Permalink to this headline">¶</a></h1>
-<p>The code in this project is QA&#8217;d using the <a class="reference external" href="http://flake8.readthedocs.io/en/latest/config.html">flake8</a> tool,
-which is to say it mostly follows the <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">standard Python coding style</a>.</p>
-<p>Errors which are turned off are set in setup.cfg at the project root.</p>
-<p>Run code QA with the following:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>flake8 src
+  <div class="section" id="prerequisites">
+<h1>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h1>
+<blockquote>
+<div><ul>
+<li><p class="first">A WormBase AWS “IAM” account</p>
+<p>An AWS administrator will need to have previously supplied
+the following required credentials:</p>
+<blockquote>
+<div><p><em>aws-username</em></p>
+<p><em>AWS_ACCESS_KEY_ID</em></p>
+<p><em>AWS_SECRET_ACCESS_KEY</em></p>
+</div></blockquote>
+</li>
+<li><p class="first">Python 3.4+</p>
+<p>On a unix-like machine, check the version with:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ which python3 <span class="o">&amp;&amp;</span> python3 -V
 </pre></div>
 </div>
+</li>
+</ul>
+</div></blockquote>
 </div>
 
 
@@ -161,10 +170,10 @@ which is to say it mostly follows the <a class="reference external" href="https:
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="testing.html" class="btn btn-neutral float-right" title="Testing" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="setup.html" class="btn btn-neutral float-right" title="Setup" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="install.html" class="btn btn-neutral" title="Installation" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral" title="Database Migration Procedure" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

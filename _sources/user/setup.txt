@@ -14,7 +14,7 @@ To test if your system has this version or higher:
 
 If your system does not already contain Python >= 3.4, then please use
 your operating system's package manager (e.g apt, yum, brew) to obtain
-a suitable version, or download and install the latest version of
+a suitable version, or download and install throm e latest version of
 `Python 3`_ from the Python website.
 
 
@@ -22,7 +22,8 @@ Python package management
 -------------------------
 pip_ is used to manage Python packages.
 
-The ``--user`` flag instructs pip to install pip in your home directory.
+The ``--user`` flag instructs pip to install packages in your home
+directory.
 
 The installation locations for all Python packages when using the
 ``--user`` flag are:
@@ -33,10 +34,18 @@ Linux
 Mac OSX
   ``${HOME}/Library``
 
+Check to make sure you have ``pip3`` available:
 
 .. code-block:: bash
 
-   python3 -m pip install --upgrade --user pip
+   $ which pip3
+
+Otherwise, for the purpose of following along with this documentation;
+set a shell alias:
+
+.. code-block:: bash
+
+   alias pip3="python3 -m pip"
 
 
 :term:`AWS` :term:`CLI` Installation
@@ -49,7 +58,6 @@ this repository's `latest release page`_.
 
    pip3 install --user awscli
    pip3 install --user <AZANIUM-WHEEL-URL>
-
 
 
 :term:`AWS` Configuration
@@ -77,20 +85,22 @@ These credentials should be given as input to the following command:
 
 Environment limitations
 =======================
-The :term:`client commands` used to interact with :term:`AWS` must be
-invoked from the same working directory, from the same computer the
-initial commands are run from.
+The :term:`client commands` used to interact with :term:`AWS` expects
+that all `azanium cloud` commands to be invoked from the same working
+directory, from the same computer the initial commands are run from.
 
-Advanced usage
-==============
-This database migration program stores the state of migration process
-in the current working directory, in the file:
+If for some reason, its desired to run this command from a different machine,
+the following files must be copied (in addition to installing the software):
 
-	``.db-migration.shelve``
+  .. code-block:: text
 
-In order to interact with commands that use the EC2 instance
-provisioned by :ref:`the first migration step <db-migration-step-1>`,
-this file must be copied to all computers from which you run commands.
+	~/.db-migration.db
+	~/.azanium.conf
+	~/.aws/credentials
+	~/.aws/config
+
+
+.. note:: The above assumes you've run all commands from your `$HOME` directory.
 
 .. _`Python 3`: https://www.python.org/downloads/
 .. _pip: https://en.wikipedia.org/wiki/Pip_(package_manager)

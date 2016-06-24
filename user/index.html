@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Usage &mdash; azanium - WormBase DB Migration 0.13 documentation</title>
+  <title>Database Migration Procedure &mdash; azanium 0.14 documentation</title>
   
 
   
@@ -30,8 +30,8 @@
   
 
   
-    <link rel="top" title="azanium - WormBase DB Migration 0.13 documentation" href="../index.html"/>
-        <link rel="next" title="Setup" href="setup.html"/>
+    <link rel="top" title="azanium 0.14 documentation" href="../index.html"/>
+        <link rel="next" title="Prerequisites" href="prerequisites.html"/>
         <link rel="prev" title="🐛 azanium - WormBase Database Migration" href="../index.html"/> 
 
   
@@ -50,7 +50,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> azanium - WormBase DB Migration
+            <a href="../index.html" class="icon icon-home"> azanium
           
 
           
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.13
+                0.14
               </div>
             
           
@@ -82,15 +82,15 @@
             
             
                 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Database Migration Procedure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="prerequisites.html">Prerequisites</a></li>
 <li class="toctree-l2"><a class="reference internal" href="setup.html">Setup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="db-migration-procedure.html">Database Migration Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notifications.html">Notifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html">Commands</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Administration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development</a></li>
-</ul>
-<ul>
 <li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 </ul>
@@ -106,7 +106,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../index.html">azanium - WormBase DB Migration</a>
+        <a href="../index.html">azanium</a>
       </nav>
 
 
@@ -123,7 +123,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
       
-    <li>Usage</li>
+    <li>Database Migration Procedure</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -137,16 +137,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="usage">
-<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
-<p>The following documentation serves as a guide for users who perform
-the <a class="reference internal" href="../glossary.html#term-acedb"><span class="xref std std-term">ACeDB</span></a> to <a class="reference internal" href="../glossary.html#term-datomic"><span class="xref std std-term">Datomic</span></a> migration commands.</p>
-<p>Contents:</p>
+  <div class="section" id="database-migration-procedure">
+<h1>Database Migration Procedure<a class="headerlink" href="#database-migration-procedure" title="Permalink to this headline">¶</a></h1>
+<p>The database migration will be performed on an ephemeral <a class="reference internal" href="../glossary.html#term-ec2"><span class="xref std std-term">EC2</span></a>
+instance.  Upon successful completion, the migrated Datomic database
+will be stored in <a class="reference internal" href="../glossary.html#term-s3"><span class="xref std std-term">S3</span></a> storage.</p>
+<p>The migration process will take approximately 3½ days to complete.</p>
+<p><cite>Notications &lt;notications&gt;</cite> will be sent before and after each step of
+the migration process.</p>
+<dl class="docutils">
+<dt><em>Any</em> person having a WormBase Amazon <a class="reference internal" href="../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> account will be</dt>
+<dd>capable of performing the migration procedure.</dd>
+</dl>
 <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="setup.html">Setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="db-migration-procedure.html">Database Migration Procedure</a></li>
-</ul>
 </div>
 </div>
 
@@ -157,7 +160,7 @@ the <a class="reference internal" href="../glossary.html#term-acedb"><span class
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="setup.html" class="btn btn-neutral float-right" title="Setup" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="prerequisites.html" class="btn btn-neutral float-right" title="Prerequisites" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../index.html" class="btn btn-neutral" title="🐛 azanium - WormBase Database Migration" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -191,7 +194,7 @@ the <a class="reference internal" href="../glossary.html#term-acedb"><span class
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.13',
+            VERSION:'0.14',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
