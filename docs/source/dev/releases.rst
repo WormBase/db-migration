@@ -24,9 +24,10 @@ Typically:
 
 3. From the root of the project, run:
 
-   ... code-block:: bash
 
-   	make release
+   .. code-block:: bash
+
+      make release
 
    Answer yes to most questions unless you are sure that's not what you want.
    Typically, it's safe to answer "Yes" to all questions.
