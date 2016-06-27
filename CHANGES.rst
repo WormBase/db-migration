@@ -5,7 +5,7 @@
 0.17 (unreleased)
 =================
 
-- Nothing changed yet.
+- Minor updates to docs.
 
 
 0.16 (2016-06-27)
