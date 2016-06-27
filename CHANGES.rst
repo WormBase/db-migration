@@ -5,7 +5,7 @@
 0.15 (unreleased)
 =================
 
-- Nothing changed yet.
+- Tweaks to documentation.
 
 
 0.14 (2016-06-24)

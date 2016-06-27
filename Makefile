@@ -29,10 +29,9 @@ clean: $(call print-help,clean,Cleans build artefacts)
 	@find . -type f \( -name '*~' -or -name '*.pyc'  \) -delete
 
 docs: $(call print-help,docs,Builds all documentation)
-	@cd docs; make clean html man text
-
-deploy-docs: $(call print-help,deploy-docs,Deploy documentation to gh-pages)
 	@cd docs; make clean html
+
+deploy-docs: $(call print-help,deploy-docs,Deploy documentation to gh-pages) docs
 	@ghp-import -p docs/build/html
 
 release: $(call print-help,release,Make code release, deploy docs to gh-pages) clean
