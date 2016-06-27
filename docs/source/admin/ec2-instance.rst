@@ -9,47 +9,41 @@ Instance details
 IP and domain name addresses are not persisted beyond the life-time of
 the instance.
 
-+--------+----------+
-|Username|ec2-user  |
-+--------+----------+
-|Type    |r3.4xlarge|
-+--------+----------+
-|Elastic |no        |
-|IP      |          |
-+--------+----------+
-|region  |us-east-1 |
-+--------+----------+
++-----------+----------+
+|Username   |ec2-user  |
++-----------+----------+
+|Type       |r3.4xlarge|
++-----------+----------+
+|Elastic IP |no        |
++-----------+----------+
+|region     |us-east-1 |
++-----------+----------+
 
 
 Storage
 =======
+The follow properties represent the minimum storage requirements for
+performing a database migration.
 
-+----------+-----------------+--------+-----+
-|Device    |Moint-point      |Type    |Size |
-+----------+-----------------+--------+-----+
-|/dev/xvda1|/                |EBS     |60Gb |
-|          |                 |        |SDD  |
-+----------+-----------------+--------+-----+
-|/dev/xvdb |/media/ephemeral9|Instance|30Gb |
-|          |                 |Store   |SSD  |
-+----------+-----------------+--------+-----+
++----------+------------------+--------------------+----------+
+|Device    |Mount-point       |Type                |Size      |
++----------+------------------+--------------------+----------+
+|/dev/xvda1|/                 |EBS, SSD            |60Gb      |
++----------+------------------+--------------------+----------+
+|/dev/xvdb |/media/ephemeral0 |Instance Store, SSD |320Gb     |
++----------+------------------+--------------------+----------+
 
 Security properties
 ===================
 The SSH key for accessing the instance is recycled automatically by the
 `azanium init` command.
 
-+--------+------------------------+
-|Security|default                 |
-|group   |                        |
-+--------+------------------------+
-|SSH Key |wb-db-migrate           |
-|name    |                        |
-+--------+------------------------+
-|Local   |~/.ssh/wb-db-migrate.pem|
-|SSH key |                        |
-|path    |                        |
-+--------+------------------------+
-|Availble|22                      |
-|ports   |                        |
-+--------+------------------------+
++------------------+--------------------------+
+|Security group    |default                   |
++------------------+--------------------------+
+|SSH Key name      |wb-db-migrate             |
++------------------+--------------------------+
+|Local SSH key path|~/.ssh/wb-db-migrate.pem  |
++------------------+--------------------------+
+|Available ports    |22                        |
++------------------+--------------------------+
