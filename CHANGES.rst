@@ -2,7 +2,13 @@
  Changelog
 ===========
 
-0.16 (unreleased)
+0.17 (unreleased)
+=================
+
+- Nothing changed yet.
+
+
+0.16 (2016-06-27)
 =================
 
 - Update install instructions in docs.
