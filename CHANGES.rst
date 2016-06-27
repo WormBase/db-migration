@@ -5,7 +5,7 @@
 0.16 (unreleased)
 =================
 
-- Nothing changed yet.
+- Update install instructions in docs.
 
 
 0.15 (2016-06-27)
