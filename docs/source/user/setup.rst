@@ -50,9 +50,9 @@ set a shell alias:
 
 :term:`AWS` :term:`CLI` and :term:`azanium` Installation
 ========================================================
-In the instructions below, `AZANIUM-WHEEL-URL` should be the url of
-the wheel_ file (`.whl` extension) listed in the downloads section of
-this repository's `latest release page`_.
+Below, `AZANIUM-WHEEL-URL` should be the url of the wheel_ file
+(`.whl` extension) listed in the downloads section of this
+repository's `latest release page`_.
 
 .. code-block:: bash
 
