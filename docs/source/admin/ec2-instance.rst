@@ -45,5 +45,5 @@ The SSH key for accessing the instance is recycled automatically by the
 +------------------+--------------------------+
 |Local SSH key path|~/.ssh/wb-db-migrate.pem  |
 +------------------+--------------------------+
-|Available ports    |22                        |
+|Available ports   | 22                       |
 +------------------+--------------------------+
