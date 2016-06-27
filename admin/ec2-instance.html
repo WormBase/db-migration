@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Administration &mdash; azanium 0.15 documentation</title>
+  <title>EC2 Instance requirements &mdash; azanium 0.15 documentation</title>
   
 
   
@@ -31,8 +31,9 @@
 
   
     <link rel="top" title="azanium 0.15 documentation" href="../index.html"/>
-        <link rel="next" title="AWS IAM setup" href="iam-setup.html"/>
-        <link rel="prev" title="Commands" href="../user/commands.html"/> 
+        <link rel="up" title="Administration" href="index.html"/>
+        <link rel="next" title="Development" href="../dev/index.html"/>
+        <link rel="prev" title="AWS IAM setup" href="iam-setup.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -83,9 +84,14 @@
             
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../user/index.html">Database Migration Procedure</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Administration</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Administration</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="iam-setup.html">AWS IAM setup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ec2-instance.html"><code class="docutils literal"><span class="pre">EC2</span></code> Instance requirements</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal"><span class="pre">EC2</span></code> Instance requirements</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#instance-details">Instance details</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#storage">Storage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#security-properties">Security properties</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development</a></li>
@@ -121,11 +127,13 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
       
-    <li>Administration</li>
+          <li><a href="index.html">Administration</a> &raquo;</li>
+      
+    <li><code class="docutils literal"><span class="pre">EC2</span></code> Instance requirements</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/admin/index.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/admin/ec2-instance.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -135,18 +143,89 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="administration">
-<h1>Administration<a class="headerlink" href="#administration" title="Permalink to this headline">¶</a></h1>
-<p>This documentation is intended for those managing the WormBase
-<a class="reference internal" href="../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> accounts; detailed here:</p>
-<blockquote>
-<div><ul class="simple">
-<li>Steps required to configure the AWS <a class="reference internal" href="../glossary.html#term-iam"><span class="xref std std-term">IAM</span></a> service
-in order for users who are to perform the database migration.</li>
-<li>Details of the  <a class="reference internal" href="../glossary.html#term-ec2"><span class="xref std std-term">EC2</span></a> instance required to perform the database migration</li>
-</ul>
-</div></blockquote>
-<div class="toctree-wrapper compound">
+  <div class="section" id="ec2-instance-requirements">
+<h1><a class="reference internal" href="../glossary.html#term-ec2"><span class="xref std std-term">EC2</span></a> Instance requirements<a class="headerlink" href="#ec2-instance-requirements" title="Permalink to this headline">¶</a></h1>
+<p>The following tables describe the requisite properties of an EC2
+instance the database migration procedure.</p>
+<div class="section" id="instance-details">
+<h2>Instance details<a class="headerlink" href="#instance-details" title="Permalink to this headline">¶</a></h2>
+<p>IP and domain name addresses are not persisted beyond the life-time of
+the instance.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="52%" />
+<col width="48%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Username</td>
+<td>ec2-user</td>
+</tr>
+<tr class="row-even"><td>Type</td>
+<td>r3.4xlarge</td>
+</tr>
+<tr class="row-odd"><td>Elastic IP</td>
+<td>no</td>
+</tr>
+<tr class="row-even"><td>region</td>
+<td>us-east-1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="storage">
+<h2>Storage<a class="headerlink" href="#storage" title="Permalink to this headline">¶</a></h2>
+<p>The follow properties represent the minimum storage requirements for
+performing a database migration.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="31%" />
+<col width="34%" />
+<col width="17%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Device</td>
+<td>Mount-point</td>
+<td>Type</td>
+<td>Size</td>
+</tr>
+<tr class="row-even"><td>/dev/xvda1</td>
+<td>/</td>
+<td>EBS, SSD</td>
+<td>60Gb</td>
+</tr>
+<tr class="row-odd"><td>/dev/xvdb</td>
+<td>/media/ephemeral0</td>
+<td>Instance Store, SSD</td>
+<td>320Gb</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="security-properties">
+<h2>Security properties<a class="headerlink" href="#security-properties" title="Permalink to this headline">¶</a></h2>
+<p>The SSH key for accessing the instance is recycled automatically by the
+<cite>azanium init</cite> command.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="41%" />
+<col width="59%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Security group</td>
+<td>default</td>
+</tr>
+<tr class="row-even"><td>SSH Key name</td>
+<td>wb-db-migrate</td>
+</tr>
+<tr class="row-odd"><td>Local SSH key path</td>
+<td>~/.ssh/wb-db-migrate.pem</td>
+</tr>
+<tr class="row-even"><td>Available ports</td>
+<td>22</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
@@ -157,10 +236,10 @@ in order for users who are to perform the database migration.</li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="iam-setup.html" class="btn btn-neutral float-right" title="AWS IAM setup" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../dev/index.html" class="btn btn-neutral float-right" title="Development" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../user/commands.html" class="btn btn-neutral" title="Commands" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="iam-setup.html" class="btn btn-neutral" title="AWS IAM setup" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

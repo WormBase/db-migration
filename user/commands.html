@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Commands &mdash; azanium 0.14 documentation</title>
+  <title>Commands &mdash; azanium 0.15 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.14 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.15 documentation" href="../index.html"/>
         <link rel="up" title="Database Migration Procedure" href="index.html"/>
         <link rel="next" title="Administration" href="../admin/index.html"/>
         <link rel="prev" title="Notifications" href="notifications.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.14
+                0.15
               </div>
             
           
@@ -87,7 +87,10 @@
 <li class="toctree-l2"><a class="reference internal" href="prerequisites.html">Prerequisites</a></li>
 <li class="toctree-l2"><a class="reference internal" href="setup.html">Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notifications.html">Notifications</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Commands</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#diagnostics">Diagnostics</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Administration</a></li>
@@ -183,7 +186,7 @@ output.</p>
 </div>
 <p>This command will execute each step of the build:</p>
 <ol class="arabic">
-<li><p class="first">Extract all .ace files from the ACeDB databsae for the current release.</p>
+<li><p class="first">Extract all .ace files from the ACeDB database for the current release.</p>
 </li>
 <li><p class="first">Compress all .ace files</p>
 </li>
@@ -191,7 +194,7 @@ output.</p>
 </li>
 <li><p class="first">Sort all EDN logs by timestamp</p>
 </li>
-<li><p class="first">Create the Datomic datbase</p>
+<li><p class="first">Create the Datomic database</p>
 </li>
 <li><p class="first">Import the EDN logs into the Datomic database</p>
 </li>
@@ -219,6 +222,12 @@ complete.</p>
 <p>If you stopped after <a class="reference internal" href="#db-migration-step-2"><span class="std std-ref">Step 2</span></a> due to data
 inconsistency, or an error occurred during any of the other steps,
 please ensure to eventually run <a class="reference internal" href="#db-migration-step-3"><span class="std std-ref">Step 3</span></a>.</p>
+<div class="section" id="diagnostics">
+<h2>Diagnostics<a class="headerlink" href="#diagnostics" title="Permalink to this headline">¶</a></h2>
+<p>In the event of any errors, a <a class="reference external" href="https://s3.amazonaws.com/wormbase/db-migration/azanium.log">log file</a> should be written to the
+<a class="reference internal" href="../glossary.html#term-s3"><span class="xref std std-term">S3</span></a> storage after each build step.
+This log file should contain more information which may help developers fix the issue.</p>
+</div>
 </div>
 
 
@@ -262,7 +271,7 @@ please ensure to eventually run <a class="reference internal" href="#db-migratio
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.14',
+            VERSION:'0.15',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

@@ -9,6 +9,7 @@ which can be restored using any recent version of :term:`Datomic`.
 
 .. note:: You must have ``ssh-agent`` running in your shell session.
 
+
 .. _db-migration-step-1:
 
 1. **Provision and bootstrap an EC2 instance**
@@ -53,11 +54,11 @@ which can be restored using any recent version of :term:`Datomic`.
 
    This command will execute each step of the build:
 
-   1. Extract all .ace files from the ACeDB databsae for the current release.
+   1. Extract all .ace files from the ACeDB database for the current release.
    2. Compress all .ace files
    3. Convert .ace files to EDN logs
    4. Sort all EDN logs by timestamp
-   5. Create the Datomic datbase
+   5. Create the Datomic database
    6. Import the EDN logs into the Datomic database
    7. Run a QA report on the database
 
@@ -82,3 +83,12 @@ complete.
 If you stopped after :ref:`Step 2 <db-migration-step-2>` due to data
 inconsistency, or an error occurred during any of the other steps,
 please ensure to eventually run :ref:`Step 3 <db-migration-step-3>`.
+
+Diagnostics
+-----------
+In the event of any errors, a `log file`_ should be written to the
+:term:`S3` storage after each build step.
+This log file should contain more information which may help developers fix the issue.
+
+
+.. _`log file`: https://s3.amazonaws.com/wormbase/db-migration/azanium.log

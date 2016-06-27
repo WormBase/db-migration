@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Notifications &mdash; azanium 0.14 documentation</title>
+  <title>Notifications &mdash; azanium 0.15 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.14 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.15 documentation" href="../index.html"/>
         <link rel="up" title="Database Migration Procedure" href="index.html"/>
         <link rel="next" title="Commands" href="commands.html"/>
         <link rel="prev" title="Setup" href="setup.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.14
+                0.15
               </div>
             
           
@@ -142,8 +142,17 @@
             
   <div class="section" id="notifications">
 <h1>Notifications<a class="headerlink" href="#notifications" title="Permalink to this headline">¶</a></h1>
-<p>The database migration processes will send notifications to the
-<cite>#wb-db-migration-events</cite> channel (<a class="reference internal" href="../glossary.html#term-slack"><span class="xref std std-term">Slack</span></a> team: wormbase-db-dev).</p>
+<p>The database migration processes will send notifications to a
+dedicated <a class="reference internal" href="../glossary.html#term-slack"><span class="xref std std-term">Slack</span></a> channel:</p>
+<blockquote>
+<div><cite>#wb-db-migration-events</cite></div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Notification support requires access to the WormBase DB
+Development slack group</p>
+</div>
+<p>As a user performing database migration, you should have received an invite,
+or otherwise subscribed to this channel.</p>
 <p>Notifications are sent before and after each build step; at the end of
 the process a notification will sent to confirm the migrated Datomic
 databases’ location on Amazon <a class="reference internal" href="../glossary.html#term-s3"><span class="xref std std-term">S3</span></a> storage To configure
@@ -195,7 +204,7 @@ notifications for you and the WormBase team:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.14',
+            VERSION:'0.15',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
