@@ -2,7 +2,13 @@
  Changelog
 ===========
 
-0.17 (unreleased)
+0.18 (unreleased)
+=================
+
+- Nothing changed yet.
+
+
+0.17 (2016-06-27)
 =================
 
 - Minor updates to docs.
