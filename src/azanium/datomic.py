@@ -1,3 +1,4 @@
+import datetime
 import time
 
 from configobj import ConfigObj
@@ -11,7 +12,8 @@ logger = log.get_logger(namespace=__name__)
 
 def backup_db(context, db):
     from_uri = context.datomic_url(db)
-    to_uri = 's3://wb-datomic-backups/' + db
+    date_stamp = datetime.date.today().isoformat()
+    to_uri = 's3://wormbase/db-migration/{}/{}'.format(date_stamp, db)
     cmd = ['bin/datomic', util.jvm_mem_opts(0.20), from_uri, to_uri]
     cwd = context.path('datomic_free')
     logger.info('Backing up database {} to {}', from_uri, to_uri)

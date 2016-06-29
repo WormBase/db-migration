@@ -6,6 +6,7 @@
 =================
 
 - Fixed issue with wrong path to QA id catalog input path.
+- Fixed bucket S3 path for Datomic db backup.
 
 
 0.17 (2016-06-27)
