@@ -38,8 +38,8 @@ echo_retry = functools.partial(click.secho, fg='cyan')
 pkgpath = functools.partial(resource_filename, __package__)
 
 
-aws_state = functools.partial(shelve.open,
-                              os.path.join(os.getcwd(), '.db-migration.db'))
+def aws_state():
+    return shelve.open(os.path.expanduser('~/.db-migration.db'))
 
 
 def echo_warning(message,
