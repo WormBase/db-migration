@@ -5,7 +5,7 @@
 0.18 (unreleased)
 =================
 
-- Nothing changed yet.
+- Fixed issue with wrong path to QA id catalog input path.
 
 
 0.17 (2016-06-27)
