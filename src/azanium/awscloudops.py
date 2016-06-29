@@ -376,8 +376,11 @@ def upload_file(ctx, path_to_upload, path_in_bucket, bucket_name):
         'ACL': 'public-read'
     }
     ct_match = mimetypes.guess_type(path_to_upload)
-    if ct_match:
-        extra_args['ContentType'] = ct_match[0]
+    if all(ct_match):
+        content_type = ct_match[0]
+    else:
+        content_type = 'text/plain'
+    extra_args['ContentType'] = content_type
     try:
         logger.debug('{} (assumed role:{}) '
                      'is attempting to upload {} to s3://{}/{}',
