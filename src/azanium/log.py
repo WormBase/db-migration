@@ -84,8 +84,9 @@ class VerbosePrettyLogger(Logger):
         return super(VerbosePrettyLogger, self).exception(msg, *args, **kw)
 
 
-def setup_logging(log_dir, log_level=logging.INFO):
-    log_filename = __package__ + '.log'
+def setup_logging(logfile_path, log_level=logging.INFO):
+    log_dir = os.path.dirname(logfile_path)
+    log_filename = os.path.basename(logfile_path)
     os.makedirs(log_dir, exist_ok=True)
     log_path = os.path.join(log_dir, log_filename)
     logging.basicConfig(filename=log_path,
