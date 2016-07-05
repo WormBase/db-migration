@@ -1,4 +1,3 @@
-import datetime
 import time
 
 from configobj import ConfigObj
@@ -10,10 +9,9 @@ from . import util
 logger = log.get_logger(namespace=__name__)
 
 
-def backup_db(context, db):
-    from_uri = context.datomic_url(db)
-    date_stamp = datetime.date.today().isoformat()
-    to_uri = 's3://wormbase/db-migration/{}/{}'.format(date_stamp, db)
+def backup_db(context, local_backup_path):
+    from_uri = context.datomic_url(context.db_name)
+    to_uri = 'file://' + local_backup_path
     cmd = ['bin/datomic',
            util.jvm_mem_opts(0.20),
            'backup-db',
@@ -23,7 +21,6 @@ def backup_db(context, db):
     logger.info('Backing up database {} to {}', from_uri, to_uri)
     util.local(cmd, cwd=cwd)
     logger.info('Database backup complete')
-    return to_uri
 
 
 def configure_transactor(context, datomic_path):

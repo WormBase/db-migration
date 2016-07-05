@@ -279,6 +279,10 @@ class CommandContext:
     def data_release_version(self):
         return self.versions['acedb_database']
 
+    @property
+    def db_name(self):
+        return self.datomic_url().rsplit('/', 1)[1]
+
     def exec_step(self,
                   step_n,
                   headline,
