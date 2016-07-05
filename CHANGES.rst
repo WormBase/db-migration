@@ -7,6 +7,8 @@
 
 - Fixed issue with wrong path to QA id catalog input path.
 - Fixed bucket S3 path for Datomic db backup.
+- datomic-free does not support direct `s3` upload -
+  work around that with local back and upload via AWS APIs.
 
 
 0.17 (2016-06-27)
