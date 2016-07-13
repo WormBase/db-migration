@@ -29,8 +29,7 @@ LAST_STEP_OK_STATE_KEY = 'last-step-ok-idx'
 @root_command.group()
 @util.pass_command_context
 def run(context):
-    """Commands for executing db migration on an ephemeral AWS EC2 instance.
-    """
+    """Commands for executing db migration on an AWS EC2 instance."""
 
 
 @run.command('acedb-compress-dump',
@@ -143,9 +142,10 @@ def backup_db_to_s3(context):
         click.get_current_context().abort()
     data_release_version = context.data_release_version
     date_stamp = datetime.date.today().isoformat()
-    local_backup_path = '/tmp/' + os.path.join('db-migration',
-                                               date_stamp,
-                                               context.db_name)
+    local_backup_path = context.path('datomic-db-backup')
+    local_backup_path = os.path.join(local_backup_path,
+                                     date_stamp,
+                                     context.db_name)
     archive_path = os.path.join(os.path.dirname(local_backup_path),
                                 '{}.tar.xz'.format(data_release_version))
     arcname = os.path.basename(local_backup_path)

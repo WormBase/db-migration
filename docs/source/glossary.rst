@@ -13,13 +13,12 @@ Glossary
       The :term:`azanium` sub-command used to administer WormBase AWS
       accounts for the database migration.
 
-   `azanium cloud`
-      The :term:`azanium` sub-command used from a client machine to
-      interact with :term:`AWS`.
-
    `azanium run`
       The :term:`azanium` sub-command used on an :term:`AWS`
       :term:`EC2` instance in order to perform the database migration.
+
+   `aws cli`
+      The `Amazon Command Line Interface`_
 
    AWS
       Amazon Web Services - the umbrella term for all of the Amazon
@@ -76,3 +75,4 @@ Glossary
 .. _`Amazon Resource Name`: http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
 .. _`Amazon Identity and Access Management`: http://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html
 .. _circus: https://circus.readthedocs.io/en/latest/
+.. _`Amazon Command Line Interface`: https://aws.amazon.com/cli/

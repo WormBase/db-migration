@@ -2,6 +2,7 @@
 import base64
 import contextlib
 import mimetypes
+import operator
 import os
 import pprint
 import re
@@ -21,6 +22,7 @@ from . import log
 from . import root_command
 from . import ssh
 from . import util
+from .admin import admin
 
 
 USER_DATA_PATH = resource_filename(
@@ -29,23 +31,28 @@ USER_DATA_PATH = resource_filename(
 
 # Instance settings based on image of default Amazon AMI (ami-f5f41398, 2016)
 EC2_INSTANCE_DEFAULTS = dict(
-    ami='ami-4d925520',
-    instance_type='r3.4xlarge',
+    ami='ami-6869aa05',
+    instance_type='m4.4xlarge',
     monitoring=True,
     dry_run=False)
 
 BLOCK_DEVICE_MAPPINGS = [{
+    # 50Gb for root
     'DeviceName': '/dev/xvda',
     'Ebs': {
-        'VolumeSize': 60,
-        'DeleteOnTermination': True
+        'VolumeSize': 50,
+        'VolumeType': 'gp2',
+        'DeleteOnTermination': False
     },
 }, {
+    # 500Gb for data
     'DeviceName': '/dev/xvdb',
-    'VirtualName': 'ephemeral0'
+    'Ebs': {
+        'VolumeSize': 500,
+        'VolumeType': 'gp2',
+        'DeleteOnTermination': False
+    }
 }]
-
-EC2_INSTANCE_ROLE = 'development'
 
 logger = log.get_logger(namespace=__name__)
 
@@ -230,7 +237,30 @@ def cloud(ctx):
     pass
 
 
-@cloud.command(short_help='Start the migrate process')
+def _tag_resources(session, instance):
+    created_by = aws_userid(session)
+    created_by_tag = dict(Key='CreatedBy', Value=created_by)
+    role_tag = dict(Key='Role', Value='database-migration')
+    instance.create_tags(Tags=[
+        created_by_tag,
+        dict(Key='Name', Value='wb-db-migration'),
+        role_tag])
+
+    ebs_volumes = sorted(instance.volumes.all(),
+                         key=operator.attrgetter('size'))
+    volumes = iter(ebs_volumes)
+    root_volume = next(volumes)
+    root_volume.create_tags(Tags=[created_by_tag,
+                                  dict(Key='Name', Value='DB Migration Root'),
+                                  role_tag])
+    data_volume = next(volumes)
+    data_volume.create_tags(Tags=[created_by_tag,
+                                  dict(Key='Name', Value='DB Migration Data'),
+                                  role_tag])
+
+
+@admin.command('create-instance',
+               short_help='Create an instance to be used for DB migration')
 @util.option('--wb-db-migrate-version',
              default='0.1',
              help='The version of *this* python package')
@@ -252,18 +282,25 @@ def cloud(ctx):
 @util.option('--keypair-name',
              default='wb-db-migrate',
              help='Name of EC2 KeyPair.')
-@util.option('--dev-mode/--no-dev-mode', default=False)
+@util.option('--dev-mode/--no-dev-mode',
+             default=False,
+             help=('In dev-mode, use local state git repository for deploying azanium/'
+                   'In no-dev-mode, will use the latest release from github'))
 @click.argument('ws_data_release', metavar='<WSXXX data release>')
+@click.argument('subnet_id', metavar='<EC2-VPC subnet-id>')
+@click.argument('security_group_id', metavar='<EC2-VPC security-group-id>')
 @util.pass_command_context
-def init(ctx,
-         ws_data_release,
-         wb_db_migrate_version,
-         ami,
-         monitoring,
-         instance_type,
-         keypair_name,
-         dry_run,
-         dev_mode):
+def create_instance(ctx,
+                    ws_data_release,
+                    wb_db_migrate_version,
+                    subnet_id,
+                    security_group_id,
+                    ami,
+                    monitoring,
+                    instance_type,
+                    keypair_name,
+                    dry_run,
+                    dev_mode):
     """Start the migrate."""
     session = ctx.session
     state = ctx.db_mig_state
@@ -283,19 +320,18 @@ def init(ctx,
         ImageId=ami,
         InstanceType=instance_type,
         KeyName=key_pair.name,
+        SubnetId=subnet_id,
         BlockDeviceMappings=BLOCK_DEVICE_MAPPINGS,
         MinCount=1,
         MaxCount=1,
         UserData=base64.b64encode(user_data.encode('utf-8')),
         Monitoring=dict(Enabled=monitoring),
+        SecurityGroupIds=[security_group_id],
+        EbsOptimized=True,  # XXX: This is dependent on instance type
         DryRun=dry_run)
-    created_by = aws_userid(session)
     instances = ec2.create_instances(**instance_options)
     instance = next(iter(instances))
-    instance.create_tags(Tags=[
-        dict(Key='CreatedBy', Value=created_by),
-        dict(Key='Name', Value='wb-db-migrate'),
-        dict(Key='Role', Value=EC2_INSTANCE_ROLE)])
+    _tag_resources(session, instance)
     state[instance.id] = dict(id=instance.id,
                               init_options=instance_options,
                               KeyPairName=key_pair.name,
@@ -319,35 +355,18 @@ def init(ctx,
     return state
 
 
-@cloud.command(short_help='Terminate ephemeral EC2 resources')
-@util.pass_command_context
-def terminate(ctx):
-    with latest_migration_state(ctx) as (instance, state):
-        try:
-            instance.terminate()
-        except ClientError as client_error:
-            msg = ('Only {[started-by]} or an adminstrator '
-                   'will be able to terminate the instance')
-            msg = msg.format(state)
-            click.secho(str(client_error), fg='red')
-            util.echo_error(msg)
-        finally:
-            state['instance-state'] = instance.state
-        msg = 'Instance {.id!r} is {[Name]}'
-        util.echo_info(msg.format(instance, instance.state))
-
-
-@cloud.command('view-state',
+@admin.command('instance-state',
                short_help='Describe the state of the instance.')
 @util.pass_command_context
-def view_state(ctx):
+def view_instance_state(ctx):
     with latest_migration_state(ctx) as (_, state):
         util.echo_info(pprint.pformat(state))
 
 
-@cloud.command(short_help='Describes the status of the instance.')
+@admin.command('instance-status',
+               short_help='Describes the status of the instance.')
 @util.pass_command_context
-def status(ctx):
+def instance_status(ctx):
     with latest_migration_state(ctx) as (instance, _):
         report_status(instance)
 

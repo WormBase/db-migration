@@ -11,11 +11,11 @@ The installation procedure "bootstraps" the instance with a distribution
 of this package.
 
 When manually testing, please pass the ``--dev-mode`` flag to
-``azanium cloud`` command, e.g:
+``azanium admin`` command, e.g:
 
 .. code-block:: bash
 
-   azanium cloud init --dev-mode WS254
+   azanium admin create-instance --dev-mode WS254 "${SUBNET_ID}"
 
 This will bootstrap the instance with the code from your local working
 directory.

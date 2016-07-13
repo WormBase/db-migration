@@ -86,7 +86,7 @@ These credentials should be given as input to the following command:
 Environment limitations
 =======================
 The :term:`client commands` used to interact with :term:`AWS` expects
-that all `azanium cloud` commands to be invoked from the same working
+that all `azanium admin` commands to be invoked from the same working
 directory, from the same computer the initial commands are run from.
 
 If for some reason, its desired to run this command from a different machine,

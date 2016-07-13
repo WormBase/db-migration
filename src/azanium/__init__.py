@@ -11,7 +11,7 @@ from . import notifications
 from . import params
 from . import util
 
-INSTANCE_BASE_PATH = '/media/ephemeral0/wormbase'
+INSTANCE_BASE_PATH = '/wormbase'
 
 @util.command_group()
 @util.log_level_option()
