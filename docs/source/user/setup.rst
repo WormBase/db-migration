@@ -5,17 +5,7 @@ Setup
 Installation requirements
 =========================
 
-Python 3.4+ is the only requirement.
-To test if your system has this version or higher:
-
-.. code-block:: bash
-
-   python -V
-
-If your system does not already contain Python >= 3.4, then please use
-your operating system's package manager (e.g apt, yum, brew) to obtain
-a suitable version, or download and install throm e latest version of
-`Python 3`_ from the Python website.
+Python_ is the only requirement.
 
 
 Python package management
@@ -34,19 +24,6 @@ Linux
 Mac OSX
   ``${HOME}/Library``
 
-Check to make sure you have ``pip3`` available:
-
-.. code-block:: bash
-
-   $ which pip3
-
-Otherwise, for the purpose of following along with this documentation;
-set a shell alias:
-
-.. code-block:: bash
-
-   alias pip3="python3 -m pip"
-
 
 :term:`AWS` :term:`CLI` and :term:`azanium` Installation
 ========================================================
@@ -56,8 +33,7 @@ repository's `latest release page`_.
 
 .. code-block:: bash
 
-   pip3 install --user awscli
-   pip3 install --user <AZANIUM-WHEEL-URL>
+   pip install --user awscli
 
 
 :term:`AWS` Configuration
@@ -83,6 +59,22 @@ These credentials should be given as input to the following command:
    aws configure --profile $USER
 
 
+Next, you should modify the file:
+
+  `~/.aws/config`
+
+and add the following profile as shown below, substituting `$USER` for
+the actual profile name used in the `aws configure` command above:
+
+.. code-block:: ini
+
+   [profile wb-db-migrator]
+   region = us-east-1
+   role_session_name = wb-db-migrator
+   role_arn = arn:aws:iam::357210185381:role/wb-db-migrator
+   source_profile = $USER
+
+
 Environment limitations
 =======================
 The :term:`client commands` used to interact with :term:`AWS` expects
@@ -102,7 +94,7 @@ the following files must be copied (in addition to installing the software):
 
 .. note:: The above assumes you've run all commands from your `$HOME` directory.
 
-.. _`Python 3`: https://www.python.org/downloads/
+.. _Python: https://www.python.org/downloads/
 .. _pip: https://en.wikipedia.org/wiki/Pip_(package_manager)
 .. _`AWS region`: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
 .. _`latest release page`: https://github.com/Wormbase/db-migration/releases/latest
