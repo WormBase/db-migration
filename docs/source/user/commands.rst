@@ -40,7 +40,7 @@ which can be restored using any recent version of :term:`Datomic`.
    The output in JSON format, and should contain the following when the
    instance is ready:
 
-   .. code-block:: json
+   .. code-block:: text
 
       "State": {
         "Code": 16,
