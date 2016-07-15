@@ -20,4 +20,5 @@ the migration process.
 
    prerequisites
    notifications
+   setup
    commands
