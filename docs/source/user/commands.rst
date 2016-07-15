@@ -41,6 +41,7 @@ which can be restored using any recent version of :term:`Datomic`.
    instance is ready:
 
    .. code-block:: json
+
       "State": {
         "Code": 16,
         "Name": "running"
