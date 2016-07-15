@@ -9,15 +9,18 @@ from . import util
 logger = log.get_logger(namespace=__name__)
 
 
-def backup_db(context, db):
-    from_uri = context.datomic_url(db)
-    to_uri = 's3://wb-datomic-backups/' + db
-    cmd = ['bin/datomic', util.jvm_mem_opts(0.20), from_uri, to_uri]
+def backup_db(context, local_backup_path):
+    from_uri = context.datomic_url(context.db_name)
+    to_uri = 'file://' + local_backup_path
+    cmd = ['bin/datomic',
+           util.jvm_mem_opts(0.20),
+           'backup-db',
+           from_uri,
+           to_uri]
     cwd = context.path('datomic_free')
     logger.info('Backing up database {} to {}', from_uri, to_uri)
     util.local(cmd, cwd=cwd)
     logger.info('Database backup complete')
-    return to_uri
 
 
 def configure_transactor(context, datomic_path):

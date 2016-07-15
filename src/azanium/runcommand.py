@@ -1,9 +1,13 @@
+import datetime
 import os
 import psutil
+import shutil
+import tarfile
 import tempfile
 import time
 from functools import partial
 
+from botocore.exceptions import ClientError
 import click
 
 from . import awscloudops
@@ -25,8 +29,7 @@ LAST_STEP_OK_STATE_KEY = 'last-step-ok-idx'
 @root_command.group()
 @util.pass_command_context
 def run(context):
-    """Commands for executing db migration on an ephemeral AWS EC2 instance.
-    """
+    """Commands for executing db migration on an AWS EC2 instance."""
 
 
 @run.command('acedb-compress-dump',
@@ -137,7 +140,33 @@ def backup_db_to_s3(context):
     prompt = 'Backup Datomic Database to S3? [y/N]:'
     if not input(prompt).lower().startswith('y'):
         click.get_current_context().abort()
-    s3_uri = datomic.backup_db(context, context.data_release_version)
+    data_release_version = context.data_release_version
+    date_stamp = datetime.date.today().isoformat()
+    local_backup_path = context.path('datomic-db-backup')
+    local_backup_path = os.path.join(local_backup_path,
+                                     date_stamp,
+                                     context.db_name)
+    archive_path = os.path.join(os.path.dirname(local_backup_path),
+                                '{}.tar.xz'.format(data_release_version))
+    arcname = os.path.basename(local_backup_path)
+    if not os.path.isdir(local_backup_path):
+        datomic.backup_db(context, local_backup_path)
+    if not os.path.isfile(archive_path):
+        with tarfile.open(archive_path, mode='w:xz') as tf:
+            tf.add(local_backup_path, arcname=arcname)
+    ctx = click.get_current_context()
+    try:
+        s3_uri = ctx.invoke(awscloudops.upload_file,
+                            path_to_upload=archive_path,
+                            path_in_bucket='db-migration/' + arcname)
+    except ClientError:
+        logger.error('Failed to upload file to S3')
+        logger.exception()
+        raise
+    else:
+        logger.info('Removing local datomic db backup {}', local_backup_path)
+        os.remove(archive_path)
+        shutil.rmtree(local_backup_path)
     return 'Datomic database transferred to {uri}.'.format(uri=s3_uri)
 
 
@@ -178,11 +207,12 @@ def migrate(context):
     step_idx = int(context.db_mig_state.get(LAST_STEP_OK_STATE_KEY, '0'))
     steps = [('Installing all software and ACeDB',
               partial(install.all.invoke, ctx))]
-    logfile_name = os.path.basename(context.logfile_path)
+    path_in_bucket = '/'.join(['db-migration',
+                               os.path.basename(context.logfile_path)])
     upload_log_file = partial(ctx.invoke,
                               awscloudops.upload_file,
                               path_to_upload=context.logfile_path,
-                              path_in_bucket=logfile_name)
+                              path_in_bucket=path_in_bucket)
     meta_steps = [
         ('Dumping all ACeDB files',
          acedb_dump,

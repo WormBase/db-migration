@@ -13,10 +13,15 @@ Prerequisites
 
   	*AWS_SECRET_ACCESS_KEY*
 
-  * Python 3.4+
+  * :term:`AWS` Command Line Interface (`aws cli`)
 
-    On a unix-like machine, check the version with:
+   `Install the aws cli`_.
 
-    .. code-block:: bash
+   As a user who will perform the database migration, a WormBase AWS
+   administrator should provide you with the `Access Key ID` and
+   `Secret Access Key` credentials mentioned in the `Getting Started`_
+   section of the AWS Command Line Interface documentation.
 
-       $ which python3 && python3 -V
+
+.. _`Install the aws cli`: https://aws.amazon.com/cli/
+.. _`Getting Started`: http://docs.aws.amazon.com/cli/latest/userguide/

@@ -30,7 +30,7 @@ performing a database migration.
 +----------+------------------+--------------------+----------+
 |/dev/xvda1|/                 |EBS, SSD            |60Gb      |
 +----------+------------------+--------------------+----------+
-|/dev/xvdb |/media/ephemeral0 |Instance Store, SSD |320Gb     |
+|/dev/xvdb |/wormbase         |Instance Store, SSD |320Gb     |
 +----------+------------------+--------------------+----------+
 
 Security properties

@@ -38,8 +38,8 @@ echo_retry = functools.partial(click.secho, fg='cyan')
 pkgpath = functools.partial(resource_filename, __package__)
 
 
-aws_state = functools.partial(shelve.open,
-                              os.path.join(os.getcwd(), '.db-migration.db'))
+def aws_state():
+    return shelve.open(os.path.expanduser('~/.db-migration.db'))
 
 
 def echo_warning(message,
@@ -278,6 +278,10 @@ class CommandContext:
     @property
     def data_release_version(self):
         return self.versions['acedb_database']
+
+    @property
+    def db_name(self):
+        return self.datomic_url().rsplit('/', 1)[1]
 
     def exec_step(self,
                   step_n,

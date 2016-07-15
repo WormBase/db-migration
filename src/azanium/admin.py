@@ -88,7 +88,7 @@ def setup(session):
         awsiam.ensure_assume_role_policy(iam,
                                          role,
                                          aws_meta.assume_role_policy_name)
-        ctx.invoke(sync, session)
+        ctx.invoke(sync_users, session)
     except Exception as e:
         util.echo_error(e)
         ctx.abort()
@@ -127,13 +127,13 @@ def add_user(session, username):
                     user.arn)
 
 
-@admin.command('users',
+@admin.command('list-users',
                short_help='Lists users of the db migration group')
 @util.option('--verify/--no-verify',
              default=True,
              help='Switch to check if users are correctly configured.')
 @pass_admin_session
-def users(session, verify):
+def list_users(session, verify):
     """List and verify IAM accounts allowed to perform db migration commands.
     """
     iam = session.resource('iam')
@@ -150,9 +150,10 @@ def users(session, verify):
     click.secho(json.dumps(users, indent=True, sort_keys=True), fg='cyan')
 
 
-@admin.command(short_help='Synchronizes all database migration-users')
+@admin.command('sync-users',
+               short_help='Synchronizes all database migration-users')
 @pass_admin_session
-def sync(session):
+def sync_users(session):
     """Synchronize members of the database migration group.
 
     This command ensures that users belonging to the designated group

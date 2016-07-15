@@ -11,7 +11,7 @@ from . import notifications
 from . import params
 from . import util
 
-INSTANCE_BASE_PATH = '/media/ephemeral0/wormbase'
+INSTANCE_BASE_PATH = '/wormbase'
 
 @util.command_group()
 @util.log_level_option()
@@ -56,7 +56,9 @@ def root_command(ctx, log_level, base_path, profile, assume_role):
     command_context.user_profile = profile
     command_context.db_mig_state = util.aws_state()
     ctx.obj = command_context
-    logfile_path = os.path.join(base_path, 'logs')
+    logfile_path = os.path.join(base_path,
+                                'logs',
+                                '{}.log'.format(__package__))
     command_context.logfile_path = logfile_path
     log.setup_logging(logfile_path, log_level=log_level)
 

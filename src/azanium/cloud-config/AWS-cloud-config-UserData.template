@@ -17,7 +17,8 @@ packages:
 
 bootcmd:
 - mkfs.ext4 /dev/xvdb
-- mount /dev/xvdb
+- mkdir -p /wormbase
+- mount /dev/xvdb /wormbase
 
 runcmd:
 - yum groupinstall -y "Development Tools"
@@ -32,8 +33,8 @@ runcmd:
 - ln -s /lib64/libreadline.so.6 /lib64/libreadline.so.5
 - cat %(azanium_completion_script)s >> ~ec2-user/.bashrc
 - chown ec2-user ~ec2-user/.bashrc
-- mkdir /media/ephemeral0/wormbase
-- chown ec2-user:ec2-user /media/ephemeral0/wormbase
+- mkdir /wormbase
+- chown ec2-user:ec2-user /wormbase
 
 
 output : { all : '| tee -a /var/log/cloud-init-output.log' }
