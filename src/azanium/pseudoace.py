@@ -22,7 +22,12 @@ def run_pseudoace(context, *args):
 
 def create_database(context):
     logger.info('Creating datomic database')
-    run_pseudoace(context, '-v', 'create-database')
+    models_filename = os.path.join(context.path('acedb_database'),
+                                   'wspec',
+                                   'models.wrm.annot')
+    run_pseudoace(context,
+                  '--models-filename', models_filename,
+                  '-v', 'create-database')
 
 
 def acedb_dump_to_edn_logs(context, acedb_dump_dir, edn_logs_dir):

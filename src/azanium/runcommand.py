@@ -164,10 +164,22 @@ def backup_db_to_s3(context):
         logger.exception()
         raise
     else:
-        logger.info('Removing local datomic db backup {}', local_backup_path)
+        logger.info('Removing local datomic db backup archive {}', archive_path)
+        logger.info('Leaving datomic backup directory {} in place',
+                    local_backup_path)
         os.remove(archive_path)
-        shutil.rmtree(local_backup_path)
     return 'Datomic database transferred to {uri}.'.format(uri=s3_uri)
+
+
+def _clean_up_previous_migration(context):
+    to_remove = set(context.versions) + {
+        'acedb-dump',
+        'edn-logs',
+        'datomic-db-backup'
+    }
+    force_rmdir = partial(shutil.rmtree, ignore_errors=True)
+    for name in to_remove:
+        force_rmdir(context.path(name))
 
 
 @root_command.command(short_help='Runs all db migration steps')
@@ -196,6 +208,7 @@ def migrate(context):
     ** Only performed if you confirm report output looks good (7).
 
     """
+    _clean_up_previous_migration(context)
     logs_dir = context.path('edn-logs')
     dump_dir = context.path('acedb-dump')
     datomic_path = context.path('datomic_free')

@@ -4,7 +4,10 @@
 
 0.18 (unreleased)
 =================
-
+- Cleanup data from any previous migration before starting a new one.
+- Keep datomic backup directory on disk after S3 upload of tarfile to
+  enable DDB restore.
+- Reflect change in pseudoace 0.4.10 (Location of annotated ACeDB models file)
 - Fixed issue with wrong path to QA id catalog input path.
 - Fixed bucket S3 path for Datomic db backup.
 - datomic-free does not support direct `s3` upload -
