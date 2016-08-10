@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.18 (unreleased)
+0.18 (2016-08-10)
 =================
 - Cleanup data from any previous migration before starting a new one.
 - Keep datomic backup directory on disk after S3 upload of tarfile to
