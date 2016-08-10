@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Administration &mdash; azanium 0.18 documentation</title>
+  <title>AWS EC2 Instance Creation &mdash; azanium 0.18 documentation</title>
   
 
   
@@ -31,8 +31,9 @@
 
   
     <link rel="top" title="azanium 0.18 documentation" href="../index.html"/>
-        <link rel="next" title="AWS IAM setup" href="iam-setup.html"/>
-        <link rel="prev" title="Commands" href="../user/commands.html"/> 
+        <link rel="up" title="Administration" href="index.html"/>
+        <link rel="next" title="EC2 Instance requirements" href="ec2-instance.html"/>
+        <link rel="prev" title="AWS IAM setup" href="iam-setup.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -83,9 +84,9 @@
             
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../user/index.html">Database Migration Procedure</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Administration</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Administration</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="iam-setup.html">AWS IAM setup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ec2-instance-creation.html">AWS EC2 Instance Creation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">AWS EC2 Instance Creation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ec2-instance.html"><code class="docutils literal"><span class="pre">EC2</span></code> Instance requirements</a></li>
 </ul>
 </li>
@@ -122,11 +123,13 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
       
-    <li>Administration</li>
+          <li><a href="index.html">Administration</a> &raquo;</li>
+      
+    <li>AWS EC2 Instance Creation</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/admin/index.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/admin/ec2-instance-creation.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -136,18 +139,61 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="administration">
-<h1>Administration<a class="headerlink" href="#administration" title="Permalink to this headline">¶</a></h1>
-<p>This documentation is intended for those managing the WormBase
-<a class="reference internal" href="../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> accounts; detailed here:</p>
-<blockquote>
-<div><ul class="simple">
-<li>Steps required to configure the AWS <a class="reference internal" href="../glossary.html#term-iam"><span class="xref std std-term">IAM</span></a> users
-in order to perform the database migration.</li>
-<li>Details of the  <a class="reference internal" href="../glossary.html#term-ec2"><span class="xref std std-term">EC2</span></a> instance required to perform the database migration</li>
-</ul>
-</div></blockquote>
-<div class="toctree-wrapper compound">
+  <div class="section" id="aws-ec2-instance-creation">
+<h1>AWS EC2 Instance Creation<a class="headerlink" href="#aws-ec2-instance-creation" title="Permalink to this headline">¶</a></h1>
+<p>The instance to be used for the db migration should be created with
+the following command:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nv">RELEASE</span><span class="o">=</span><span class="s2">&quot;WS....&quot;</span>
+<span class="nv">SUBNET_ID</span><span class="o">=</span><span class="s2">&quot;subnet-xxxxx&quot;</span>
+azanium --profile<span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">AWS_CLI_ADMIN_ACCOUNT</span><span class="si">}</span><span class="s2">&quot;</span> <span class="se">\</span>
+      cloud init <span class="s2">&quot;</span><span class="si">${</span><span class="nv">RELEASE</span><span class="si">}</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">subnet_id</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p>In the above, <cite>SUBNET_ID</cite> should be the id of the subnet in the new
+EC2-VPC named &#8220;wormbase&#8221;.</p>
+<p>The command above in effect,  wraps the typical <cite>aws ec2 run-instances</cite> command to install the <cite>azanium</cite> software on the instance, and pre-configure the instance with
+<cite>UserData</cite>, as follows:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>#cloud-config
+repo_update: true
+repo_upgrade: all
+
+packages:
+  - libffi-devel
+  - openssl-devel
+  - readline-devel
+  - java-1.8.0-openjdk-headless
+  - python34
+  - python34-pip
+  - python34-tools
+  - python34-libs
+  - python34-virtualenv
+  - screen
+  - tmux
+
+bootcmd:
+- mkfs.ext4 /dev/xvdb
+- mkdir -p /wormbase
+- mount /dev/xvdb /wormbase
+
+runcmd:
+- yum groupinstall -y &quot;Development Tools&quot;
+- update-alternatives --set java /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
+- pip3 install --upgrade pip
+- yum update -y
+- wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
+- sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
+- yum install -y apache-maven
+# hack to make the tace binary work on the latest Amazon AMI:
+#  Expects libreadline.so.5, which is not currently installable.
+- ln -s /lib64/libreadline.so.6 /lib64/libreadline.so.5
+- cat %(azanium_completion_script)s &gt;&gt; ~ec2-user/.bashrc
+- chown ec2-user ~ec2-user/.bashrc
+- mkdir /wormbase
+- chown ec2-user:ec2-user /wormbase
+
+
+output : { all : &#39;| tee -a /var/log/cloud-init-output.log&#39; }
+</pre></div>
 </div>
 </div>
 
@@ -158,10 +204,10 @@ in order to perform the database migration.</li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="iam-setup.html" class="btn btn-neutral float-right" title="AWS IAM setup" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="ec2-instance.html" class="btn btn-neutral float-right" title="EC2 Instance requirements" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../user/commands.html" class="btn btn-neutral" title="Commands" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="iam-setup.html" class="btn btn-neutral" title="AWS IAM setup" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

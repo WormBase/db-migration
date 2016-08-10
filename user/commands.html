@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Commands &mdash; azanium 0.17 documentation</title>
+  <title>Commands &mdash; azanium 0.18 documentation</title>
   
 
   
@@ -30,10 +30,10 @@
   
 
   
-    <link rel="top" title="azanium 0.17 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.18 documentation" href="../index.html"/>
         <link rel="up" title="Database Migration Procedure" href="index.html"/>
         <link rel="next" title="Administration" href="../admin/index.html"/>
-        <link rel="prev" title="Notifications" href="notifications.html"/> 
+        <link rel="prev" title="Setup" href="setup.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.17
+                0.18
               </div>
             
           
@@ -85,8 +85,8 @@
                 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Database Migration Procedure</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="prerequisites.html">Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html">Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notifications.html">Notifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">Setup</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Commands</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#diagnostics">Diagnostics</a></li>
 </ul>
@@ -153,18 +153,37 @@ which can be restored using any recent version of <a class="reference internal" 
 <p class="last">You must have <code class="docutils literal"><span class="pre">ssh-agent</span></code> running in your shell session.</p>
 </div>
 <ol class="arabic" id="db-migration-step-1">
-<li><p class="first"><strong>Provision and bootstrap an EC2 instance</strong></p>
-<p>The following <a class="reference internal" href="../glossary.html#term-azanium"><span class="xref std std-term">azanium</span></a> sub-command below will
-print out the ssh commands needed for the next step.</p>
+<li><p class="first"><strong>Start the DB Migration EC2 instance</strong></p>
+<p>Assuming you have correctly setup AWS Command Line Interface, using
+the <cite>db migration ec2 instance id</cite> provided by a WormBase AWS
+Administrator, enter the following <a class="reference internal" href="../glossary.html#term-aws-cli"><span class="xref std std-term">aws cli</span></a> command to start
+the migration instance:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nv">AWS_PROFILE</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">USER</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="nv">WB_DATA_RELEASE</span><span class="o">=</span><span class="s2">&quot;WS254&quot;</span>
-azanium cloud --profile <span class="s2">&quot;</span><span class="si">${</span><span class="nv">USER</span><span class="si">}</span><span class="s2">&quot;</span> init <span class="s2">&quot;</span><span class="si">${</span><span class="nv">WB_DATA_RELEASE</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="nv">INSTANCE_ID</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">INSTANCE_ID_PROVIDED_BY_WORMBASE_AWS_ADMIN</span><span class="si">}</span><span class="s2">&quot;</span>
+aws --profile <span class="s2">&quot;</span><span class="si">${</span><span class="nv">AWS_PROFILE</span><span class="si">}</span><span class="s2">&quot;</span> <span class="se">\</span>
+             ec2 start-instances --instance-ids <span class="s2">&quot;</span><span class="si">${</span><span class="nv">INSTANCE_ID</span><span class="si">}</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
 </li>
 </ol>
 <ol class="arabic" id="db-migration-step-2" start="2">
 <li><p class="first"><strong>Connect to the EC2 instance using ssh - run the migrate command</strong></p>
+<p>Use the following command check the status of the instance:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>aws --profile<span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">AWS_PROFILE</span><span class="si">}</span><span class="s2">&quot;</span> <span class="se">\</span>
+             ec2 describe-instances --instance-ids <span class="s2">&quot;</span><span class="si">${</span><span class="nv">INSTANCE_ID</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p>The output in JSON format, and should contain the following when the
+instance is ready:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>&quot;State&quot;: {
+  &quot;Code&quot;: 16,
+  &quot;Name&quot;: &quot;running&quot;
+}
+</pre></div>
+</div>
+<p>Once runnuing, either the <cite>PublicDnsName</cite> or <cite>PublicIPAddress</cite> mentioned in
+same output can be used to connect to the instance via <cite>ssh</cite> using an
+ssh provided by a WormBase <a class="reference internal" href="../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> administrator.</p>
 <p>The commands below will emit their current progress to the console,
 and will also print out the location of a log file for more detailed
 output.</p>
@@ -212,7 +231,7 @@ confirm the next step, or abort.</p>
 </ol>
 <ol class="arabic" id="db-migration-step-3" start="3">
 <li><p class="first"><strong>Terminate the EC2 instance</strong></p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium cloud --profile <span class="nv">$USER</span> terminate
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium --profile <span class="nv">$USER</span> admin stop-instance
 </pre></div>
 </div>
 </li>
@@ -240,7 +259,7 @@ This log file should contain more information which may help developers fix the 
         <a href="../admin/index.html" class="btn btn-neutral float-right" title="Administration" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="notifications.html" class="btn btn-neutral" title="Notifications" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="setup.html" class="btn btn-neutral" title="Setup" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -271,7 +290,7 @@ This log file should contain more information which may help developers fix the 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.17',
+            VERSION:'0.18',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Database Migration Procedure &mdash; azanium 0.17 documentation</title>
+  <title>Database Migration Procedure &mdash; azanium 0.18 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.17 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.18 documentation" href="../index.html"/>
         <link rel="next" title="Prerequisites" href="prerequisites.html"/>
         <link rel="prev" title="🐛 azanium - WormBase Database Migration" href="../index.html"/> 
 
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.17
+                0.18
               </div>
             
           
@@ -84,8 +84,8 @@
                 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Database Migration Procedure</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="prerequisites.html">Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html">Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notifications.html">Notifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="commands.html">Commands</a></li>
 </ul>
 </li>
@@ -139,9 +139,9 @@
             
   <div class="section" id="database-migration-procedure">
 <h1>Database Migration Procedure<a class="headerlink" href="#database-migration-procedure" title="Permalink to this headline">¶</a></h1>
-<p>The database migration will be performed on an ephemeral <a class="reference internal" href="../glossary.html#term-ec2"><span class="xref std std-term">EC2</span></a>
-instance.  Upon successful completion, the migrated Datomic database
-will be stored in <a class="reference internal" href="../glossary.html#term-s3"><span class="xref std std-term">S3</span></a> storage.</p>
+<p>The database migration will be performed on an <a class="reference internal" href="../glossary.html#term-ec2"><span class="xref std std-term">EC2</span></a> instance.
+Upon successful completion, the migrated Datomic database will be
+stored in <a class="reference internal" href="../glossary.html#term-s3"><span class="xref std std-term">S3</span></a> storage.</p>
 <p>The migration process will take approximately 3½ days to complete.</p>
 <p><cite>Notications &lt;notications&gt;</cite> will be sent before and after each step of
 the migration process.</p>
@@ -194,7 +194,7 @@ the migration process.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.17',
+            VERSION:'0.18',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

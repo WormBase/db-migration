@@ -1,9 +1,9 @@
 ============================
 Database Migration Procedure
 ============================
-The database migration will be performed on an ephemeral :term:`EC2`
-instance.  Upon successful completion, the migrated Datomic database
-will be stored in :term:`S3` storage.
+The database migration will be performed on an :term:`EC2` instance.
+Upon successful completion, the migrated Datomic database will be
+stored in :term:`S3` storage.
 
 The migration process will take approximately 3½ days to complete.
 
@@ -19,6 +19,6 @@ the migration process.
    :maxdepth: 1
 
    prerequisites
-   setup
    notifications
+   setup
    commands

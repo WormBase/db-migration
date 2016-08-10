@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Notifications &mdash; azanium 0.17 documentation</title>
+  <title>Notifications &mdash; azanium 0.18 documentation</title>
   
 
   
@@ -30,10 +30,10 @@
   
 
   
-    <link rel="top" title="azanium 0.17 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.18 documentation" href="../index.html"/>
         <link rel="up" title="Database Migration Procedure" href="index.html"/>
-        <link rel="next" title="Commands" href="commands.html"/>
-        <link rel="prev" title="Setup" href="setup.html"/> 
+        <link rel="next" title="Setup" href="setup.html"/>
+        <link rel="prev" title="Prerequisites" href="prerequisites.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.17
+                0.18
               </div>
             
           
@@ -85,8 +85,8 @@
                 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Database Migration Procedure</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="prerequisites.html">Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html">Setup</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Notifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="commands.html">Commands</a></li>
 </ul>
 </li>
@@ -151,14 +151,19 @@ dedicated <a class="reference internal" href="../glossary.html#term-slack"><span
 <p class="last">Notification support requires access to the WormBase DB
 Development slack group</p>
 </div>
-<p>As a user performing database migration, you should have received an invite,
-or otherwise subscribed to this channel.</p>
+<p>As a user performing database migration, you should have received an
+invitation, or otherwise subscribed to this channel.</p>
 <p>Notifications are sent before and after each build step; at the end of
 the process a notification will sent to confirm the migrated Datomic
 databases’ location on Amazon <a class="reference internal" href="../glossary.html#term-s3"><span class="xref std std-term">S3</span></a> storage To configure
 notifications for you and the WormBase team:</p>
-<p>Enter the <a class="reference external" href="https://wormbase-db-dev.slack.com/services/B1HNK2JEM#service_setup">slack webhook url</a> to the following command:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium configure &lt;SLACK_WEBHOOK_URL&gt;
+<p>Enter the <a class="reference external" href="https://wormbase-db-dev.slack.com/services/B1HNK2JEM#service_setup">slack webhook url</a> into a file in your home directory,
+named as follows:</p>
+<blockquote>
+<div><cite>~/.azanium.conf</cite></div></blockquote>
+<p>The format of the file should match the following:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="k">[azanium.notifications]</span>
+<span class="na">url</span> <span class="o">=</span> <span class="s">https://hooks.slack.com/services/&lt;UNIQUE_TOKEN_1&gt;/&lt;UNIQUE_TOKEN_2&gt;</span>
 </pre></div>
 </div>
 </div>
@@ -170,10 +175,10 @@ notifications for you and the WormBase team:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="commands.html" class="btn btn-neutral float-right" title="Commands" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="setup.html" class="btn btn-neutral float-right" title="Setup" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="setup.html" class="btn btn-neutral" title="Setup" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="prerequisites.html" class="btn btn-neutral" title="Prerequisites" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -204,7 +209,7 @@ notifications for you and the WormBase team:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.17',
+            VERSION:'0.18',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

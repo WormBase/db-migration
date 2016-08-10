@@ -12,25 +12,48 @@ which can be restored using any recent version of :term:`Datomic`.
 
 .. _db-migration-step-1:
 
-1. **Provision and bootstrap an EC2 instance**
+1. **Start the DB Migration EC2 instance**
 
-   The following :term:`azanium` sub-command below will
-   print out the ssh commands needed for the next step.
+   Assuming you have correctly setup AWS Command Line Interface, using
+   the `db migration ec2 instance id` provided by a WormBase AWS
+   Administrator, enter the following :term:`aws cli` command to start
+   the migration instance:
 
    .. code-block:: bash
 
       AWS_PROFILE="${USER}"
-      WB_DATA_RELEASE="WS254"
-      azanium cloud --profile "${USER}" init "${WB_DATA_RELEASE}"
+      INSTANCE_ID="${INSTANCE_ID_PROVIDED_BY_WORMBASE_AWS_ADMIN}"
+      aws --profile "${AWS_PROFILE}" \
+		   ec2 start-instances --instance-ids "${INSTANCE_ID}"
 
 .. _db-migration-step-2:
 
 2. **Connect to the EC2 instance using ssh - run the migrate command**
 
+   Use the following command check the status of the instance:
+
+   .. code-block:: bash
+
+      aws --profile="${AWS_PROFILE}" \
+		   ec2 describe-instances --instance-ids "${INSTANCE_ID}"
+
+   The output in JSON format, and should contain the following when the
+   instance is ready:
+
+   .. code-block:: text
+
+      "State": {
+        "Code": 16,
+        "Name": "running"
+      }
+
+   Once runnuing, either the `PublicDnsName` or `PublicIPAddress` mentioned in
+   same output can be used to connect to the instance via `ssh` using an
+   ssh provided by a WormBase :term:`AWS` administrator.
+
    The commands below will emit their current progress to the console,
    and will also print out the location of a log file for more detailed
    output.
-
 
    Use the `ssh` command printed from step 1 to connect to the EC2 instance.
 
@@ -74,7 +97,7 @@ which can be restored using any recent version of :term:`Datomic`.
 
    .. code-block:: bash
 
-      azanium cloud --profile $USER terminate
+      azanium --profile $USER admin stop-instance
 
 
 Should all steps complete successfully, the migration process is now
