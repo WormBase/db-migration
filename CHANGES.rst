@@ -13,6 +13,7 @@
 - datomic-free does not support direct `s3` upload -
   work around that with local back and upload via AWS APIs.
 - Updates to reflect switch to non-ephemeral instance.
+- Bump data version to WS255.
 
 
 0.17 (2016-06-27)
