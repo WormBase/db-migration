@@ -172,7 +172,7 @@ def backup_db_to_s3(context):
 
 
 def _clean_up_previous_migration(context):
-    to_remove = set(context.versions) + {
+    to_remove = set(context.versions) | {
         'acedb-dump',
         'edn-logs',
         'datomic-db-backup'

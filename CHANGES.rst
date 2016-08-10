@@ -5,7 +5,7 @@
 0.19 (unreleased)
 =================
 
-- Nothing changed yet.
+- Fixed issue in cleaning up previous migration.
 
 
 0.18 (2016-08-10)
