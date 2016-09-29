@@ -8,7 +8,7 @@ the following command:
 
    RELEASE="WS...."
    SUBNET_ID="subnet-xxxxx"
-   azanium --profile="${AWS_CLI_ADMIN_ACCOUNT}" \
+   azanium --profile="${AWS_DEFAULT_PROFILE}" \
 	 cloud init "${RELEASE}" "${subnet_id}"
 
 In the above, `SUBNET_ID` should be the id of the subnet in the new

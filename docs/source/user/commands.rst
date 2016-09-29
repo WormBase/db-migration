@@ -14,17 +14,16 @@ which can be restored using any recent version of :term:`Datomic`.
 
 1. **Start the DB Migration EC2 instance**
 
-   Assuming you have correctly setup AWS Command Line Interface, using
+   Having previously setup AWS Command Line Interface, using
    the `db migration ec2 instance id` provided by a WormBase AWS
    Administrator, enter the following :term:`aws cli` command to start
    the migration instance:
 
    .. code-block:: bash
 
-      AWS_PROFILE="${USER}"
+      AWS_DEFAULT_PROFILE="${USER}" # WormBase AWS account username
       INSTANCE_ID="${INSTANCE_ID_PROVIDED_BY_WORMBASE_AWS_ADMIN}"
-      aws --profile "${AWS_PROFILE}" \
-		   ec2 start-instances --instance-ids "${INSTANCE_ID}"
+      aws ec2 start-instances --instance-ids "${INSTANCE_ID}"
 
 .. _db-migration-step-2:
 
@@ -34,8 +33,7 @@ which can be restored using any recent version of :term:`Datomic`.
 
    .. code-block:: bash
 
-      aws --profile="${AWS_PROFILE}" \
-		   ec2 describe-instances --instance-ids "${INSTANCE_ID}"
+      aws ec2 describe-instances --instance-ids "${INSTANCE_ID}"
 
    The output in JSON format, and should contain the following when the
    instance is ready:
@@ -97,7 +95,7 @@ which can be restored using any recent version of :term:`Datomic`.
 
    .. code-block:: bash
 
-      azanium --profile $USER admin stop-instance
+      azanium admin stop-instance
 
 
 Should all steps complete successfully, the migration process is now
