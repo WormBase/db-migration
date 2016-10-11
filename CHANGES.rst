@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.19 (unreleased)
+0.19 (2016-10-11)
 =================
 
 - Fixed issue in cleaning up previous migration.
