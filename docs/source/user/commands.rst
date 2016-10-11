@@ -45,9 +45,10 @@ which can be restored using any recent version of :term:`Datomic`.
         "Name": "running"
       }
 
-   Once runnuing, either the `PublicDnsName` or `PublicIPAddress` mentioned in
-   same output can be used to connect to the instance via `ssh` using an
-   ssh provided by a WormBase :term:`AWS` administrator.
+   Once running, either the `PublicDnsName` or `PublicIPAddress`
+   mentioned in same output can be used to connect to the instance via
+   `ssh` using an ssh provided by a WormBase :term:`AWS`
+   administrator.
 
    The commands below will emit their current progress to the console,
    and will also print out the location of a log file for more detailed
