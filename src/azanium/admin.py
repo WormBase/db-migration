@@ -41,7 +41,7 @@ pass_admin_session = click.make_pass_decorator(AdminSession)
 
 
 @root_command.group()
-@util.option('--profile', default='default', help='aws profile name')
+@util.aws_profile_option()
 @click.option('-p',
               '--assume-role-policy-name',
               default=awsiam.DB_MIG_ROLE + '-assume',

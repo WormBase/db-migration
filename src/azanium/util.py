@@ -174,6 +174,13 @@ log_level_option = functools.partial(
     type=click.Choice(choices=('DEBUG', 'INFO', 'WARNING', 'ERROR')),
     help='Logging level.')
 
+aws_profile_option = functools.partial(
+    option,
+    '-p',
+    '--profile',
+    default=os.environ.get('AWS_DEFAULT_PROFILE', 'default'),
+    help='AWS profile')
+
 
 def download(url, local_filename, chunk_size=1024 * 10):
     """Download `url` into `local_filename'.
