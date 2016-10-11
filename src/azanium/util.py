@@ -309,13 +309,9 @@ class CommandContext:
         return os.path.join(self.base_path, *args)
 
     def datomic_url(self,
-                    db='',
-                    protocol='free',
-                    host='localhost',
-                    port='4334'):
-        db_name = db if db else self.data_release_version
-        url = 'datomic:{protocol}://{host}:{port}/{db}'
-        return url.format(protocol=protocol, host=host, port=port, db=db_name)
+                    default_prefix='datomic:free://localhost:4334/'):
+        default_url = default_prefix + self.data_release_version
+        return os.environ.get('DATOMIC_URI', default_url)
 
 
 pass_command_context = click.make_pass_decorator(CommandContext)
