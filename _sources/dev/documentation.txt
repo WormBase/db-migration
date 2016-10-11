@@ -30,13 +30,11 @@ Example 3 - Vuew the generated HTML user documentation
 
    python -m webbrowser ./docs/build/html/index.html
 
-
 Distributing
 ============
 This documentation is automatically deployed to github-pages when a
 release is made (push and/or tag made on the `master` branch), via a
 `zest.releaser entry-point`_.
-
 
 .. _reStructuredText: http://www.sphinx-doc.org/en/stable/rest.html
 .. _Sphinx: http://www.sphinx-doc.org/en/stable/

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>AWS EC2 Instance Creation &mdash; azanium 0.18 documentation</title>
+  <title>AWS EC2 Instance Creation &mdash; azanium 0.19 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.18 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.19 documentation" href="../index.html"/>
         <link rel="up" title="Administration" href="index.html"/>
         <link rel="next" title="EC2 Instance requirements" href="ec2-instance.html"/>
         <link rel="prev" title="AWS IAM setup" href="iam-setup.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.18
+                0.19
               </div>
             
           
@@ -145,7 +145,7 @@
 the following command:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nv">RELEASE</span><span class="o">=</span><span class="s2">&quot;WS....&quot;</span>
 <span class="nv">SUBNET_ID</span><span class="o">=</span><span class="s2">&quot;subnet-xxxxx&quot;</span>
-azanium --profile<span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">AWS_CLI_ADMIN_ACCOUNT</span><span class="si">}</span><span class="s2">&quot;</span> <span class="se">\</span>
+azanium --profile<span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">AWS_DEFAULT_PROFILE</span><span class="si">}</span><span class="s2">&quot;</span> <span class="se">\</span>
       cloud init <span class="s2">&quot;</span><span class="si">${</span><span class="nv">RELEASE</span><span class="si">}</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">subnet_id</span><span class="si">}</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
@@ -173,6 +173,7 @@ packages:
 bootcmd:
 - mkfs.ext4 /dev/xvdb
 - mkdir -p /wormbase
+- echo -e &quot;/dev/xvdb\t/wormbase\tdefaults,nofail\t0\t2&quot; &gt;&gt; /etc/fstab
 - mount /dev/xvdb /wormbase
 
 runcmd:
@@ -238,7 +239,7 @@ output : { all : &#39;| tee -a /var/log/cloud-init-output.log&#39; }
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.18',
+            VERSION:'0.19',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Commands &mdash; azanium 0.18 documentation</title>
+  <title>Commands &mdash; azanium 0.19 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.18 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.19 documentation" href="../index.html"/>
         <link rel="up" title="Database Migration Procedure" href="index.html"/>
         <link rel="next" title="Administration" href="../admin/index.html"/>
         <link rel="prev" title="Setup" href="setup.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.18
+                0.19
               </div>
             
           
@@ -154,14 +154,13 @@ which can be restored using any recent version of <a class="reference internal" 
 </div>
 <ol class="arabic" id="db-migration-step-1">
 <li><p class="first"><strong>Start the DB Migration EC2 instance</strong></p>
-<p>Assuming you have correctly setup AWS Command Line Interface, using
+<p>Having previously setup AWS Command Line Interface, using
 the <cite>db migration ec2 instance id</cite> provided by a WormBase AWS
 Administrator, enter the following <a class="reference internal" href="../glossary.html#term-aws-cli"><span class="xref std std-term">aws cli</span></a> command to start
 the migration instance:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nv">AWS_PROFILE</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">USER</span><span class="si">}</span><span class="s2">&quot;</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nv">AWS_DEFAULT_PROFILE</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">USER</span><span class="si">}</span><span class="s2">&quot;</span> <span class="c1"># WormBase AWS account username</span>
 <span class="nv">INSTANCE_ID</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">INSTANCE_ID_PROVIDED_BY_WORMBASE_AWS_ADMIN</span><span class="si">}</span><span class="s2">&quot;</span>
-aws --profile <span class="s2">&quot;</span><span class="si">${</span><span class="nv">AWS_PROFILE</span><span class="si">}</span><span class="s2">&quot;</span> <span class="se">\</span>
-             ec2 start-instances --instance-ids <span class="s2">&quot;</span><span class="si">${</span><span class="nv">INSTANCE_ID</span><span class="si">}</span><span class="s2">&quot;</span>
+aws ec2 start-instances --instance-ids <span class="s2">&quot;</span><span class="si">${</span><span class="nv">INSTANCE_ID</span><span class="si">}</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
 </li>
@@ -169,8 +168,7 @@ aws --profile <span class="s2">&quot;</span><span class="si">${</span><span clas
 <ol class="arabic" id="db-migration-step-2" start="2">
 <li><p class="first"><strong>Connect to the EC2 instance using ssh - run the migrate command</strong></p>
 <p>Use the following command check the status of the instance:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>aws --profile<span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">AWS_PROFILE</span><span class="si">}</span><span class="s2">&quot;</span> <span class="se">\</span>
-             ec2 describe-instances --instance-ids <span class="s2">&quot;</span><span class="si">${</span><span class="nv">INSTANCE_ID</span><span class="si">}</span><span class="s2">&quot;</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>aws ec2 describe-instances --instance-ids <span class="s2">&quot;</span><span class="si">${</span><span class="nv">INSTANCE_ID</span><span class="si">}</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
 <p>The output in JSON format, and should contain the following when the
@@ -181,9 +179,10 @@ instance is ready:</p>
 }
 </pre></div>
 </div>
-<p>Once runnuing, either the <cite>PublicDnsName</cite> or <cite>PublicIPAddress</cite> mentioned in
-same output can be used to connect to the instance via <cite>ssh</cite> using an
-ssh provided by a WormBase <a class="reference internal" href="../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> administrator.</p>
+<p>Once running, either the <cite>PublicDnsName</cite> or <cite>PublicIPAddress</cite>
+mentioned in same output can be used to connect to the instance via
+<cite>ssh</cite> using an ssh provided by a WormBase <a class="reference internal" href="../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a>
+administrator.</p>
 <p>The commands below will emit their current progress to the console,
 and will also print out the location of a log file for more detailed
 output.</p>
@@ -195,11 +194,12 @@ output.</p>
 </pre></div>
 </div>
 </div>
-<p>Then, using either <cite>screen</cite> or <cite>tmux</cite> session, e.g:</p>
+<p>Once connected to the EC2 instance via ssh, use either <cite>screen</cite> or
+<cite>tmux</cite> session, e.g:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>tmux new-session -s azanium-commands
 </pre></div>
 </div>
-<p>issue the following command:</p>
+<p>then issue the following command:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>azanium migrate
 </pre></div>
 </div>
@@ -231,7 +231,7 @@ confirm the next step, or abort.</p>
 </ol>
 <ol class="arabic" id="db-migration-step-3" start="3">
 <li><p class="first"><strong>Terminate the EC2 instance</strong></p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium --profile <span class="nv">$USER</span> admin stop-instance
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium admin stop-instance
 </pre></div>
 </div>
 </li>
@@ -290,7 +290,7 @@ This log file should contain more information which may help developers fix the 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.18',
+            VERSION:'0.19',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
