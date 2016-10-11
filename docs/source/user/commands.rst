@@ -61,13 +61,14 @@ which can be restored using any recent version of :term:`Datomic`.
 
    	ssh-add ~/.ssh/wb-db-migrate.pem
 
-   Then, using either `screen` or `tmux` session, e.g:
+   Once connected to the EC2 instance via ssh, use either `screen` or
+   `tmux` session, e.g:
 
    .. code-block:: bash
 
       tmux new-session -s azanium-commands
 
-   issue the following command:
+   then issue the following command:
 
    .. code-block:: bash
 
