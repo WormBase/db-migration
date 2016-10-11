@@ -14,17 +14,16 @@ which can be restored using any recent version of :term:`Datomic`.
 
 1. **Start the DB Migration EC2 instance**
 
-   Assuming you have correctly setup AWS Command Line Interface, using
+   Having previously setup AWS Command Line Interface, using
    the `db migration ec2 instance id` provided by a WormBase AWS
    Administrator, enter the following :term:`aws cli` command to start
    the migration instance:
 
    .. code-block:: bash
 
-      AWS_PROFILE="${USER}"
+      AWS_DEFAULT_PROFILE="${USER}" # WormBase AWS account username
       INSTANCE_ID="${INSTANCE_ID_PROVIDED_BY_WORMBASE_AWS_ADMIN}"
-      aws --profile "${AWS_PROFILE}" \
-		   ec2 start-instances --instance-ids "${INSTANCE_ID}"
+      aws ec2 start-instances --instance-ids "${INSTANCE_ID}"
 
 .. _db-migration-step-2:
 
@@ -34,8 +33,7 @@ which can be restored using any recent version of :term:`Datomic`.
 
    .. code-block:: bash
 
-      aws --profile="${AWS_PROFILE}" \
-		   ec2 describe-instances --instance-ids "${INSTANCE_ID}"
+      aws ec2 describe-instances --instance-ids "${INSTANCE_ID}"
 
    The output in JSON format, and should contain the following when the
    instance is ready:
@@ -47,9 +45,10 @@ which can be restored using any recent version of :term:`Datomic`.
         "Name": "running"
       }
 
-   Once runnuing, either the `PublicDnsName` or `PublicIPAddress` mentioned in
-   same output can be used to connect to the instance via `ssh` using an
-   ssh provided by a WormBase :term:`AWS` administrator.
+   Once running, either the `PublicDnsName` or `PublicIPAddress`
+   mentioned in same output can be used to connect to the instance via
+   `ssh` using an ssh provided by a WormBase :term:`AWS`
+   administrator.
 
    The commands below will emit their current progress to the console,
    and will also print out the location of a log file for more detailed
@@ -63,13 +62,14 @@ which can be restored using any recent version of :term:`Datomic`.
 
    	ssh-add ~/.ssh/wb-db-migrate.pem
 
-   Then, using either `screen` or `tmux` session, e.g:
+   Once connected to the EC2 instance via ssh, use either `screen` or
+   `tmux` session, e.g:
 
    .. code-block:: bash
 
       tmux new-session -s azanium-commands
 
-   issue the following command:
+   then issue the following command:
 
    .. code-block:: bash
 
@@ -97,7 +97,7 @@ which can be restored using any recent version of :term:`Datomic`.
 
    .. code-block:: bash
 
-      azanium --profile $USER admin stop-instance
+      azanium admin stop-instance
 
 
 Should all steps complete successfully, the migration process is now

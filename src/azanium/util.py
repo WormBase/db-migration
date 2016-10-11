@@ -174,6 +174,13 @@ log_level_option = functools.partial(
     type=click.Choice(choices=('DEBUG', 'INFO', 'WARNING', 'ERROR')),
     help='Logging level.')
 
+aws_profile_option = functools.partial(
+    option,
+    '-p',
+    '--profile',
+    default=os.environ.get('AWS_DEFAULT_PROFILE', 'default'),
+    help='AWS profile')
+
 
 def download(url, local_filename, chunk_size=1024 * 10):
     """Download `url` into `local_filename'.
@@ -309,13 +316,9 @@ class CommandContext:
         return os.path.join(self.base_path, *args)
 
     def datomic_url(self,
-                    db='',
-                    protocol='free',
-                    host='localhost',
-                    port='4334'):
-        db_name = db if db else self.data_release_version
-        url = 'datomic:{protocol}://{host}:{port}/{db}'
-        return url.format(protocol=protocol, host=host, port=port, db=db_name)
+                    default_prefix='datomic:free://localhost:4334/'):
+        default_url = default_prefix + self.data_release_version
+        return os.environ.get('DATOMIC_URI', default_url)
 
 
 pass_command_context = click.make_pass_decorator(CommandContext)

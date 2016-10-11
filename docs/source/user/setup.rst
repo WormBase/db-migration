@@ -41,12 +41,17 @@ repository's `latest release page`_.
 A WormBase AWS administrator should have previously supplied
 you with the required credentials:
 
-  AWS IAM username
+  AWS_DEFAULT_PROFILE
+  	WormBase AWS IAM username
+
+  AWS_DEFAULT_REGION
+  	The default region of the WormBase AWS account (Always `us-east-1`)
 
   AWS_ACCESS_KEY_ID
+  	Secret generated within the AWS IAM console
 
   AWS_SECRET_ACCESS_KEY
-
+  	Secret key generated within the AWS IAM console
 
 The `aws configure` below will ask for a default ``region``, you
 should specify `us-east-1` (this the primary `AWS region`_ that the
@@ -56,7 +61,7 @@ These credentials should be given as input to the following command:
 
 .. code-block:: bash
 
-   aws configure --profile $USER
+   aws configure
 
 
 Next, you should modify the file:

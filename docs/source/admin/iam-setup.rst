@@ -56,7 +56,7 @@ assigned the ``IAMFullAccess`` policy.
 
 .. code-block:: bash
 
-   alias iam="aws iam --profile=${AWS_ADMIN_USERNAME}"
+   alias iam="aws iam"
 
 Create the user group
 =====================

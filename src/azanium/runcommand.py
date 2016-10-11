@@ -171,8 +171,11 @@ def backup_db_to_s3(context):
     return 'Datomic database transferred to {uri}.'.format(uri=s3_uri)
 
 
-def _clean_up_previous_migration(context):
-    to_remove = set(context.versions) + {
+@root_command.command(
+    short_help='Removes data from a previous migration run.')
+@util.pass_command_context
+def clean_previous_state(context):
+    to_remove = set(context.versions) | {
         'acedb-dump',
         'edn-logs',
         'datomic-db-backup'
@@ -208,7 +211,6 @@ def migrate(context):
     ** Only performed if you confirm report output looks good (7).
 
     """
-    _clean_up_previous_migration(context)
     logs_dir = context.path('edn-logs')
     dump_dir = context.path('acedb-dump')
     datomic_path = context.path('datomic_free')

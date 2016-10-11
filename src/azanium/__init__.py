@@ -15,14 +15,12 @@ INSTANCE_BASE_PATH = '/wormbase'
 
 @util.command_group()
 @util.log_level_option()
+@util.aws_profile_option()
 @util.option('-b', '--base-path',
              default=INSTANCE_BASE_PATH,
              type=params.PlatformAwareDirectory(),
              help=('The default base directory all software and data '
                    'will be installed into.'))
-@util.option('--profile',
-             default='default',
-             help='AWS profile')
 @util.option('--assume-role',
              default=awsiam.DB_MIG_ROLE,
              help='AWS Role that will be assumed.')

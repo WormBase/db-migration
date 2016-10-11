@@ -18,6 +18,7 @@ packages:
 bootcmd:
 - mkfs.ext4 /dev/xvdb
 - mkdir -p /wormbase
+- echo -e "/dev/xvdb\t/wormbase\tdefaults,nofail\t0\t2" >> /etc/fstab
 - mount /dev/xvdb /wormbase
 
 runcmd:
