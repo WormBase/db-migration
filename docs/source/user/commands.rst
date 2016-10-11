@@ -69,7 +69,20 @@ which can be restored using any recent version of :term:`Datomic`.
 
       tmux new-session -s azanium-commands
 
-   then issue the following command:
+
+   Clean up after any previous migration:
+
+   .. code-block:: bash
+
+      azanium clean-previous-state
+
+   Install the required software and data:
+
+   .. code-block:: bash
+
+      azanium install all
+
+   Perform the migration:
 
    .. code-block:: bash
 
