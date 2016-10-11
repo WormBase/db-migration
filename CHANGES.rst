@@ -6,7 +6,11 @@
 =================
 
 - Fixed issue in cleaning up previous migration.
-
+- Allow Datomic URI to be overridden via environment variable.
+- Minor fixes to docs.
+- Bump data release version to WS256.
+- Use the AWS_DEFAULT_PROFILE environment variable rather requiring user to
+  specify with `--profile`.
 
 0.18 (2016-08-10)
 =================
