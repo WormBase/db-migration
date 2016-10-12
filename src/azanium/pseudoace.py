@@ -22,12 +22,16 @@ def run_pseudoace(context, *args):
 
 def create_database(context):
     logger.info('Creating datomic database')
-    models_filename = os.path.join(context.path('acedb_database'),
-                                   'wspec',
-                                   'models.wrm.annot')
+    fn_template = 'models.wrm.{.data_release_version}.annot'
+    ann_models_filename = fn_template.format(context)
+    models_path = os.path.join(context.path('acedb_database'),
+                               'wspec',
+                               ann_models_filename)
     run_pseudoace(context,
-                  '--models-filename', models_filename,
-                  '-v', 'create-database')
+                  '--models-filename',
+                  models_path,
+                  '--verbose',
+                  'create-database')
 
 
 def acedb_dump_to_edn_logs(context, acedb_dump_dir, edn_logs_dir):
