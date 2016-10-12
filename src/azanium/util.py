@@ -4,6 +4,7 @@ import contextlib
 import ftplib
 import functools
 import itertools
+import logging
 import operator
 import os
 import psutil
@@ -215,8 +216,10 @@ def ftp_connection(host, logger):
 def ftp_download(host,
                  file_selector_regexp,
                  download_dir,
-                 logger,
+                 logger=None,
                  initial_cwd=None):
+    if logger is None:
+        logger = logging.getLogger(__package__)
     downloaded = []
     file_selector = functools.partial(re.match, file_selector_regexp)
     with ftp_connection(host, logger) as ftp:

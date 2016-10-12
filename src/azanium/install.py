@@ -131,17 +131,22 @@ def acedb_database(meta,
     """Installs the ACeDB database system."""
     format_path = remote_path_template.format
     version = meta.version
-    downloaded = ftp_download(ftp_host,
-                              file_selector_regexp,
-                              meta.download_dir,
-                              logger,
-                              initial_cwd=format_path(version=version))
+    wspec_dir = os.path.join(meta.install_dir, 'wspec')
+    ftp_get = functools.partial(ftp_download,
+                                logger=logger,
+                                initial_cwd=format_path(version=version))
+    downloaded = ftp_get(ftp_host, file_selector_regexp, meta.download_dir)
     for path in downloaded:
         with tarfile.open(path) as tf:
             logger.info('Extracting {} to {}', path, meta.install_dir)
             tf.extractall(path=meta.install_dir)
+
+    # Download the annotated models file separately
+    dl_filename = 'models.wrm.{version}.annot'.format(version=version)
+    ftp_get(ftp_host, dl_filename, wspec_dir, dl_filename)
+
     # Enable the Dump command
-    passwd_path = os.path.join(meta.install_dir, 'wspec', 'passwd.wrm')
+    passwd_path = os.path.join(wspec_dir, 'passwd.wrm')
     mode = 0o644
     logger.info('Changing permissions of {} to {}',
                 passwd_path,

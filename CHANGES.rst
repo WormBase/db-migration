@@ -5,7 +5,7 @@
 0.20 (unreleased)
 =================
 
-- Nothing changed yet.
+- Download the annotated models file separately (Fixes #8).
 
 
 0.19 (2016-10-11)
