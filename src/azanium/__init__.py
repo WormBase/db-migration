@@ -73,3 +73,11 @@ def configure(slack_url):
                                            url=slack_url)
     with open(config.PATH, 'wb') as fp:
         az_conf.write(fp)
+
+
+@root_command.command()
+@click.argument('message')
+@util.pass_command_context
+def notify(context, message):
+    conf = config.parse(section=notifications.__name__)
+    return notifications.notify(conf, message)
