@@ -6,7 +6,7 @@
 =================
 
 - Download the annotated models file separately (Fixes #8).
-
+- Fix last step (backup and transfer to S3)
 
 0.19 (2016-10-11)
 =================
