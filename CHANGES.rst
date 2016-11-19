@@ -5,7 +5,7 @@
 0.21 (unreleased)
 =================
 
-- Nothing changed yet.
+- Bump versions.
 
 
 0.20 (2016-11-19)
