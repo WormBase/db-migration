@@ -143,7 +143,7 @@ def acedb_database(meta,
 
     # Download the annotated models file separately
     dl_filename = 'models.wrm.{version}.annot'.format(version=version)
-    ftp_get(ftp_host, dl_filename, wspec_dir, dl_filename)
+    ftp_get(ftp_host, dl_filename, wspec_dir)
 
     # Enable the Dump command
     passwd_path = os.path.join(wspec_dir, 'passwd.wrm')
