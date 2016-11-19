@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Commands &mdash; azanium 0.19 documentation</title>
+  <title>Commands &mdash; azanium 0.21 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.19 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.21 documentation" href="../index.html"/>
         <link rel="up" title="Database Migration Procedure" href="index.html"/>
         <link rel="next" title="Administration" href="../admin/index.html"/>
         <link rel="prev" title="Setup" href="setup.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.19
+                0.21
               </div>
             
           
@@ -199,7 +199,15 @@ output.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>tmux new-session -s azanium-commands
 </pre></div>
 </div>
-<p>then issue the following command:</p>
+<p>Clean up after any previous migration:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium clean-previous-state
+</pre></div>
+</div>
+<p>Install the required software and data:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium install all
+</pre></div>
+</div>
+<p>Perform the migration:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>azanium migrate
 </pre></div>
 </div>
@@ -290,7 +298,7 @@ This log file should contain more information which may help developers fix the 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.19',
+            VERSION:'0.21',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
