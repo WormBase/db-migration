@@ -91,3 +91,6 @@ def qa_report_to_html(report_path, title):
     html_report += markdown.markdown(md_table, ['markdown.extensions.extra'])
     html_report += '</body></html>'
     return html_report
+
+def excise_tmp_data(context):
+    run_pseudoace('excise-tmp-data', '--verbose')

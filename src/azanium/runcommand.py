@@ -130,6 +130,14 @@ def import_logs(context, edn_logs_dir):
     pseudoace.import_logs(context, edn_logs_dir)
 
 
+@run.command('excise-tmp-data',
+             short_help='Excise temporaty data')
+@util.pass_command_context
+def excise_tmp_data(context):
+    """Excise temporary data from the migrated datomic database."""
+    pseudoace.excise_tmp_data(context)
+
+
 @run.command('backup-db-to-s3',
              short_help='Transfers the Datomic db backup to S3')
 @util.pass_command_context
@@ -250,6 +258,9 @@ def migrate(context):
         ('Running QA report on Datomic database',
          qa_report,
          dict(acedb_id_catalog=id_catalog_path)),
+        ('Excising temporary data',
+         excise_tmp_data,
+         {}),
         (('@{user} - How does the report look?'
           'Please answer the question in ssh console session '
           'to backup the datomic database to S3, '
