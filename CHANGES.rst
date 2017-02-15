@@ -2,10 +2,10 @@
  Changelog
 ===========
 
-0.21 (unreleased)
+0.21 (2016-11-19)
 =================
 
-- Bump versions.
+- Bumped versions.
 
 
 0.20 (2016-11-19)
