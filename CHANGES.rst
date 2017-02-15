@@ -2,21 +2,21 @@
  Changelog
 ===========
 
-0.21 (2016-11-19)
+0.22 (unreleased)
 =================
-
 - Bumped versions.
 
+0.21 (2016-11-19)
+=================
+- Bumped versions.
 
 0.20 (2016-11-19)
 =================
-
 - Download the annotated models file separately (Fixes #8).
 - Fix last step (backup and transfer to S3)
 
 0.19 (2016-10-11)
 =================
-
 - Fixed issue in cleaning up previous migration.
 - Allow Datomic URI to be overridden via environment variable.
 - Minor fixes to docs.
