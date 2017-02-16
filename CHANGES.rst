@@ -4,9 +4,7 @@
 
 0.23 (unreleased)
 =================
-
-- Nothing changed yet.
-
+- Bumped data release version.
 
 0.22 (2017-02-16)
 =================
