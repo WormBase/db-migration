@@ -4,7 +4,7 @@
 
 0.22 (unreleased)
 =================
-- Nothing changed yet.
+- Bumped versions.
 
 0.21 (2016-11-19)
 =================
