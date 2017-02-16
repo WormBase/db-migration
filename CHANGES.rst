@@ -10,10 +10,6 @@
 =================
 - Bumped versions.
 
-0.21 (2016-11-19)
-=================
-- Bumped versions.
-
 0.20 (2016-11-19)
 =================
 - Download the annotated models file separately (Fixes #8).
