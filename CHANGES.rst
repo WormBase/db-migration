@@ -2,6 +2,10 @@
  Changelog
 ===========
 
+0.23 (unreleased)
+=================
+- Nothing changed yet.
+
 0.22 (2017-02-16)
 =================
 - Bumped versions.
