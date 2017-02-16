@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.23 (unreleased)
+0.23 (2017-02-16)
 =================
 - Bumped data release version.
 
