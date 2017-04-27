@@ -229,8 +229,10 @@ def migrate(context):
     conf = config.parse(section=notifications.__name__)
     ctx = click.get_current_context()
     step_idx = int(context.db_mig_state.get(LAST_STEP_OK_STATE_KEY, '0'))
-    steps = [('Installing all software and ACeDB',
-              partial(install.all.invoke, ctx))]
+    steps = []
+    if not os.path.exists(context.path('acedb_database')):
+        steps = [('Installing all software and ACeDB',
+                  partial(install.all.invoke, ctx))]
     path_in_bucket = '/'.join(['db-migration',
                                os.path.basename(context.logfile_path)])
     upload_log_file = partial(ctx.invoke,
