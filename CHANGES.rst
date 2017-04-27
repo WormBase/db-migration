@@ -2,6 +2,12 @@
  Changelog
 ===========
 
+0.25 (unreleased)
+=================
+
+- Nothing changed yet.
+
+
 0.24 (2017-04-27)
 =================
 - Bumped data release and pseudoace versions.
