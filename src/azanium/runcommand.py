@@ -180,6 +180,7 @@ def backup_db_to_s3(context):
 
 
 @root_command.command(
+    'clean-previous-state',
     short_help='Removes data from a previous migration run.')
 @util.pass_command_context
 def clean_previous_state(context):

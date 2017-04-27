@@ -4,9 +4,7 @@
 
 0.24 (unreleased)
 =================
-
-- Nothing changed yet.
-
+- Bumped data release and pseudoace versions.
 
 0.23 (2017-02-16)
 =================
