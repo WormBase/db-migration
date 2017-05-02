@@ -93,4 +93,4 @@ def qa_report_to_html(report_path, title):
     return html_report
 
 def excise_tmp_data(context):
-    run_pseudoace('excise-tmp-data', '--verbose')
+    run_pseudoace(context, 'excise-tmp-data', '--verbose')
