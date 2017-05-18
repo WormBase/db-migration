@@ -1,3 +1,4 @@
+import csv
 import os
 import psutil
 
@@ -72,20 +73,24 @@ def import_logs(context, edn_logs_dir):
 
 def qa_report(context, acedb_id_catalog_path):
     data_release = context.data_release_version
-    build_data_filename = 'all_classes_report.{}.txt'.format(data_release)
-    build_data_path = os.path.join(acedb_id_catalog_path, build_data_filename)
+    report_filename = 'all_classes_report.{}.txt'.format(data_release)
+    report_path = os.path.join(acedb_id_catalog_path, report_filename)
     out_path = os.path.expanduser(
-        '~/{release}-report.txt'.format(release=data_release))
+        '~/{release}-report.csv'.format(release=data_release))
     run_pseudoace(context,
-                  '--build-data=' + build_data_path,
+                  '--acedb-class-report=' + report_path,
                   '--report-filename=' + out_path,
                   'generate-report')
     return out_path
 
 
+class QADialect(csv.excel):
+    quoting = csv.QUOTE_ALL
+
+
 def qa_report_to_html(report_path, title):
     with open(report_path) as fp:
-        report_matrix = list(line.strip().split() for line in fp)
+        report_matrix = list(csv.reader(fp, dialect=QADialect()))
     md_table = util.markdown_table(report_matrix)
     html_report = '<html><body><h1>{title}</h1>'.format(title=title)
     html_report += markdown.markdown(md_table, ['markdown.extensions.extra'])

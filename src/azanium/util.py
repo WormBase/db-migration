@@ -78,21 +78,19 @@ def markdown_table(rows):
     divider = []
     matrix = collections.deque(rows)
     header_row = matrix.popleft()
-    # cls_rows = tuple(set(map(tuple, matrix)))
-
-    cls_rows = tuple(set((row[0],) + tuple(map(int, row[1:]))
-                         for row in matrix))
-    matrix = sorted(cls_rows, key=operator.itemgetter(1), reverse=True)
+    # 0th element: Class name
+    # 1th element: datomic ident
+    # rest are counts.
+    rows = tuple(set(tuple(row[0:2]) + tuple(map(int, row[2:]))
+                     for row in matrix))
+    matrix = sorted(rows, key=operator.itemgetter(2), reverse=True)
     matrix.insert(0, header_row)
     matrix = list(map(str, row) for row in matrix)
-    # matrix.sort(key=operator.itemgetter(0))
-    # matrix = [matrix[0]] + sorted(tuple(set(tuple(map(tuple, matrix[1:])))),
-    #                               key=operator.itemgetter(0))
     for i, columns in enumerate(column_matrix):
         divider.append('-' * col_max_lens[i])
     matrix.insert(1, divider)
     lines = []
-    for i, row in enumerate(matrix):
+    for row in matrix:
         line = ['| ']
         for j, cell in enumerate(row):
             line.append(' {} '.format(cell.rjust(col_max_lens[j])))
