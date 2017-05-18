@@ -41,7 +41,12 @@ def acedb_compress_dump(context, dump_dir):
     """
     gzip_cmd = ['find', dump_dir, '-type', 'f', '-name', '"*.ace"']
     gzip_cmd.extend([
-        '|', 'xargs', '-n', '1', '-P', str(psutil.cpu_count()), 'gzip'
+        '|',
+        'xargs',
+        '--no-run-if-empty',
+        '-n', '1',
+        '-P', str(psutil.cpu_count()),
+        'gzip'
     ])
     util.local(gzip_cmd)
     logger.info('Compressed all .ace files in {}', dump_dir)
@@ -56,6 +61,8 @@ def acedb_compress_dump(context, dump_dir):
 @util.pass_command_context
 def acedb_dump(context, dump_dir, tace_dump_options):
     """Dump the ACeDB database."""
+    if os.path.isdir(dump_dir):
+        return dump_dir
     db_directory = context.path('acedb_database')
     os.makedirs(dump_dir, exist_ok=True)
     dump_cmd = ' '.join(['Dump', tace_dump_options, dump_dir])
