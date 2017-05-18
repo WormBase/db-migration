@@ -4,7 +4,9 @@
 
 0.25 (unreleased)
 =================
-- Nothing changed yet.
+- Bumped version of pseudoace.
+- Allow migrate command to work with existing ACeDB database
+  and corresponding pre-gzipped output.
 
 0.24 (2017-04-27)
 =================
