@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.25 (unreleased)
+0.25 (2017-05-19)
 =================
 - Bumped version of pseudoace.
 - Allow migrate command to work with existing ACeDB database
