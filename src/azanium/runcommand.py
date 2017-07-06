@@ -268,9 +268,6 @@ def migrate(context):
         ('Running QA report on Datomic database',
          qa_report,
          dict(acedb_id_catalog=id_catalog_path)),
-        ('Excising temporary data',
-         excise_tmp_data,
-         {}),
         (('@{user} - How does the report look?'
           'Please answer the question in ssh console session '
           'to backup the datomic database to S3, '
