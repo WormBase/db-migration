@@ -7,6 +7,7 @@
 - Bumped version of pseudoace.
 - Bumped version of datomic-free.
 - Bumped release version.
+- Removed excise-tmp-data step.
 
 0.25 (2017-05-19)
 =================
