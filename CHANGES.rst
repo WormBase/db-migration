@@ -4,15 +4,13 @@
 
 0.26 (unreleased)
 =================
-
-- Nothing changed yet.
-
+- Bumped version of pseudoace.
+- Bumped version of datomic-free.
+- Bumped release version.
 
 0.25 (2017-05-19)
 =================
 - Bumped version of pseudoace.
-- Bumped version of datomic-free.
-- Bumped release version.
 - Allow migrate command to work with existing ACeDB database
   and corresponding pre-gzipped output.
 
