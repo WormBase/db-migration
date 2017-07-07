@@ -2,7 +2,7 @@
 Releases
 ========
 This package uses `zest.releaser`_ to automate the release process.
-Automatically updates the `CHANGES.rst`, `setup.py` files and handles
+Automatically updates the `changelog.rst`, `setup.py` files and handles
 tagging with `git` and pushing releases to github.
 
 Having checked out the master *master* branch, and merged the

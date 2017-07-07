@@ -10,7 +10,7 @@ def _read_file(name):
 
 
 README = _read_file('README.rst')
-CHANGES = _read_file('CHANGES.rst')
+CHANGES = _read_file('changelog.rst')
 INSTALL_REQUIRES = _read_file('requirements.txt').splitlines()
 
 setup(
