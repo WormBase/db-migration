@@ -9,6 +9,9 @@ which can be restored using any recent version of :term:`Datomic`.
 
 .. note:: You must have ``ssh-agent`` running in your shell session.
 
+.. ATTENTION::
+
+   Should the migration fail at any step, please ensure to eventually :ref:`stop <db-migration-stage-3>` the AWS instance.
 
 .. _db-migration-step-1:
 
@@ -102,9 +105,38 @@ which can be restored using any recent version of :term:`Datomic`.
          	confirm the next step, or abort.
 
    8. Transfer the Datomic database to Amazon S3 storage
+   9. azanium backup-db
+   10. Delete oldest WS database table in AWS DynamoDB and create the
+       new one.
+
+       .. code-block:: bash
+
+	  aws dynamodb delete-table --table-name $OLDEST_WS_RELEASE
+          aws dynamodb create-table --table-name $WS_RELEASE \
+   	   --attribute-definitions AttributeName=id,AttributeType="S" \
+           --key-schema KeyType="HASH",AttributeName="id"  \
+           --provisioned-throughput ReadCapacityUnits=500,WriteCapacityUnits=500
+   11. Transfer backed-up database to AWS S3
+
+       .. code-block:: bash
+
+	  FROM_URI="file:///wormbase/datomic-db-backups/$LATEST_DATE/$WS_RELEASE"
+	  TO_URI="datomic:ddb://us-east-1/$WS_RELEASE/wormbase"
+
+   11. With the corresponding version of datomic-pro installed in DATOMIC_HOME:
+       .. code-block:: bash
+
+	  cd $DATOMIC_PRO_HOME
+          ./bin/datomic backup-db "$FROM_URI" "$TO_URI"
+
+   12. Set the throughput values on the DynamoDB table for $WS_RELEASE
+       to their lowest possible values.
+
+   13. Write completion notification to the #db-migration-events
+       wormbase-db-dev slack channel.
 
 
-.. _db-migration-step-3:
+.. _db-migration-stage-3:
 
 3. **Terminate the EC2 instance**
 
@@ -115,10 +147,6 @@ which can be restored using any recent version of :term:`Datomic`.
 
 Should all steps complete successfully, the migration process is now
 complete.
-
-If you stopped after :ref:`Step 2 <db-migration-step-2>` due to data
-inconsistency, or an error occurred during any of the other steps,
-please ensure to eventually run :ref:`Step 3 <db-migration-step-3>`.
 
 Diagnostics
 -----------
