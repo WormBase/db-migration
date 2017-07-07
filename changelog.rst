@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.26 (unreleased)
+0.26 (2017-07-07)
 =================
 - Bumped version of pseudoace.
 - Bumped version of datomic-free.
