@@ -2,6 +2,12 @@
  Changelog
 ===========
 
+0.27 (unreleased)
+=================
+
+- Nothing changed yet.
+
+
 0.26 (2017-07-07)
 =================
 - Bumped version of pseudoace.
