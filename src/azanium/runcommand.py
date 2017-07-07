@@ -161,9 +161,9 @@ def backup_db_to_s3(context):
     local_backup_path = os.path.join(local_backup_path,
                                      date_stamp,
                                      context.db_name)
+    arcname = '{}.tar.xz'.format(data_release_version)
     archive_path = os.path.join(os.path.dirname(local_backup_path),
-                                '{}.tar.xz'.format(data_release_version))
-    arcname = os.path.basename(local_backup_path)
+                                arcname)
     if not os.path.isdir(local_backup_path):
         datomic.backup_db(context, local_backup_path)
     if not os.path.isfile(archive_path):
