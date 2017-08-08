@@ -4,6 +4,7 @@ import psutil
 
 import markdown
 
+from . import github
 from . import log
 from . import util
 
@@ -21,13 +22,30 @@ def run_pseudoace(context, *args):
     logger.info(out)
 
 
+def source_annotated_models_file(context):
+    """Sources the annotated models file from github.
+
+    Returns the local filename. """
+    # Get the annotated models file separately from github.
+    gh_repo_path = 'WormBase/wormbase-pipeline'
+    gh_file_path = 'wspec/models.wrm.annot'
+    annot_file_content = github.read_released_file(gh_repo_path,
+                                                   gh_file_path)
+    version = context.data_release_version
+    target_dir = context.base_path
+    am_local_filename = os.path.basename(gh_file_path) + '.' + version
+    am_local_path = os.path.join(target_dir, am_local_filename)
+    with open(am_local_path, mode='w') as fp:
+        fp.write(annot_file_content)
+    return fp.name
+
+
 def create_database(context):
     logger.info('Creating datomic database')
-    fn_template = 'models.wrm.{.data_release_version}.annot'
-    ann_models_filename = fn_template.format(context)
+    am_filename = source_annotated_models_file(context)
     models_path = os.path.join(context.path('acedb_database'),
                                'wspec',
-                               ann_models_filename)
+                               am_filename)
     run_pseudoace(context,
                   '--models-filename',
                   models_path,
