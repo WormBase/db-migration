@@ -68,9 +68,14 @@ def configure(slack_url):
 
     - Notifications to Slack
     """
-    az_conf = ConfigObj()
-    az_conf[notifications.__name__] = dict(notifications.DEFAULTS,
-                                           url=slack_url)
+    notifications_key = notifications.__name__
+    new_data = dict(url=slack_url)
+    if os.path.exists(config.PATH):
+        az_conf = config.parse()
+    else:
+        az_conf = ConfigObj()
+        new_data.update(notifications.DEFAULTS)
+    az_conf[notifications_key].update(new_data)
     with open(config.PATH, 'wb') as fp:
         az_conf.write(fp)
 
