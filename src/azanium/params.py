@@ -41,7 +41,7 @@ class URL(click.types.ParamType):
         else:
             response = requests.get(pr.geturl())
             if response.status_code != 400:
-                self.fail('Invalid {.human_readable_name}'.format(value))
+                self.fail('Invalid {.human_readable_name}'.format(self))
         if fail:
             msg = '{0!r} is not a valid {1.human_readable_name}'
             self.fail(msg.format(value, self), param, ctx)
