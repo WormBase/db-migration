@@ -35,7 +35,7 @@ def source_annotated_models_file(context):
     target_dir = context.base_path
     am_local_filename = os.path.basename(gh_file_path) + '.' + version
     am_local_path = os.path.join(target_dir, am_local_filename)
-    with open(am_local_path, mode='w') as fp:
+    with open(am_local_path, mode='wb') as fp:
         fp.write(annot_file_content)
     return fp.name
 
