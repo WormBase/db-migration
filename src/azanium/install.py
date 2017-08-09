@@ -141,11 +141,7 @@ def acedb_database(meta,
             logger.info('Extracting {} to {}', path, meta.install_dir)
             tf.extractall(path=meta.install_dir)
 
-    # Download the annotated models file separately
-    dl_filename = 'models.wrm.{version}.annot'.format(version=version)
-    ftp_get(ftp_host, dl_filename, wspec_dir)
-
-    # Enable the Dump command
+    # Enable the Dump command (requires adding user to ACeDB pw file)
     passwd_path = os.path.join(wspec_dir, 'passwd.wrm')
     mode = 0o644
     logger.info('Changing permissions of {} to {}',
