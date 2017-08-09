@@ -4,9 +4,10 @@
 
 0.27 (unreleased)
 =================
-
-- Nothing changed yet.
-
+- Source annotated models from release-tag in the 
+  `Wormbase/wormbase-pipeline` repository
+- Fixed issue with notifications configuration where configuration
+  could potentially be overridden.
 
 0.26 (2017-07-07)
 =================
