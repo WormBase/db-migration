@@ -85,3 +85,14 @@ def publish_release(reporoot, version, bundle_path):
         filename = os.path.basename(fp.name)
         asset = release.upload_asset('application/zip', filename, fp)
     return asset
+
+def read_released_file(repo_root, release_tag, path):
+    tags = (t.as_dict() for t in repo_root.tags())
+    named_tags = {tag['name']: tag for tag in tags}
+    tag = named_tags[release_tag]
+    if repo_root.release_from_tag(release_tag).is_null():
+        raise RuntimeError('checkout of file from a non-release tag forbidden')
+    file_contents = repo_root.file_contents(path, tag['commit']['sha'])
+    return file_contents.decoded
+
+    
