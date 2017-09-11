@@ -8,6 +8,7 @@
   `Wormbase/wormbase-pipeline` repository
 - Fixed issue with notifications configuration where configuration
   could potentially be overridden.
+- Bumped versions for next migration run.
 
 0.26 (2017-07-07)
 =================
