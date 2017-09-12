@@ -29,9 +29,11 @@ def source_annotated_models_file(context):
     # Get the annotated models file separately from github.
     gh_repo_path = 'WormBase/wormbase-pipeline'
     gh_file_path = 'wspec/models.wrm.annot'
-    annot_file_content = github.read_released_file(gh_repo_path,
-                                                   gh_file_path)
+    repo = github.repo_from_path(gh_repo_path)
     version = context.data_release_version
+    annot_file_content = github.read_released_file(repo,
+                                                   version,
+                                                   gh_file_path)
     target_dir = context.base_path
     am_local_filename = os.path.basename(gh_file_path) + '.' + version
     am_local_path = os.path.join(target_dir, am_local_filename)
