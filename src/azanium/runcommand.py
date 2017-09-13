@@ -252,12 +252,11 @@ def available_reset_steps(context):
                       short_help='Reset the migration to a previous step')
 @util.pass_command_context
 def reset_to_step(context):
-    last_ok_step_n = context.app_state[LAST_STEP_OK_STATE_KEY]
+    error = lambda msg: util.echo_error('ERROR: {}'.format(msg), notify=False)
+    last_ok_step_n = context.app_state.get(LAST_STEP_OK_STATE_KEY)
     if not last_ok_step_n:
-        click.echo('Migration has not been run, cannot reset to any state.',
-                   color='#ff0000',
-                   err=True)
-        return
+        error('Migration has not been run, cannot reset to any state.')
+        click.get_current_context().exit(1)
     click.echo('Reset to previous migration step')
     click.echo(
         'The last step that completed successfully was: {}'.format(last_ok_step_n),
@@ -270,7 +269,6 @@ def reset_to_step(context):
     It's responsibility to remove any state/files that have been created since
     the step you want to revert to.
     """, color='red')
-    error = functools.partial(click.echo, color="#ff0000", err=True)
     out_lines = []
     available_steps = available_reset_steps(context)
     for (step_n, step_desc) in available_steps.items():
