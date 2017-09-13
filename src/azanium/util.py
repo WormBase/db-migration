@@ -39,7 +39,7 @@ echo_retry = functools.partial(click.secho, fg='cyan')
 pkgpath = functools.partial(resource_filename, __package__)
 
 
-def aws_state():
+def app_state():
     return shelve.open(os.path.expanduser('~/.db-migration.db'))
 
 
@@ -290,6 +290,13 @@ class CommandContext:
     @property
     def db_name(self):
         return self.datomic_url().rsplit('/', 1)[1]
+
+    @property
+    def app_state(self):
+        state = getattr(self, '_app_state', None)
+        if state is None:
+            state = self._app_state = app_state()
+        return state
 
     def exec_step(self,
                   step_n,

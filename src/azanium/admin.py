@@ -26,7 +26,6 @@ class AdminSession:
 
     def __init__(self, profile_name, **aws_meta):
         self.session = awsiam.make_session(profile_name)
-        self.aws_state = util.aws_state()
         self.aws_meta = AWSMeta(**aws_meta)
 
     def __getattr__(self, name):
