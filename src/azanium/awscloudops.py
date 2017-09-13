@@ -110,8 +110,6 @@ def latest_migration_state(ctx):
 
 
 def get_archive_filename():
-    # XXX: Path to filename produced by: python setup.py sdist (for now)
-    # XXX: Best to download from github release.
     pkg_fullname = util.distribution_name()
     archive_filename = pkg_fullname + '.tar.gz'
     return archive_filename
