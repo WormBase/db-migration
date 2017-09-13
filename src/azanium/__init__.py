@@ -52,7 +52,6 @@ def root_command(ctx, log_level, base_path, profile, assume_role):
     command_context.session = session
     command_context.assumed_profile = ar_profile_name
     command_context.user_profile = profile
-    command_context.db_mig_state = util.app_state()
     ctx.obj = command_context
     logfile_path = os.path.join(base_path,
                                 'logs',

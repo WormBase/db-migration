@@ -92,7 +92,7 @@ def wait_for_sshd(ec2_instance, max_timeout=60 * 6):
 
 @contextlib.contextmanager
 def latest_migration_state(ctx):
-    bstate = ctx.db_mig_state
+    bstate = ctx.app_state
     bstate.sync()
     curr_bstate = bstate.get('current')
     if curr_bstate is None:
@@ -301,7 +301,7 @@ def create_instance(ctx,
                     dev_mode):
     """Start the migrate."""
     session = ctx.session
-    state = ctx.db_mig_state
+    state = ctx.app_state
     ec2 = session.resource('ec2')
     if not os.path.isfile(config.PATH):
         util.echo_error('azanium is not configured, run:', notify=False)
