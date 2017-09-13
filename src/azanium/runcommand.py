@@ -250,15 +250,14 @@ def available_reset_steps(context):
 
 @root_command.command('reset-to-step',
                       short_help='Reset the migration to a previous step')
-# @click.argument('step_number')
 @util.pass_command_context
 def reset_to_step(context):
     last_ok_step_n = context.app_state[LAST_STEP_OK_STATE_KEY]
-    # if not last_ok_step_n:
-    #     click.echo('Migration has not been run, cannot reset to any state.',
-    #                color='#ff0000',
-    #                err=True)
-    #     return
+    if not last_ok_step_n:
+        click.echo('Migration has not been run, cannot reset to any state.',
+                   color='#ff0000',
+                   err=True)
+        return
     click.echo('Reset to previous migration step')
     click.echo(
         'The last step that completed successfully was: {}'.format(last_ok_step_n),
