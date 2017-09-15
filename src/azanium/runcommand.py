@@ -126,7 +126,7 @@ def qa_report(context, acedb_id_catalog):
     title = 'QA report for {versions[acedb_database]} available at <{loc}>'
     title = title.format(versions=context.versions, loc=report_url)
     pretext = ('*Please check this looks correct '
-               'before backing the datomic database*')
+               'before backing-up the datomic database*')
     attachment = notifications.Attachment(title, pretext=pretext)
     return attachment
 
