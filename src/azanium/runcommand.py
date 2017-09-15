@@ -1,6 +1,5 @@
 import collections
 import datetime
-import functools
 import os
 import psutil
 import shutil
