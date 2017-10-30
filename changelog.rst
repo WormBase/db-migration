@@ -6,7 +6,7 @@
 =================
 - Addition of new command "reset-to-step".
 - clean-previous-state command now removes app state file.
-
+- Bump versions for next migration run.
 
 0.27 (2017-09-11)
 =================
