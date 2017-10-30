@@ -2,6 +2,12 @@
  Changelog
 ===========
 
+0.29 (unreleased)
+=================
+
+- Nothing changed yet.
+
+
 0.28 (2017-10-30)
 =================
 - Addition of new command "reset-to-step".
