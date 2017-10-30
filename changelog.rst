@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.28 (unreleased)
+0.28 (2017-10-30)
 =================
 - Addition of new command "reset-to-step".
 - clean-previous-state command now removes app state file.
