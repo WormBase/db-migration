@@ -4,6 +4,10 @@
 
 0.29 (2017-12-18)
 =================
+- Updated python requirements.
+
+0.29 (2017-12-18)
+=================
 - Bump versions for next migration run.
 
 0.28 (2017-10-30)
