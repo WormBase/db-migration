@@ -4,9 +4,7 @@
 
 0.29 (unreleased)
 =================
-
-- Nothing changed yet.
-
+- Bump versions for next migration run.
 
 0.28 (2017-10-30)
 =================
