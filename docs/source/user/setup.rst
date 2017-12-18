@@ -35,8 +35,7 @@ repository's `latest release page`_.
 
    # To install the aws cli:
    pip install --user awscli
-		
-   # To install the latest version of the db migration code
+   # To install the latest version of the db migration code:
    pip install --upgrade --user "$AZANIUM_WHEEL_URL"
 
 
