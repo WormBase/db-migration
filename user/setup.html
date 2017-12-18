@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Setup &mdash; azanium 0.28 documentation</title>
+  <title>Setup &mdash; azanium 0.30 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.28 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.30 documentation" href="../index.html"/>
         <link rel="up" title="Database Migration Procedure" href="index.html"/>
         <link rel="next" title="Commands" href="commands.html"/>
         <link rel="prev" title="Notifications" href="notifications.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.28
+                0.30
               </div>
             
           
@@ -171,10 +171,13 @@ directory.</p>
 </div>
 <div class="section" id="aws-cli-and-azanium-installation">
 <h2><a class="reference internal" href="../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> <a class="reference internal" href="../glossary.html#term-cli"><span class="xref std std-term">CLI</span></a> and <a class="reference internal" href="../glossary.html#term-azanium"><span class="xref std std-term">azanium</span></a> Installation<a class="headerlink" href="#aws-cli-and-azanium-installation" title="Permalink to this headline">¶</a></h2>
-<p>Below, <cite>AZANIUM-WHEEL-URL</cite> should be the url of the <a class="reference external" href="http://pythonwheels.com/">wheel</a> file
+<p>Below, <cite>$AZANIUM_WHEEL_URL</cite> should be the url of the <a class="reference external" href="http://pythonwheels.com/">wheel</a> file
 (<cite>.whl</cite> extension) listed in the downloads section of this
 repository&#8217;s <a class="reference external" href="https://github.com/Wormbase/db-migration/releases/latest">latest release page</a>.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install --user awscli
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># To install the aws cli:</span>
+pip install --user awscli
+<span class="c1"># To install the latest version of the db migration code:</span>
+pip install --upgrade --user <span class="s2">&quot;</span><span class="nv">$AZANIUM_WHEEL_URL</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -277,7 +280,7 @@ the following files must be copied (in addition to installing the software):</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.28',
+            VERSION:'0.30',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

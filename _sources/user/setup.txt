@@ -27,13 +27,16 @@ Mac OSX
 
 :term:`AWS` :term:`CLI` and :term:`azanium` Installation
 ========================================================
-Below, `AZANIUM-WHEEL-URL` should be the url of the wheel_ file
+Below, `$AZANIUM_WHEEL_URL` should be the url of the wheel_ file
 (`.whl` extension) listed in the downloads section of this
 repository's `latest release page`_.
 
 .. code-block:: bash
 
+   # To install the aws cli:
    pip install --user awscli
+   # To install the latest version of the db migration code:
+   pip install --upgrade --user "$AZANIUM_WHEEL_URL"
 
 
 :term:`AWS` Configuration

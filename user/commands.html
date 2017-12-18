@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Commands &mdash; azanium 0.28 documentation</title>
+  <title>Commands &mdash; azanium 0.30 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.28 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.30 documentation" href="../index.html"/>
         <link rel="up" title="Database Migration Procedure" href="index.html"/>
         <link rel="next" title="Administration" href="../admin/index.html"/>
         <link rel="prev" title="Setup" href="setup.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.28
+                0.30
               </div>
             
           
@@ -246,7 +246,7 @@ new one.</p>
 aws dynamodb create-table --table-name <span class="nv">$WS_RELEASE</span> <span class="se">\</span>
  --attribute-definitions <span class="nv">AttributeName</span><span class="o">=</span>id,AttributeType<span class="o">=</span><span class="s2">&quot;S&quot;</span> <span class="se">\</span>
  --key-schema <span class="nv">KeyType</span><span class="o">=</span><span class="s2">&quot;HASH&quot;</span>,AttributeName<span class="o">=</span><span class="s2">&quot;id&quot;</span>  <span class="se">\</span>
- --provisioned-throughput <span class="nv">ReadCapacityUnits</span><span class="o">=</span>500,WriteCapacityUnits<span class="o">=</span>500
+ --provisioned-throughput <span class="nv">ReadCapacityUnits</span><span class="o">=</span><span class="m">500</span>,WriteCapacityUnits<span class="o">=</span><span class="m">500</span>
 </pre></div>
 </div>
 </li>
@@ -332,7 +332,7 @@ This log file should contain more information which may help developers fix the 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.28',
+            VERSION:'0.30',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
