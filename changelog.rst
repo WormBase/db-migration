@@ -4,9 +4,7 @@
 
 0.31 (unreleased)
 =================
-
-- Nothing changed yet.
-
+- Release to fix release-script malfunction (!).
 
 0.30 (2017-12-18)
 =================
