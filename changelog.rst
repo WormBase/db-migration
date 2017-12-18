@@ -2,6 +2,12 @@
  Changelog
 ===========
 
+0.32 (unreleased)
+=================
+
+- Nothing changed yet.
+
+
 0.31 (2017-12-18)
 =================
 - Release to fix release-script malfunction (!).
