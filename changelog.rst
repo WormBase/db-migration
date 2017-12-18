@@ -2,6 +2,12 @@
  Changelog
 ===========
 
+0.31 (unreleased)
+=================
+
+- Nothing changed yet.
+
+
 0.30 (2017-12-18)
 =================
 - Updated python requirements.
