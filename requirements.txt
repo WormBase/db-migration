@@ -13,6 +13,6 @@ jmespath==0.9.3
 paramiko==2.2.1
 python-dateutil==2.6.0
 PyYAML==3.12
-requests==2.18.1
+requests==2.18.4
 scp==0.10.2
 six==1.10.0
