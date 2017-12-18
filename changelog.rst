@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.29 (unreleased)
+0.29 (2017-12-18)
 =================
 - Bump versions for next migration run.
 
