@@ -113,16 +113,14 @@ def qa_report(context, acedb_id_catalog):
     """
     report_path = pseudoace.qa_report(context, acedb_id_catalog)
     key_template = 'db-migration/{}-report.csv'
-    bucket_path = key_template.format(context.versions['acedb_database'])
-    with tempfile.NamedTemporaryFile(suffix='WS252-report.csv') as fp:
-        title = 'QA Report for {versions[acedb_database]}'
-        title = title.format(versions=context.versions)
-        html_report = pseudoace.qa_report_to_html(report_path, title)
-        fp.write(html_report.encode('utf-8'))
-        invoke = click.get_current_context().invoke
-        report_url = invoke(awscloudops.upload_file,
-                            path_to_upload=fp.name,
-                            path_in_bucket=bucket_path)
+    ws_version = context.versions['acedb_database']
+    bucket_path = key_template.format(ws_version)
+    title = 'QA Report for {}'
+    title = title.format(ws_version)
+    invoke = click.get_current_context().invoke
+    report_url = invoke(awscloudops.upload_file,
+                        path_to_upload=report_path,
+                        path_in_bucket=bucket_path)
     title = 'QA report for {versions[acedb_database]} available at <{loc}>'
     title = title.format(versions=context.versions, loc=report_url)
     pretext = ('*Please check this looks correct '
