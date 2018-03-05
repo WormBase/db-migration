@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.32 (unreleased)
+0.32 (2018-03-05)
 =================
 - Bumped versions for corresponding versions in pseudoace (WS264 + datomic).
 
