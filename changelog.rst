@@ -4,9 +4,7 @@
 
 0.32 (unreleased)
 =================
-
-- Nothing changed yet.
-
+- Bumped versions for corresponding versions in pseudoace (WS264 + datomic).
 
 0.31 (2017-12-18)
 =================
