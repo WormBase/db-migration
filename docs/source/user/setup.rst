@@ -32,11 +32,13 @@ Below, `$AZANIUM_WHEEL_URL` should be the url of the wheel_ file
 repository's `latest release page`_.
 
 .. code-block:: bash
+   # Ensure you're using Python 3
+   alias pip=pip3
 
-   # To install the aws cli:
-   pip install --user awscli
+   # Ensure to install the latest aws cli:
+   pip install --user --upgrade awscli
    # To install the latest version of the db migration code:
-   pip install --upgrade --user "$AZANIUM_WHEEL_URL"
+   pip install --user "$AZANIUM_WHEEL_URL"
 
 
 :term:`AWS` Configuration
