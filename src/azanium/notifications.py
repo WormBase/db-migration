@@ -16,7 +16,7 @@ SLACK_HOOK_URL = params.URL(human_readable_name='Slack webhook URL',
                             netloc='hooks.slack.com',
                             path='/services/\w+/\w+/\w+')
 
-def _notify_noop(config, *args, **kw):
+def _notify_noop(conf, *args, **kw):
     log = importlib.import_module(__package__ + '.log')
     logger = log.get_logger(__name__)
     logger.warn('Notifications are not going to sent - '
@@ -65,26 +65,26 @@ def _notify(conf,
         logger.info('Notificaiton data: {}', repr(data))
 
 
-def notify(config, *args, **kw):
-    delegate = _notify if config else _notify_noop
-    return delegate(config, *args, **kw)
+def notify(conf, headline, **kw):
+    delegate = _notify if conf else _notify_noop
+    return delegate(conf, headline, **kw)
 
 
-def notify_threaded(*args, **kw):
-    args = (config.parse(section=__name__),) + args
+def notify_threaded(headline, **kw):
+    args = (config.parse(section=__name__),) + headline
     t = threading.Thread(target=notify, args=args, kwargs=kw)
     t.start()
     t.join()
 
 
-def around(func, config, headline, message, pre_kw=None, post_kw=None):
+def around(func, conf, headline, message, pre_kw=None, post_kw=None):
     pre_kw = pre_kw if pre_kw else {}
     post_kw = post_kw if post_kw else {}
     post_kw.setdefault('color', 'good')
     attachments_pre = [Attachment(title=message)]
-    notify(config, headline, attachments=attachments_pre, **pre_kw)
+    notify(conf, headline, attachments=attachments_pre, **pre_kw)
     result = func()
-    notify(config, headline + ' - *complete*', attachments=result, **post_kw)
+    notify(conf, headline + ' - *complete*', attachments=result, **post_kw)
 
 
 class Attachment(collections.Mapping):
