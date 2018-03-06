@@ -204,14 +204,15 @@ def clean_previous_state(context):
         # file removed manually perhaps?
         print(err)
 
-Step = collections.namedtuple('Step', ('description', 'func', 'args'))
+Step = collections.namedtuple('Step', ('description', 'func', 'kwargs'))
 
-def _meta_steps(context):
+LOGS_DIR = 'edn-logs'
+
+def _get_convert_steps(context):
     dump_dir = context.path('acedb-dump')
-    logs_dir = context.path('edn-logs')
+    logs_dir = context.path(LOGS_DIR)
     datomic_path = context.path('datomic_free')
-    id_catalog_path = context.path('acedb_id_catalog')
-    meta_steps = [
+    steps = [
         Step('Dumping all ACeDB files',
              acedb_dump,
              dict(dump_dir=dump_dir)),
@@ -226,18 +227,24 @@ def _meta_steps(context):
              dict(acedb_dump_dir=dump_dir, edn_logs_dir=logs_dir)),
         Step('Sorting EDN logs by timestamp',
              sort_edn_logs,
-             dict(edn_logs_dir=logs_dir)),
+             dict(edn_logs_dir=logs_dir))]
+    return steps
+
+def _get_import_steps(context):
+    logs_dir = context.path(LOGS_DIR)
+    id_catalog_path = context.path('acedb_id_catalog')
+    steps = [
         Step('Import EDN logs into Datomic database',
              import_logs,
              dict(edn_logs_dir=logs_dir)),
         Step('Running QA report on Datomic database',
              qa_report,
              dict(acedb_id_catalog=id_catalog_path))]
-    return meta_steps
+    return steps
 
 
 def available_reset_steps(context):
-    steps = _meta_steps(context)
+    steps = _get_convert_steps(context) + _get_import_steps(context)
     last_ok_step_n = context.app_state[LAST_STEP_OK_STATE_KEY]
     avail_steps = collections.OrderedDict()
     for (step_n, t) in enumerate(steps[:last_ok_step_n - 1], start=1):
@@ -287,61 +294,21 @@ def reset_to_step(context):
     step_n = context.app_state[LAST_STEP_OK_STATE_KEY]
     click.echo('Migration step is now set to {}'.format(step_n))
 
-
-@root_command.command(short_help='Runs all db migration steps')
-@util.pass_command_context
-def migrate(context):
-    """Run all database migrations steps.
-
-    Steps:
-
-        1. Dump ACeDB files (.ace files)
-
-        2. Compress ACedB files using gzip
-
-        3. Create Datomic Database
-
-        4. Convert .ace files to EDN logs
-
-        5. Sort EDN log files by timestamp
-
-        6. Import EDN logs into Datomic database
-
-        7. Run QA Report on Datomic DB
-
-        8. Backup Datomic database to Amazon S3 storage **
-
-    ** Only performed if you confirm report output looks good (7).
-
-    """
+def process_steps(context, steps):
     headline_fmt = 'Migrating ACeDB {release} to Datomic, *Step {step}*'
     release = context.versions['acedb_database']
     conf = config.parse(section=notifications.__name__)
-    ctx = click.get_current_context()
-    step_idx = int(context.app_state.get(LAST_STEP_OK_STATE_KEY, '0'))
-    steps = []
-    if not os.path.exists(context.path('acedb_database')):
-        steps = [('Installing all software and ACeDB',
-                  partial(install.all.invoke, ctx))]
     path_in_bucket = '/'.join(['db-migration',
                                os.path.basename(context.logfile_path)])
+    ctx = click.get_current_context()
     upload_log_file = partial(ctx.invoke,
                               awscloudops.upload_file,
                               path_to_upload=context.logfile_path,
                               path_in_bucket=path_in_bucket)
-    meta_steps = _meta_steps(context)
-    meta_steps.append(Step(('@{user} - How does the report look?'
-                            'Please answer the question in ssh console session '
-                            'to backup the datomic database to S3, '
-                            'and complete the db migration '
-                            'process').format(user=context.user_profile),
-                           backup_db_to_s3,
-                           {}))
-    steps.extend(list((msg, partial(ctx.invoke, cmd, **kw))
-                      for (msg, cmd, kw) in meta_steps))
+    step_idx = int(context.app_state.get(LAST_STEP_OK_STATE_KEY, '0'))
     step_n = step_idx + 1
     for (step_n, step) in enumerate(steps[step_idx:], start=step_n):
-        (message, step_command) = step
+        step_command = partial(ctx.invoke, step.func, **step.kwargs)
         headline = headline_fmt.format(release=release, step=step_n)
         with logger:
             if step_idx == len(steps):
@@ -352,8 +319,58 @@ def migrate(context):
                 notifications.around(step_command,
                                      conf,
                                      headline,
-                                     message,
+                                     step.description,
                                      post_kw=post_kw)
             finally:
                 upload_log_file()
             context.app_state[LAST_STEP_OK_STATE_KEY] = step_n - 1
+
+@root_command.command('migrate-stage-1',
+                      short_help='Run initial db migration steps.')
+@util.pass_command_context
+def migrate_stage_1(context):
+    """Steps:
+        1. Dump ACeDB files (.ace files)
+
+        2. Compress ACedB files using gzip
+
+        3. Create Datomic Database
+
+        4. Convert .ace files to EDN logs
+
+        5. Sort EDN log files by timestamp
+    """
+    steps = []
+    ctx = click.get_current_context()
+    if os.path.exists(context.path('acedb_database')):
+        steps = [('Installing all software and ACeDB',
+                  partial(install.all.invoke, ctx))]
+    steps.extend(_get_convert_steps(context))
+    process_steps(context, steps)
+
+@root_command.command('migrate-stage-2',
+                      short_help='Completes db migration steps')
+@util.pass_command_context
+def migrate_stage_2(context):
+    """Import the EDN files into datomic.
+
+    Steps:
+
+        6. Import EDN logs into Datomic database
+
+        7. Run QA Report on Datomic DB
+
+        8. Backup Datomic database to Amazon S3 storage **
+
+    ** Only performed if you confirm report output looks good (7).
+
+    """
+    steps = _get_import_steps(context)
+    steps.append(Step(('@{user} - How does the report look?'
+                       'Please answer the question in ssh console session '
+                       'to backup the datomic database to S3, '
+                       'and complete the db migration '
+                       'process').format(user=context.user_profile),
+                      backup_db_to_s3,
+                      {}))
+    process_steps(context, steps)
