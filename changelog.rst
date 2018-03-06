@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.33 (2018-03-06)
+0.33 (un-released)
 =================
 
 - Split migration into two stages to speed up the process.
