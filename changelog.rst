@@ -2,10 +2,12 @@
  Changelog
 ===========
 
-0.33 (unreleased)
+0.33 (2018-03-06)
 =================
 
-- Nothing changed yet.
+- Split migration into two stages to speed up the process.
+- Fix issue with upgrading package dependencies on install (docs)
+- Updated documentation.
 
 
 0.32 (2018-03-05)
