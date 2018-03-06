@@ -87,11 +87,15 @@ which can be restored using any recent version of :term:`Datomic`.
 
    Perform the migration:
 
+   If any patches need to be loaded, then:
+
+   azanium run acedb-dump
+
    .. code-block:: bash
 
-      azanium migrate
+      azanium migrate-stage-1
 
-   This command will execute each step of the build:
+   This command will execute steps for stage 1 of the migration:
 
    1. Extract all .ace files from the ACeDB database for the current release.
    2. Compress all .ace files
@@ -99,6 +103,23 @@ which can be restored using any recent version of :term:`Datomic`.
    4. Sort all EDN logs by timestamp
    5. Create the Datomic database
    6. Import the EDN logs into the Datomic database
+
+   free up memory:
+
+   .. code-block:: bash
+
+      sudo -i
+      echo 3 > /proc/sys/vm/drop_caches
+      exit
+
+   Run stage 2 of the migration:
+
+   .. code-block:: bash
+
+      azanium migrate-stage-2
+
+   This command will execute steps for stage 2 of the migration:
+
    7. Run a QA report on the database
 
       .. note:: Once this step has completed, the user is prompted to
