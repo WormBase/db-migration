@@ -4,7 +4,6 @@ import logging
 import os
 import traceback
 
-from . import config
 from . import util
 
 
@@ -76,7 +75,6 @@ class VerbosePrettyLogger(Logger):
                 preface='An unexpected error occurred')
             att.add_content(traceback.format_exc())
             notifications.notify_threaded(
-                config.parse(),
                 '*Looks like we have a bug here...*',
                 attachments=[att],
                 color='danger',
