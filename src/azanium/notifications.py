@@ -71,7 +71,7 @@ def notify(conf, headline, **kw):
 
 
 def notify_threaded(headline, **kw):
-    args = (config.parse(section=__name__),) + headline
+    args = (config.parse(section=__name__),) + (headline,)
     t = threading.Thread(target=notify, args=args, kwargs=kw)
     t.start()
     t.join()
