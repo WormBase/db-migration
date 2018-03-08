@@ -365,7 +365,7 @@ def migrate_stage_2(context):
     ** Only performed if you confirm report output looks good (7).
 
     """
-    steps = _get_import_steps(context)
+    steps = _get_convert_steps(context) + _get_import_steps(context)
     steps.append(Step(('@{user} - How does the report look?'
                        'Please answer the question in ssh console session '
                        'to backup the datomic database to S3, '
