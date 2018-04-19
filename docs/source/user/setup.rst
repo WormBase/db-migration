@@ -73,7 +73,7 @@ Next, you should modify the file:
 
   `~/.aws/config`
 
-and add the following profile as shown below, substituting `$USER` for
+and add the following profile as shown below, substituting `$AWS_USER` for
 the actual profile name used in the `aws configure` command above:
 
 .. code-block:: ini
@@ -82,7 +82,7 @@ the actual profile name used in the `aws configure` command above:
    region = us-east-1
    role_session_name = wb-db-migrator
    role_arn = arn:aws:iam::357210185381:role/wb-db-migrator
-   source_profile = $USER
+   source_profile = $AWS_USER
 
 
 Environment limitations
