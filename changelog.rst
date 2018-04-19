@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.35 (unreleased)
+0.35 (2018-04-19)
 =================
 
 - Use FTP staging area to obtain ACeDB release and class report.
