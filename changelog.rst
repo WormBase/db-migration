@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.34 (unreleased)
+0.34 (2018-04-19)
 =================
 
 - Bumped software versions.
