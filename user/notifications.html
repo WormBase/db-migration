@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Notifications &mdash; azanium 0.33 documentation</title>
+  <title>Notifications &mdash; azanium 0.34 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.33 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.34 documentation" href="../index.html"/>
         <link rel="up" title="Database Migration Procedure" href="index.html"/>
         <link rel="next" title="Setup" href="setup.html"/>
         <link rel="prev" title="Prerequisites" href="prerequisites.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.33
+                0.34
               </div>
             
           
@@ -142,6 +142,14 @@
             
   <div class="section" id="notifications">
 <h1>Notifications<a class="headerlink" href="#notifications" title="Permalink to this headline">¶</a></h1>
+<div class="admonition attention">
+<p class="first admonition-title">Attention</p>
+<p class="last">The instructions on this page can usually be skipped, since
+the configuration will be done on initially setup.
+Only follow the steps below if you are setting up the migration pipeline
+from scratch, or need to change the slack web-hook URL.</p>
+</div>
+<p></p>
 <p>The database migration processes will send notifications to a
 dedicated <a class="reference internal" href="../glossary.html#term-slack"><span class="xref std std-term">Slack</span></a> channel:</p>
 <blockquote>
@@ -157,8 +165,8 @@ invitation, or otherwise subscribed to this channel.</p>
 the process a notification will sent to confirm the migrated Datomic
 databases’ location on Amazon <a class="reference internal" href="../glossary.html#term-s3"><span class="xref std std-term">S3</span></a> storage To configure
 notifications for you and the WormBase team:</p>
-<p>Enter the <a class="reference external" href="https://wormbase-db-dev.slack.com/services/B1HNK2JEM#service_setup">slack webhook url</a> into a file in your home directory,
-named as follows:</p>
+<p>Enter the <a class="reference external" href="https://wormbase-db-dev.slack.com/services/B1HNK2JEM#service_setup">slack webhook url</a> into the following file in the home directory,
+of the user that will run the migration:</p>
 <blockquote>
 <div><cite>~/.azanium.conf</cite></div></blockquote>
 <p>The format of the file should match the following:</p>
@@ -209,7 +217,7 @@ named as follows:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.33',
+            VERSION:'0.34',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
