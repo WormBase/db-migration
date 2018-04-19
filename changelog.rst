@@ -5,8 +5,8 @@
 0.35 (unreleased)
 =================
 
-- Nothing changed yet.
-
+- Use FTP staging area to obtain ACeDB release and class report.
+- Improved docs.
 
 0.34 (2018-04-19)
 =================
