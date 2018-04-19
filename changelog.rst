@@ -5,8 +5,9 @@
 0.34 (unreleased)
 =================
 
-- Nothing changed yet.
-
+- Bumped software versions.
+- Updated notification docs.
+- Fixed syntax errors.
 
 0.33 (2018-03-06)
 =================
