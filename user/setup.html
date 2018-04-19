@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Setup &mdash; azanium 0.34 documentation</title>
+  <title>Setup &mdash; azanium 0.35 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.34 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.35 documentation" href="../index.html"/>
         <link rel="up" title="Database Migration Procedure" href="index.html"/>
         <link rel="next" title="Commands" href="commands.html"/>
         <link rel="prev" title="Notifications" href="notifications.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.34
+                0.35
               </div>
             
           
@@ -201,13 +201,13 @@ WormBase services are operated from).</p>
 <p>Next, you should modify the file:</p>
 <blockquote>
 <div><cite>~/.aws/config</cite></div></blockquote>
-<p>and add the following profile as shown below, substituting <cite>$USER</cite> for
+<p>and add the following profile as shown below, substituting <cite>$AWS_USER</cite> for
 the actual profile name used in the <cite>aws configure</cite> command above:</p>
 <div class="highlight-ini"><div class="highlight"><pre><span></span><span class="k">[profile wb-db-migrator]</span>
 <span class="na">region</span> <span class="o">=</span> <span class="s">us-east-1</span>
 <span class="na">role_session_name</span> <span class="o">=</span> <span class="s">wb-db-migrator</span>
 <span class="na">role_arn</span> <span class="o">=</span> <span class="s">arn:aws:iam::357210185381:role/wb-db-migrator</span>
-<span class="na">source_profile</span> <span class="o">=</span> <span class="s">$USER</span>
+<span class="na">source_profile</span> <span class="o">=</span> <span class="s">$AWS_USER</span>
 </pre></div>
 </div>
 </div>
@@ -274,7 +274,7 @@ the following files must be copied (in addition to installing the software):</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.34',
+            VERSION:'0.35',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
