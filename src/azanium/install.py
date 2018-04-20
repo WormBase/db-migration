@@ -32,7 +32,7 @@ Meta = collections.namedtuple('Meta', ('download_dir',
                                        'install_dir',
                                        'version'))
 
-DEFAULT_EBI_FTP_PATH_PREFIX = ''
+DEFAULT_EBI_FTP_PATH_PREFIX = '/pub/databases/wormbase/staging/releases'
 
 def installer(func):
     """Decorate a click command as an ``installer``.
@@ -119,7 +119,7 @@ def acedb_id_catalog(meta,
         default='ftp.ebi.ac.uk',
         help='FTP hostname for ACeDB data.')
 @option('--remote-path-template',
-        default=DEFAULT_EBI_FTP_PATH_PREFIX + '{version}/acedb',
+        default=DEFAULT_EBI_FTP_PATH_PREFIX + '/{version}/acedb',
         help='Path to the file(s) containing compressed database.')
 @option('--file-selector-regexp',
         default='.*\.tar\.gz$',
