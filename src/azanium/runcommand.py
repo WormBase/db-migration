@@ -202,7 +202,7 @@ def clean_previous_state(context):
         os.remove(os.path.expanduser('~/.db-migration.db'))
     except OSError as err:
         # file removed manually perhaps?
-        print(err)
+        pass
 
 Step = collections.namedtuple('Step', ('description', 'func', 'kwargs'))
 
@@ -342,9 +342,9 @@ def migrate_stage_1(context):
     """
     steps = []
     ctx = click.get_current_context()
-    if os.path.exists(context.path('acedb_database')):
-        steps = [('Installing all software and ACeDB',
-                  partial(install.all.invoke, ctx))]
+    if not os.path.exists(context.path('acedb_database')):
+        steps = [Step('Installing all software and ACeDB',
+                      partial(install.all.invoke, ctx))]
     steps.extend(_get_convert_steps(context))
     process_steps(context, steps)
 
