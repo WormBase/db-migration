@@ -33,9 +33,13 @@ runcmd:
 #  Expects libreadline.so.5, which is not currently installable.
 - ln -s /lib64/libreadline.so.6 /lib64/libreadline.so.5
 - cat %(azanium_completion_script)s >> ~ec2-user/.bashrc
+- cat %(add_user_script) > ~ec2-user/.local/bin/wbadduser
+- chmod u+x ~ec2-user/.local/bin/wbadduser
 - chown ec2-user ~ec2-user/.bashrc
 - mkdir /wormbase
-- chown ec2-user:ec2-user /wormbase
+- groupadd wormbase
+- chgrp wormbase /wormbase
+- chmod g=rwx -R /wormbase
 
 
 output : { all : '| tee -a /var/log/cloud-init-output.log' }

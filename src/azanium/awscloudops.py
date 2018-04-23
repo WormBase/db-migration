@@ -311,8 +311,10 @@ def create_instance(ctx,
     with open(USER_DATA_PATH) as fp:
         user_data = fp.read()
         completion_script = util.pkgpath('completion/azanium-complete.sh')
+        add_user_script = util.pkgpath('scripts/wbadduser')
         user_data %= {
-            'azanium_completion_script': completion_script
+            'azanium_completion_script': completion_script,
+            'azanium_adduser_script': add_user_script
         }
     instance_options = dict(
         ImageId=ami,
