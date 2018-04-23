@@ -1,0 +1,32 @@
+#!/bin/sh
+
+group="wormbase"
+user="$1"
+pub_key="$2"
+
+if [ -z $user ] || [ -z "$pub_key" ]; then
+    echo "Usage: $0 <username> \"<ssh-public-key>\""
+    exit 1
+fi
+
+
+ssh_path="/home/${user}/.ssh"
+ssh_ak="${ssh_path}/authorized_keys"
+
+sudo -- sh -c "adduser --disabled-password --gecos '' ${user} > /dev/null;\
+               usermod -aG ${group} ${user} && \
+               sleep 1 && \
+	       mkdir ${ssh_path} && \
+	       chmod 700 ${ssh_path} && \
+	       touch ${ssh_ak} && \
+	       chmod 600 ${ssh_ak} && \
+               chown -R ${user}:${group} ${ssh_path} && \
+               echo ${pub_key} | sudo tee --append ${ssh_ak} > /dev/null && \
+               echo -n 'User \"$user\" has been added to group \"${group}\" and '
+               echo 'has been configured for ssh access.'"
+exit $?
+
+
+
+
+
