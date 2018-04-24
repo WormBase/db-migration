@@ -2,6 +2,7 @@ include requirements.txt
 include LICENSE
 include Makefile
 include *.rst
+include src/azanium/scripts/wbadduser
 recursive-include docs *.py
 recursive-include docs Makefile *.rst *.css
 recursive-exclude src *~ *.pyc
