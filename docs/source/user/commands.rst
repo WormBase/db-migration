@@ -135,7 +135,6 @@ which should be restored using the correct version of :term:`Datomic Pro`.
 
        .. code-block:: bash
 
-	  aws dynamodb delete-table --table-name $OLDEST_WS_RELEASE
           aws dynamodb create-table --table-name $WS_RELEASE \
    	   --attribute-definitions AttributeName=id,AttributeType="S" \
            --key-schema KeyType="HASH",AttributeName="id"  \
