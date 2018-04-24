@@ -150,13 +150,24 @@ which should be restored using the correct version of :term:`Datomic Pro`.
        .. code-block:: bash
 
 	  cd $DATOMIC_PRO_HOME
+          # Notify users on the slack channel
+          azanium notify \
+	     "Migrating ACeDB WS254 to Datomic, Step 9 - Restoring to DynamoDB"
           ./bin/datomic backup-db "$FROM_URI" "$TO_URI"
+          azanium notify \
+	     "Migrating ACeDB WS254 to Datomic, Step 9 - complete"
+
 
    12. Set the throughput values on the DynamoDB table for $WS_RELEASE
        to their lowest possible values.
 
    13. Write completion notification to the #db-migration-events
        wormbase-db-dev slack channel.
+
+       .. code-block:: bash
+
+          azanium notify \
+	     "Migration of ACeDB WS254 to Datomic complete! :fireworks:"
 
 
 .. _db-migration-stage-3:
