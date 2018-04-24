@@ -5,8 +5,8 @@
 0.36 (unreleased)
 =================
 
-- Nothing changed yet.
-
+- Added admin script for adding new AWS IAM and EC2-host linux user.
+- Updated documentation for multi-user migration.
 
 0.35 (2018-04-19)
 =================
