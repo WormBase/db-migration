@@ -166,10 +166,12 @@ def backup_db_to_s3(context):
     if not os.path.isdir(local_backup_path):
         datomic.backup_db(context, local_backup_path)
     if not os.path.isfile(archive_path):
+        logger.info('Creating archive {} for upload', archive_path)
         with tarfile.open(archive_path, mode='w:xz') as tf:
             tf.add(local_backup_path, arcname=arcname)
     ctx = click.get_current_context()
     try:
+        logger.info('Uploading archive {} to S3', archive_path)
         s3_uri = ctx.invoke(awscloudops.upload_file,
                             path_to_upload=archive_path,
                             path_in_bucket='db-migration/' + arcname)

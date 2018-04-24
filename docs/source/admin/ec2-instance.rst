@@ -1,6 +1,7 @@
 =================================
 :term:`EC2` Instance requirements
 =================================
+
 The following tables describe the requisite properties of an EC2
 instance the database migration procedure.
 

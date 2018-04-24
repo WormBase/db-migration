@@ -47,8 +47,7 @@ necessary for a migration to be performed.
    policies require specification of a fully-qualified :term:`ARN`
    when forming relationships between trusted entities in :term:`IAM`.
 
-Initial configuration
-=====================
+
 The remainder of the documentation here will assume the following alias.
 
 The username referred to as ``${AWS_ADMIN_USERNAME}`` should have the
