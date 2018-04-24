@@ -1,8 +1,8 @@
 .. _db-migration-steps:
 
-========
-Commands
-========
+==========
+ Commands
+==========
 The following steps below will migrate the ACeDB database to Datomic.
 Then end result will be a Datomic database stored on Amazon :term:`S3`,
 which should be restored using the correct version of :term:`Datomic Pro`.
@@ -141,19 +141,28 @@ which should be restored using the correct version of :term:`Datomic Pro`.
            --provisioned-throughput ReadCapacityUnits=500,WriteCapacityUnits=500
    11. Transfer backed-up database to AWS S3
 
+	.. todo::
+
+    	   Workout how to get datomic-pro distributed accross the team
+       	   such that any staff member can install datomic-pro on the
+       	   migration EC2 host.
+
        .. code-block:: bash
 
 	  FROM_URI="file:///wormbase/datomic-db-backups/$LATEST_DATE/$WS_RELEASE"
 	  TO_URI="datomic:ddb://us-east-1/$WS_RELEASE/wormbase"
 
    11. With the corresponding version of datomic-pro installed in DATOMIC_HOME:
+
+       .. _install_datomic_pro:
+
        .. code-block:: bash
 
 	  cd $DATOMIC_PRO_HOME
           # Notify users on the slack channel
           azanium notify \
-	     "Migrating ACeDB WS254 to Datomic, Step 9 - Restoring to DynamoDB"
-          ./bin/datomic backup-db "$FROM_URI" "$TO_URI"
+	     "Migrating ACeDB WS254 to Datomic, Step 9 - Restoring to DynamoDB" && \
+          ./bin/datomic backup-db "$FROM_URI" "$TO_URI" && \
           azanium notify \
 	     "Migrating ACeDB WS254 to Datomic, Step 9 - complete"
 
@@ -183,7 +192,7 @@ Should all steps complete successfully, the migration process is now
 complete.
 
 Diagnostics
------------
+===========
 In the event of any errors, a `log file`_ should be written to the
 :term:`S3` storage after each build step.
 This log file should contain more information which may help developers fix the issue.

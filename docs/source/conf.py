@@ -20,6 +20,7 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
+import datetime
 import pkg_resources
 
 _dist = pkg_resources.get_distribution('azanium')
@@ -33,7 +34,11 @@ _dist = pkg_resources.get_distribution('azanium')
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.githubpages']
+extensions = ['sphinx.ext.githubpages',
+              'sphinx.ext.todo',
+              'sphinx.ext.autosectionlabel',
+              'sphinx.ext.extlinks',
+              'sphinx.ext.viewcode']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -53,7 +58,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = _dist.project_name
-copyright = '2016, Matt Russell'
+now = datetime.datetime.utcnow()
+copyright = '{}, Matt Russell'.format(now.year)
 author = 'Matt Russell <matthew.russell@wormbase.org>'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -115,7 +121,8 @@ pygments_style = 'sphinx'
 # keep_warnings = False
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
-todo_include_todos = False
+todo_include_todos = True
+todo_emit_warnings = True
 
 
 # -- Options for HTML output ----------------------------------------------

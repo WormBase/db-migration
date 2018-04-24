@@ -9,12 +9,13 @@ stored in :term:`S3` storage.
 
 The migration process will take approximately 3½ days to complete.
 
-`Notications <notications>` will be sent before and after each step of
+`<Notifications :ref:`Notifications`> will be sent before and after each step of
 the migration process.
 
 *Any* person having a WormBase Amazon :term:`AWS` account will be
  capable of performing the migration procedure.
 
+.. todolist::
 
 .. toctree::
    :hidden:
@@ -24,3 +25,5 @@ the migration process.
    notifications
    setup
    commands
+
+
