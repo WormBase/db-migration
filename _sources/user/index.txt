@@ -1,3 +1,5 @@
+.. _db-migration-user-guide:
+
 ============================
 Database Migration Procedure
 ============================

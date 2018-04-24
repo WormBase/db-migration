@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>AWS IAM setup &mdash; azanium 0.35 documentation</title>
+  <title>AWS IAM setup &mdash; azanium 0.36 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.35 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.36 documentation" href="../index.html"/>
         <link rel="up" title="Administration" href="index.html"/>
         <link rel="next" title="AWS EC2 Instance Creation" href="ec2-instance-creation.html"/>
         <link rel="prev" title="Administration" href="index.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.35
+                0.36
               </div>
             
           
@@ -87,7 +87,6 @@
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Administration</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">AWS IAM setup</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#iam-admin-tool-azanium-admin">IAM admin tool (<cite>azanium admin</cite>)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#initial-configuration">Initial configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#create-the-user-group">Create the user group</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#create-the-role-to-be-assumed">Create the role to be assumed</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#role-policies">Role policies</a></li>
@@ -98,6 +97,8 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ec2-instance-creation.html">AWS EC2 Instance Creation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ec2-instance.html"><code class="docutils literal"><span class="pre">EC2</span></code> Instance requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#new-user-configuration">New user configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#tasks">Tasks</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development</a></li>
@@ -196,9 +197,6 @@ IAM such that users can use the <cite>AssumeRole</cite> API.</p>
 policies require specification of a fully-qualified <a class="reference internal" href="../glossary.html#term-arn"><span class="xref std std-term">ARN</span></a>
 when forming relationships between trusted entities in <a class="reference internal" href="../glossary.html#term-iam"><span class="xref std std-term">IAM</span></a>.</p>
 </div>
-</div>
-<div class="section" id="initial-configuration">
-<h2>Initial configuration<a class="headerlink" href="#initial-configuration" title="Permalink to this headline">¶</a></h2>
 <p>The remainder of the documentation here will assume the following alias.</p>
 <p>The username referred to as <code class="docutils literal"><span class="pre">${AWS_ADMIN_USERNAME}</span></code> should have the
 assigned the <code class="docutils literal"><span class="pre">IAMFullAccess</span></code> policy.</p>
@@ -341,7 +339,7 @@ allows them to assume this role.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.35',
+            VERSION:'0.36',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

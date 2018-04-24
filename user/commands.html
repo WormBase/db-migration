@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Commands &mdash; azanium 0.35 documentation</title>
+  <title>Commands &mdash; azanium 0.36 documentation</title>
   
 
   
@@ -30,10 +30,10 @@
   
 
   
-    <link rel="top" title="azanium 0.35 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.36 documentation" href="../index.html"/>
         <link rel="up" title="Database Migration Procedure" href="index.html"/>
         <link rel="next" title="Administration" href="../admin/index.html"/>
-        <link rel="prev" title="Setup" href="setup.html"/> 
+        <link rel="prev" title="AWS Setup" href="setup.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.35
+                0.36
               </div>
             
           
@@ -86,7 +86,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Database Migration Procedure</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="prerequisites.html">Prerequisites</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notifications.html">Notifications</a></li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html">Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">AWS Setup</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Commands</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#diagnostics">Diagnostics</a></li>
 </ul>
@@ -147,7 +147,7 @@
 <span id="db-migration-steps"></span><h1>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h1>
 <p>The following steps below will migrate the ACeDB database to Datomic.
 Then end result will be a Datomic database stored on Amazon <a class="reference internal" href="../glossary.html#term-s3"><span class="xref std std-term">S3</span></a>,
-which can be restored using any recent version of <a class="reference internal" href="../glossary.html#term-datomic"><span class="xref std std-term">Datomic</span></a>.</p>
+which should be restored using the correct version of <a class="reference internal" href="../glossary.html#term-datomic-pro"><span class="xref std std-term">Datomic Pro</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">You must have <code class="docutils literal"><span class="pre">ssh-agent</span></code> running in your shell session.</p>
@@ -162,8 +162,8 @@ which can be restored using any recent version of <a class="reference internal" 
 the <cite>db migration ec2 instance id</cite> provided by a WormBase AWS
 Administrator, enter the following <a class="reference internal" href="../glossary.html#term-aws-cli"><span class="xref std std-term">aws cli</span></a> command to start
 the migration instance:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nv">AWS_DEFAULT_PROFILE</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">USER</span><span class="si">}</span><span class="s2">&quot;</span> <span class="c1"># WormBase AWS account username</span>
-<span class="nv">INSTANCE_ID</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">INSTANCE_ID_PROVIDED_BY_WORMBASE_AWS_ADMIN</span><span class="si">}</span><span class="s2">&quot;</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">AWS_PROFILE</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">USER</span><span class="si">}</span><span class="s2">&quot;</span> <span class="c1"># WormBase AWS account username</span>
+<span class="nb">export</span> <span class="nv">INSTANCE_ID</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">INSTANCE_ID_PROVIDED_BY_WORMBASE_AWS_ADMIN</span><span class="si">}</span><span class="s2">&quot;</span>
 aws ec2 start-instances --instance-ids <span class="s2">&quot;</span><span class="si">${</span><span class="nv">INSTANCE_ID</span><span class="si">}</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
@@ -223,26 +223,31 @@ output.</p>
 <li>Compress all .ace files</li>
 <li>Convert .ace files to EDN logs</li>
 <li>Sort all EDN logs by timestamp</li>
-<li>Create the Datomic database</li>
-<li>Import the EDN logs into the Datomic database</li>
 </ol>
-<p>free up memory:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>sudo -i
-<span class="nb">echo</span> <span class="m">3</span> &gt; /proc/sys/vm/drop_caches
-<span class="nb">exit</span>
+<div class="admonition attention">
+<p class="first admonition-title">Attention</p>
+<p>Now, from your <em>client</em> machine, restart the instance to free-up resources on the host (memory).</p>
+<div class="last highlight-bash"><div class="highlight"><pre><span></span>aws ec2 restart-instances --instance-ids <span class="nv">$INSTANCE_ID</span>
 </pre></div>
+</div>
 </div>
 <p>Run stage 2 of the migration:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>azanium migrate-stage-2
 </pre></div>
 </div>
 <p>This command will execute steps for stage 2 of the migration:</p>
-<ol class="arabic" start="7">
+<ol class="arabic" start="5">
+<li><p class="first">Create the Datomic database</p>
+</li>
+<li><p class="first">Import the EDN logs into the Datomic database</p>
+</li>
 <li><p class="first">Run a QA report on the database</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Once this step has completed, the user is prompted to
-confirm the next step, or abort.</p>
+<p class="last">Once this step has completed, the user will be prompted
+in the tmux/screen shell session to confirm the next step, or abort.
+This will also be posted to the slack channel for
+tracking migration events.</p>
 </div>
 </li>
 <li><p class="first">Transfer the Datomic database to Amazon S3 storage</p>
@@ -310,7 +315,7 @@ This log file should contain more information which may help developers fix the 
         <a href="../admin/index.html" class="btn btn-neutral float-right" title="Administration" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="setup.html" class="btn btn-neutral" title="Setup" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="setup.html" class="btn btn-neutral" title="AWS Setup" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -341,7 +346,7 @@ This log file should contain more information which may help developers fix the 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.35',
+            VERSION:'0.36',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

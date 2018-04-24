@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>AWS EC2 Instance Creation &mdash; azanium 0.35 documentation</title>
+  <title>AWS EC2 Instance Creation &mdash; azanium 0.36 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.35 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.36 documentation" href="../index.html"/>
         <link rel="up" title="Administration" href="index.html"/>
         <link rel="next" title="EC2 Instance requirements" href="ec2-instance.html"/>
         <link rel="prev" title="AWS IAM setup" href="iam-setup.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.35
+                0.36
               </div>
             
           
@@ -88,6 +88,8 @@
 <li class="toctree-l2"><a class="reference internal" href="iam-setup.html">AWS IAM setup</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">AWS EC2 Instance Creation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ec2-instance.html"><code class="docutils literal"><span class="pre">EC2</span></code> Instance requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#new-user-configuration">New user configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#tasks">Tasks</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development</a></li>
@@ -145,7 +147,7 @@
 the following command:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nv">RELEASE</span><span class="o">=</span><span class="s2">&quot;WS....&quot;</span>
 <span class="nv">SUBNET_ID</span><span class="o">=</span><span class="s2">&quot;subnet-xxxxx&quot;</span>
-azanium --profile<span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">AWS_DEFAULT_PROFILE</span><span class="si">}</span><span class="s2">&quot;</span> <span class="se">\</span>
+azanium --profile<span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">AWS_PROFILE</span><span class="si">}</span><span class="s2">&quot;</span> <span class="se">\</span>
       cloud init <span class="s2">&quot;</span><span class="si">${</span><span class="nv">RELEASE</span><span class="si">}</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">subnet_id</span><span class="si">}</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
@@ -188,9 +190,13 @@ runcmd:
 #  Expects libreadline.so.5, which is not currently installable.
 - ln -s /lib64/libreadline.so.6 /lib64/libreadline.so.5
 - cat %(azanium_completion_script)s &gt;&gt; ~ec2-user/.bashrc
+- cat %(add_user_script) &gt; ~ec2-user/.local/bin/wbadduser
+- chmod u+x ~ec2-user/.local/bin/wbadduser
 - chown ec2-user ~ec2-user/.bashrc
 - mkdir /wormbase
-- chown ec2-user:ec2-user /wormbase
+- groupadd wormbase
+- chgrp wormbase /wormbase
+- chmod g=rwx -R /wormbase
 
 
 output : { all : &#39;| tee -a /var/log/cloud-init-output.log&#39; }
@@ -239,7 +245,7 @@ output : { all : &#39;| tee -a /var/log/cloud-init-output.log&#39; }
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.35',
+            VERSION:'0.36',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

@@ -1,6 +1,14 @@
-=====
-Setup
-=====
+=========
+AWS Setup
+=========
+The commands here will setup the AWS client for access to the WormBase
+AWS account, for the purpose of running the migration.
+
+.. attention:: 
+
+   The commands below should be run on the :term:`EC2` host that will
+   be used to perform the migration.
+
 
 Installation requirements
 =========================
@@ -10,7 +18,7 @@ Python_ is the only requirement.
 
 Python package management
 -------------------------
-pip_ is used to manage Python packages.
+pip3_ is used to manage Python packages.
 
 The ``--user`` flag instructs pip to install packages in your home
 directory.
@@ -32,22 +40,26 @@ Below, `$AZANIUM_WHEEL_URL` should be the url of the wheel_ file
 repository's `latest release page`_.
 
 .. code-block:: bash
-   # Ensure you're using Python 3
-   alias pip=pip3
 
    # Ensure to install the latest aws cli:
-   pip install --user --upgrade awscli
+   pip3 install --user --upgrade awscli
    # To install the latest version of the db migration code:
-   pip install --user "$AZANIUM_WHEEL_URL"
+   pip3 install --user "$AZANIUM_WHEEL_URL"
 
+
+.. _aws-client-configuration:
 
 :term:`AWS` Configuration
 =========================
+
 A WormBase AWS administrator should have previously supplied
 you with the required credentials:
 
+  AWS_PROFILE
+  	WormBase AWS IAM username (current session)
+
   AWS_DEFAULT_PROFILE
-  	WormBase AWS IAM username
+  	WormBase AWS IAM username (all sessions)
 
   AWS_DEFAULT_REGION
   	The default region of the WormBase AWS account (Always `us-east-1`)
@@ -66,7 +78,7 @@ These credentials should be given as input to the following command:
 
 .. code-block:: bash
 
-   aws configure
+   aws configure --profile="${AWS_USER}"
 
 
 Next, you should modify the file:
@@ -105,7 +117,7 @@ the following files must be copied (in addition to installing the software):
 .. note:: The above assumes you've run all commands from your `$HOME` directory.
 
 .. _Python: https://www.python.org/downloads/
-.. _pip: https://en.wikipedia.org/wiki/Pip_(package_manager)
+.. _pip3: https://en.wikipedia.org/wiki/Pip_(package_manager)
 .. _`AWS region`: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
 .. _`latest release page`: https://github.com/Wormbase/db-migration/releases/latest
 .. _wheel: http://pythonwheels.com/

@@ -5,11 +5,11 @@ Commands
 ========
 The following steps below will migrate the ACeDB database to Datomic.
 Then end result will be a Datomic database stored on Amazon :term:`S3`,
-which can be restored using any recent version of :term:`Datomic`.
+which should be restored using the correct version of :term:`Datomic Pro`.
 
 .. note:: You must have ``ssh-agent`` running in your shell session.
 
-.. ATTENTION::
+.. attention::
 
    Should the migration fail at any step, please ensure to eventually :ref:`stop <db-migration-stage-3>` the AWS instance.
 
@@ -24,8 +24,8 @@ which can be restored using any recent version of :term:`Datomic`.
 
    .. code-block:: bash
 
-      AWS_DEFAULT_PROFILE="${USER}" # WormBase AWS account username
-      INSTANCE_ID="${INSTANCE_ID_PROVIDED_BY_WORMBASE_AWS_ADMIN}"
+      export AWS_PROFILE="${USER}" # WormBase AWS account username
+      export INSTANCE_ID="${INSTANCE_ID_PROVIDED_BY_WORMBASE_AWS_ADMIN}"
       aws ec2 start-instances --instance-ids "${INSTANCE_ID}"
 
 .. _db-migration-step-2:
@@ -101,16 +101,15 @@ which can be restored using any recent version of :term:`Datomic`.
    2. Compress all .ace files
    3. Convert .ace files to EDN logs
    4. Sort all EDN logs by timestamp
-   5. Create the Datomic database
-   6. Import the EDN logs into the Datomic database
 
-   free up memory:
 
-   .. code-block:: bash
+   .. attention::
 
-      sudo -i
-      echo 3 > /proc/sys/vm/drop_caches
-      exit
+      Now, from your *client* machine, restart the instance to free-up resources on the host (memory).
+
+      .. code-block:: bash
+
+   	aws ec2 restart-instances --instance-ids $INSTANCE_ID
 
    Run stage 2 of the migration:
 
@@ -120,10 +119,14 @@ which can be restored using any recent version of :term:`Datomic`.
 
    This command will execute steps for stage 2 of the migration:
 
+   5. Create the Datomic database
+   6. Import the EDN logs into the Datomic database
    7. Run a QA report on the database
 
-      .. note:: Once this step has completed, the user is prompted to
-         	confirm the next step, or abort.
+      .. note:: Once this step has completed, the user will be prompted
+	        in the tmux/screen shell session to confirm the next step, or abort.
+	        This will also be posted to the slack channel for
+	        tracking migration events.
 
    8. Transfer the Datomic database to Amazon S3 storage
    9. azanium backup-db

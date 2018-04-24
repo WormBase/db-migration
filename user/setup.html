@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Setup &mdash; azanium 0.35 documentation</title>
+  <title>AWS Setup &mdash; azanium 0.36 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.35 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.36 documentation" href="../index.html"/>
         <link rel="up" title="Database Migration Procedure" href="index.html"/>
         <link rel="next" title="Commands" href="commands.html"/>
         <link rel="prev" title="Notifications" href="notifications.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.35
+                0.36
               </div>
             
           
@@ -86,7 +86,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Database Migration Procedure</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="prerequisites.html">Prerequisites</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notifications.html">Notifications</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Setup</a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">AWS Setup</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#installation-requirements">Installation requirements</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#python-package-management">Python package management</a></li>
 </ul>
@@ -135,7 +135,7 @@
       
           <li><a href="index.html">Database Migration Procedure</a> &raquo;</li>
       
-    <li>Setup</li>
+    <li>AWS Setup</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -149,14 +149,21 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="setup">
-<h1>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="aws-setup">
+<h1>AWS Setup<a class="headerlink" href="#aws-setup" title="Permalink to this headline">¶</a></h1>
+<p>The commands here will setup the AWS client for access to the WormBase
+AWS account, for the purpose of running the migration.</p>
+<div class="admonition attention">
+<p class="first admonition-title">Attention</p>
+<p class="last">The commands below should be run on the <a class="reference internal" href="../glossary.html#term-ec2"><span class="xref std std-term">EC2</span></a> host that will
+be used to perform the migration.</p>
+</div>
 <div class="section" id="installation-requirements">
 <h2>Installation requirements<a class="headerlink" href="#installation-requirements" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="https://www.python.org/downloads/">Python</a> is the only requirement.</p>
 <div class="section" id="python-package-management">
 <h3>Python package management<a class="headerlink" href="#python-package-management" title="Permalink to this headline">¶</a></h3>
-<p><a class="reference external" href="https://en.wikipedia.org/wiki/Pip_(package_manager)">pip</a> is used to manage Python packages.</p>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Pip_(package_manager)">pip3</a> is used to manage Python packages.</p>
 <p>The <code class="docutils literal"><span class="pre">--user</span></code> flag instructs pip to install packages in your home
 directory.</p>
 <p>The installation locations for all Python packages when using the
@@ -174,15 +181,23 @@ directory.</p>
 <p>Below, <cite>$AZANIUM_WHEEL_URL</cite> should be the url of the <a class="reference external" href="http://pythonwheels.com/">wheel</a> file
 (<cite>.whl</cite> extension) listed in the downloads section of this
 repository&#8217;s <a class="reference external" href="https://github.com/Wormbase/db-migration/releases/latest">latest release page</a>.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># Ensure to install the latest aws cli:</span>
+pip3 install --user --upgrade awscli
+<span class="c1"># To install the latest version of the db migration code:</span>
+pip3 install --user <span class="s2">&quot;</span><span class="nv">$AZANIUM_WHEEL_URL</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="aws-configuration">
-<h2><a class="reference internal" href="../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> Configuration<a class="headerlink" href="#aws-configuration" title="Permalink to this headline">¶</a></h2>
+<span id="aws-client-configuration"></span><h2><a class="reference internal" href="../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> Configuration<a class="headerlink" href="#aws-configuration" title="Permalink to this headline">¶</a></h2>
 <p>A WormBase AWS administrator should have previously supplied
 you with the required credentials:</p>
 <blockquote>
 <div><dl class="docutils">
+<dt>AWS_PROFILE</dt>
+<dd>WormBase AWS IAM username (current session)</dd>
 <dt>AWS_DEFAULT_PROFILE</dt>
-<dd>WormBase AWS IAM username</dd>
+<dd>WormBase AWS IAM username (all sessions)</dd>
 <dt>AWS_DEFAULT_REGION</dt>
 <dd>The default region of the WormBase AWS account (Always <cite>us-east-1</cite>)</dd>
 <dt>AWS_ACCESS_KEY_ID</dt>
@@ -195,7 +210,7 @@ you with the required credentials:</p>
 should specify <cite>us-east-1</cite> (this the primary <a class="reference external" href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html">AWS region</a> that the
 WormBase services are operated from).</p>
 <p>These credentials should be given as input to the following command:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>aws configure
+<div class="highlight-bash"><div class="highlight"><pre><span></span>aws configure --profile<span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">AWS_USER</span><span class="si">}</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
 <p>Next, you should modify the file:</p>
@@ -274,7 +289,7 @@ the following files must be copied (in addition to installing the software):</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.35',
+            VERSION:'0.36',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

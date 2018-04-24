@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Administration &mdash; azanium 0.36 documentation</title>
+  <title>Adding a new user &mdash; azanium 0.36 documentation</title>
   
 
   
@@ -31,8 +31,9 @@
 
   
     <link rel="top" title="azanium 0.36 documentation" href="../index.html"/>
-        <link rel="next" title="AWS IAM setup" href="iam-setup.html"/>
-        <link rel="prev" title="Commands" href="../user/commands.html"/> 
+        <link rel="up" title="Administration" href="index.html"/>
+        <link rel="next" title="Development" href="../dev/index.html"/>
+        <link rel="prev" title="EC2 Instance requirements" href="ec2-instance.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -83,13 +84,13 @@
             
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../user/index.html">Database Migration Procedure</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Administration</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Administration</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="iam-setup.html">AWS IAM setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ec2-instance-creation.html">AWS EC2 Instance Creation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ec2-instance.html"><code class="docutils literal"><span class="pre">EC2</span></code> Instance requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#new-user-configuration">New user configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#tasks">Tasks</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="ec2-wb-add-new-user.html">Adding a new user</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#new-user-configuration">New user configuration</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#tasks">Tasks</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Adding a new user</a></li>
 </ul>
 </li>
 </ul>
@@ -127,11 +128,13 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
       
-    <li>Administration</li>
+          <li><a href="index.html">Administration</a> &raquo;</li>
+      
+    <li>Adding a new user</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/admin/index.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/admin/ec2-wb-add-new-user.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -141,27 +144,47 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="administration">
-<h1>Administration<a class="headerlink" href="#administration" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-</div>
-<div class="section" id="new-user-configuration">
-<h2>New user configuration<a class="headerlink" href="#new-user-configuration" title="Permalink to this headline">¶</a></h2>
-<p>This section describes the steps need to be run (once only) to setup a
-new user such that they can perform they database migration tasks.</p>
+  <div class="section" id="adding-a-new-user">
+<h1>Adding a new user<a class="headerlink" href="#adding-a-new-user" title="Permalink to this headline">¶</a></h1>
+<p>The <cite>wbadduser</cite> script:</p>
 <blockquote>
 <div><ul class="simple">
-<li>Steps required to configure the AWS <a class="reference internal" href="../glossary.html#term-iam"><span class="xref std std-term">IAM</span></a> users
-in order to perform the database migration.</li>
-<li>Details of the  <a class="reference internal" href="../glossary.html#term-ec2"><span class="xref std std-term">EC2</span></a> instance required to perform the database migration</li>
+<li>Adds a new AWS IAM user</li>
+<li>Configures user with the &#8220;STS&#8221; role that needed to be assumed to
+perform migration tasks</li>
+<li>Grants user relevant AWS IAM policies</li>
+<li>Adds the user to the <cite>wb-db-migration-users</cite> AWS IAM group</li>
+<li>Creates a linux user on the <cite>wb-db-migration</cite> AWS EC2 host.</li>
 </ul>
 </div></blockquote>
+<p>The following tasks must be completed in order to setup a new user, capable of performing the migration:</p>
+<blockquote>
+<div><ul>
+<li><p class="first">An AWS administrator must use the <cite>ec2-user</cite> account on the
+<cite>wb-db-migration</cite> <a class="reference internal" href="../glossary.html#term-ec2"><span class="xref std std-term">EC2</span></a> isntance to create a new user:</p>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># variables:</span>
+<span class="c1">#  - KEY: path to SSH key</span>
+<span class="c1">#         Associated with the EC2 migration instance</span>
+<span class="c1">#         The key can be obtain from the &quot;KeyPairs&quot; section of the EC2</span>
+<span class="c1">#  - EC2_INST_ADDR address of the EC2 instance.</span>
+<span class="c1">#  - USER  The user-name for the user.</span>
+<span class="c1">#          Ideally use the same user-name the AWS IAM user to avoid confusion.</span>
+<span class="c1"># - USER_SSH_PUB_KEY the contents of the public SSH key for the user.</span>
+<span class="c1"># Both the key pair and the instance address can be obtained from the EC2</span>
+<span class="c1"># service (either via web management console or the command line tool)</span>
+
+<span class="c1"># Run a command on the remote instance to create a new (linux) user.</span>
+ssh -i <span class="nv">$KEY</span> ec2-user@<span class="si">${</span><span class="nv">EC2_INST_ADDR</span><span class="si">}</span> wb-add-new-user <span class="nv">$USER</span> <span class="nv">$USER_SSH_PUB_KEY</span>
+</pre></div>
 </div>
-<div class="section" id="tasks">
-<h2>Tasks<a class="headerlink" href="#tasks" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-</div>
-</div>
+</div></blockquote>
+</li>
+<li><p class="first">The user must then setup their environment as per the <a class="reference internal" href="../user/setup.html#aws-client-configuration"><span class="std std-ref">user
+guide</span></a>.</p>
+</li>
+</ul>
+</div></blockquote>
 </div>
 
 
@@ -171,10 +194,10 @@ in order to perform the database migration.</li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="iam-setup.html" class="btn btn-neutral float-right" title="AWS IAM setup" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../dev/index.html" class="btn btn-neutral float-right" title="Development" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../user/commands.html" class="btn btn-neutral" title="Commands" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="ec2-instance.html" class="btn btn-neutral" title="EC2 Instance requirements" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

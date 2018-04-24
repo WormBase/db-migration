@@ -45,6 +45,11 @@ Glossary
    Datomic
       The new WormBase database technology.
 
+   Datomic Pro
+      The "pro" version of the Datomic software, also known as "Datomic On-Prem".
+      This version of the software requires a software license from the vendor (Cognitect Inc.),
+      and provides capabilities not available in the free version (e.g: libraries for interaction with AWS).
+
    ACeDB
 
       The current, legacy database technology.
@@ -70,9 +75,13 @@ Glossary
    Slack
       The messaging service used for WormBase inter-team communications.
 
+   Python3
+      The Python_ language.
+
 
 
 .. _`Amazon Resource Name`: http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
 .. _`Amazon Identity and Access Management`: http://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html
 .. _circus: https://circus.readthedocs.io/en/latest/
 .. _`Amazon Command Line Interface`: https://aws.amazon.com/cli/
+.. _Python: https://www.python.org
