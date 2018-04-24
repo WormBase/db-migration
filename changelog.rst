@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.36 (unreleased)
+0.36 (2018-04-24)
 =================
 
 - Added admin script for adding new AWS IAM and EC2-host linux user.
