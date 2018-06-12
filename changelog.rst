@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.37 (unreleased)
+0.37 (2018-06-12)
 =================
 
 - Updated versions for the next migration run.
