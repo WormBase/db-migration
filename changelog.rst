@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.38 (unreleased)
+0.38 (2018-06-12)
 =================
 
 - Fixed dependency issue with `awscli`.
