@@ -21,9 +21,5 @@ the migration process.
    :hidden:
    :maxdepth: 1
 
-   prerequisites
-   notifications
-   setup
+   setup/index
    commands
-
-

@@ -42,7 +42,7 @@ repository's `latest release page`_.
 .. code-block:: bash
 
    # Ensure to install the latest aws cli:
-   pip3 install --user --upgrade awscli
+   pip3 install --user "awscli==1.15.36"
    # To install the latest version of the db migration code:
    pip3 install --user "$AZANIUM_WHEEL_URL"
 

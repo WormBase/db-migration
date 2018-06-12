@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>AWS Setup &mdash; azanium 0.37 documentation</title>
+  <title>AWS Setup &mdash; azanium 0.38 documentation</title>
   
 
   
@@ -24,19 +24,19 @@
 
   
   
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   
 
   
 
   
-    <link rel="top" title="azanium 0.37 documentation" href="../index.html"/>
-        <link rel="up" title="Database Migration Procedure" href="index.html"/>
-        <link rel="next" title="Commands" href="commands.html"/>
+    <link rel="top" title="azanium 0.38 documentation" href="../../index.html"/>
+        <link rel="up" title="Prerequisites" href="index.html"/>
+        <link rel="next" title="Commands" href="../commands.html"/>
         <link rel="prev" title="Notifications" href="notifications.html"/> 
 
   
-  <script src="../_static/js/modernizr.min.js"></script>
+  <script src="../../_static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -51,7 +51,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> azanium
+            <a href="../../index.html" class="icon icon-home"> azanium
           
 
           
@@ -61,14 +61,14 @@
             
             
               <div class="version">
-                0.37
+                0.38
               </div>
             
           
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -83,26 +83,25 @@
             
             
                 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Database Migration Procedure</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="prerequisites.html">Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notifications.html">Notifications</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">AWS Setup</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#installation-requirements">Installation requirements</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#python-package-management">Python package management</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Database Migration Procedure</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Prerequisites</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="notifications.html">Notifications</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">AWS Setup</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#installation-requirements">Installation requirements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aws-cli-and-azanium-installation"><code class="docutils literal"><span class="pre">AWS</span></code> <code class="docutils literal"><span class="pre">CLI</span></code> and <code class="docutils literal"><span class="pre">azanium</span></code> Installation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#aws-configuration"><code class="docutils literal"><span class="pre">AWS</span></code> Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#environment-limitations">Environment limitations</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#aws-cli-and-azanium-installation"><code class="docutils literal"><span class="pre">AWS</span></code> <code class="docutils literal"><span class="pre">CLI</span></code> and <code class="docutils literal"><span class="pre">azanium</span></code> Installation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#aws-configuration"><code class="docutils literal"><span class="pre">AWS</span></code> Configuration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#environment-limitations">Environment limitations</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="commands.html">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../commands.html">Commands</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Administration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../admin/index.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
 </ul>
 
             
@@ -116,7 +115,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../index.html">azanium</a>
+        <a href="../../index.html">azanium</a>
       </nav>
 
 
@@ -131,15 +130,17 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../index.html">Docs</a> &raquo;</li>
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
       
-          <li><a href="index.html">Database Migration Procedure</a> &raquo;</li>
+          <li><a href="../index.html">Database Migration Procedure</a> &raquo;</li>
+      
+          <li><a href="index.html">Prerequisites</a> &raquo;</li>
       
     <li>AWS Setup</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/user/setup.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/user/setup/aws_setup.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -155,7 +156,7 @@
 AWS account, for the purpose of running the migration.</p>
 <div class="admonition attention">
 <p class="first admonition-title">Attention</p>
-<p class="last">The commands below should be run on the <a class="reference internal" href="../glossary.html#term-ec2"><span class="xref std std-term">EC2</span></a> host that will
+<p class="last">The commands below should be run on the <a class="reference internal" href="../../glossary.html#term-ec2"><span class="xref std std-term">EC2</span></a> host that will
 be used to perform the migration.</p>
 </div>
 <div class="section" id="installation-requirements">
@@ -177,19 +178,19 @@ directory.</p>
 </div>
 </div>
 <div class="section" id="aws-cli-and-azanium-installation">
-<h2><a class="reference internal" href="../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> <a class="reference internal" href="../glossary.html#term-cli"><span class="xref std std-term">CLI</span></a> and <a class="reference internal" href="../glossary.html#term-azanium"><span class="xref std std-term">azanium</span></a> Installation<a class="headerlink" href="#aws-cli-and-azanium-installation" title="Permalink to this headline">¶</a></h2>
+<h2><a class="reference internal" href="../../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> <a class="reference internal" href="../../glossary.html#term-cli"><span class="xref std std-term">CLI</span></a> and <a class="reference internal" href="../../glossary.html#term-azanium"><span class="xref std std-term">azanium</span></a> Installation<a class="headerlink" href="#aws-cli-and-azanium-installation" title="Permalink to this headline">¶</a></h2>
 <p>Below, <cite>$AZANIUM_WHEEL_URL</cite> should be the url of the <a class="reference external" href="http://pythonwheels.com/">wheel</a> file
 (<cite>.whl</cite> extension) listed in the downloads section of this
 repository&#8217;s <a class="reference external" href="https://github.com/Wormbase/db-migration/releases/latest">latest release page</a>.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># Ensure to install the latest aws cli:</span>
-pip3 install --user --upgrade awscli
+pip3 install --user <span class="s2">&quot;awscli==1.15.36&quot;</span>
 <span class="c1"># To install the latest version of the db migration code:</span>
 pip3 install --user <span class="s2">&quot;</span><span class="nv">$AZANIUM_WHEEL_URL</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="aws-configuration">
-<span id="aws-client-configuration"></span><h2><a class="reference internal" href="../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> Configuration<a class="headerlink" href="#aws-configuration" title="Permalink to this headline">¶</a></h2>
+<span id="aws-client-configuration"></span><h2><a class="reference internal" href="../../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> Configuration<a class="headerlink" href="#aws-configuration" title="Permalink to this headline">¶</a></h2>
 <p>A WormBase AWS administrator should have previously supplied
 you with the required credentials:</p>
 <blockquote>
@@ -228,7 +229,7 @@ the actual profile name used in the <cite>aws configure</cite> command above:</p
 </div>
 <div class="section" id="environment-limitations">
 <h2>Environment limitations<a class="headerlink" href="#environment-limitations" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="../glossary.html#term-client-commands"><span class="xref std std-term">client commands</span></a> used to interact with <a class="reference internal" href="../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> expects
+<p>The <a class="reference internal" href="../../glossary.html#term-client-commands"><span class="xref std std-term">client commands</span></a> used to interact with <a class="reference internal" href="../../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> expects
 that all <cite>azanium admin</cite> commands to be invoked from the same working
 directory, from the same computer the initial commands are run from.</p>
 <p>If for some reason, its desired to run this command from a different machine,
@@ -255,7 +256,7 @@ the following files must be copied (in addition to installing the software):</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="commands.html" class="btn btn-neutral float-right" title="Commands" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../commands.html" class="btn btn-neutral float-right" title="Commands" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="notifications.html" class="btn btn-neutral" title="Notifications" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -288,22 +289,22 @@ the following files must be copied (in addition to installing the software):</p>
 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.37',
+            URL_ROOT:'../../',
+            VERSION:'0.38',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
         };
     </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
 
   
 
   
   
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
   
 
   
