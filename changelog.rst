@@ -5,7 +5,7 @@
 0.37 (unreleased)
 =================
 
-- Nothing changed yet.
+- Updated versions for the next migration run.
 
 
 0.36 (2018-04-24)
