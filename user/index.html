@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Database Migration Procedure &mdash; azanium 0.36 documentation</title>
+  <title>Database Migration Procedure &mdash; azanium 0.37 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.36 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.37 documentation" href="../index.html"/>
         <link rel="next" title="Prerequisites" href="prerequisites.html"/>
         <link rel="prev" title="🐛 azanium - WormBase Database Migration" href="../index.html"/> 
 
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.36
+                0.37
               </div>
             
           
@@ -143,12 +143,19 @@
 Upon successful completion, the migrated Datomic database will be
 stored in <a class="reference internal" href="../glossary.html#term-s3"><span class="xref std std-term">S3</span></a> storage.</p>
 <p>The migration process will take approximately 3½ days to complete.</p>
-<p><cite>Notications &lt;notications&gt;</cite> will be sent before and after each step of
+<p><cite>&lt;Notifications :ref:`Notifications</cite>&gt; will be sent before and after each step of
 the migration process.</p>
 <dl class="docutils">
 <dt><em>Any</em> person having a WormBase Amazon <a class="reference internal" href="../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> account will be</dt>
 <dd>capable of performing the migration procedure.</dd>
 </dl>
+<div class="admonition-todo admonition">
+<p class="first admonition-title">Todo</p>
+<p class="last">Workout how to get datomic-pro distributed accross the team
+such that any staff member can install datomic-pro on the
+migration EC2 host.</p>
+</div>
+<p class="todo-source">(The <a class="reference internal" href="commands.html#index-0"><em>original entry</em></a> is located in /home/matt/git/db-migration/docs/source/user/commands.rst, line 144.)</p>
 <div class="toctree-wrapper compound">
 </div>
 </div>
@@ -172,7 +179,7 @@ the migration process.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Matt Russell.
+        &copy; Copyright 2018, Matt Russell.
 
     </p>
   </div>
@@ -194,7 +201,7 @@ the migration process.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.36',
+            VERSION:'0.37',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
