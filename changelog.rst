@@ -5,8 +5,8 @@
 0.38 (unreleased)
 =================
 
-- Nothing changed yet.
-
+- Fixed dependency issue with `awscli`.
+- Improved docs.
 
 0.37 (2018-06-12)
 =================

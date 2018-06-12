@@ -1,8 +1,8 @@
 Markdown==2.6.8
 PyYAML==3.12
 awacs==0.6.2
-boto3==1.4.4
-botocore==1.5.80
+boto3==1.7.36
+botocore==1.10.36
 circus==0.14.0
 click==6.7
 configobj==5.0.6
