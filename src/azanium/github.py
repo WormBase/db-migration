@@ -25,7 +25,7 @@ def login(scopes=('user', 'repo')):
         password = _prompt('GitHub password')
         uniq = base64.b64encode(os.urandom(16))[:-2].decode('ascii')
         note = __package__ + ' session ' + uniq
-        auth =  github3.authorize(username, password, scopes, note=note)
+        auth = github3.authorize(username, password, scopes, note=note)
         saved_auth = {'auth.token': auth.token, 'auth.id': auth.id}
         conf[__name__] = saved_auth
         config.write(conf)
@@ -86,6 +86,7 @@ def publish_release(reporoot, version, bundle_path):
         asset = release.upload_asset('application/zip', filename, fp)
     return asset
 
+
 def read_released_file(repo, data_version, path):
     tags = (t.as_dict() for t in repo.tags())
     named_tags = {tag['name']: tag for tag in tags}
@@ -96,5 +97,3 @@ def read_released_file(repo, data_version, path):
     file_contents = repo.file_contents(path, tag['commit']['sha'])
     return file_contents.decoded
 
-
-    
