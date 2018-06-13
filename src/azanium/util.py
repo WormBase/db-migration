@@ -47,19 +47,15 @@ def echo_warning(message,
                  prefix='⚠ WARNING!:',
                  fg='yellow',
                  bold=True,
-                 notify=True) :
+                 notify=True):
     if notify:
-        notifications.notify_threaded(message,
-                                      icon_emoji=':warning',
-                                      color='warning')
+        notifications.notify(message, icon_emoji=':warning', color='warning')
     return _secho(message, prefix=prefix, fg=fg, bold=bold)
 
 
 def echo_error(message, err=True, fg='red', bold=True, notify=True):
     if notify:
-        notifications.notify_threaded(message,
-                                      icon_emoji=':fire:',
-                                      color='warning')
+        notifications.notify(message, icon_emoji=':fire:', color='warning')
     return _secho(message, err=err, fg=fg, bold=bold)
 
 

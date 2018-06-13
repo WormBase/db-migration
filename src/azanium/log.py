@@ -74,7 +74,7 @@ class VerbosePrettyLogger(Logger):
                 str(msg),
                 preface='An unexpected error occurred')
             att.add_content(traceback.format_exc())
-            notifications.notify_threaded(
+            notifications.notify(
                 '*Looks like we have a bug here...*',
                 attachments=[att],
                 color='danger',
