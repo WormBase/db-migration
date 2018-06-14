@@ -13,7 +13,7 @@ the instance.
 +-----------+----------+
 |Username   |ec2-user  |
 +-----------+----------+
-|Type       |r3.4xlarge|
+|Type       |m4.4xlarge|
 +-----------+----------+
 |Elastic IP |no        |
 +-----------+----------+
