@@ -71,7 +71,7 @@
 
 0.27 (2017-09-11)
 =================
-- Source annotated models from release-tag in the 
+- Source annotated models from release-tag in the
   `Wormbase/wormbase-pipeline` repository
 - Fixed issue with notifications configuration where configuration
   could potentially be overridden.
