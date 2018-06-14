@@ -4,14 +4,11 @@ import os
 import psutil
 import shutil
 import tarfile
-import tempfile
 import time
 from functools import partial
 
-from botocore.exceptions import ClientError
 import click
 
-from . import awscloudops
 from . import config
 from . import datomic
 from . import install
@@ -30,7 +27,7 @@ LAST_STEP_OK_STATE_KEY = 'last-step-ok-idx'
 @root_command.group()
 @util.pass_command_context
 def run(context):
-    """Commands for executing db migration on an AWS EC2 instance."""
+    """Commands for executing the database migration."""
 
 
 @run.command('acedb-compress-dump',
@@ -118,11 +115,8 @@ def qa_report(context, acedb_id_catalog):
     title = 'QA Report for {}'
     title = title.format(ws_version)
     invoke = click.get_current_context().invoke
-    report_url = invoke(awscloudops.upload_file,
-                        path_to_upload=report_path,
-                        path_in_bucket=bucket_path)
-    title = 'QA report for {versions[acedb_database]} available at <{loc}>'
-    title = title.format(versions=context.versions, loc=report_url)
+    title = 'QA report for {versions[acedb_database]} available in <{path}>'
+    title = title.format(versions=context.versions, loc=report_path)
     pretext = ('*Please check this looks correct '
                'before backing-up the datomic database*')
     attachment = notifications.Attachment(title, pretext=pretext)
@@ -136,28 +130,19 @@ def import_logs(context, edn_logs_dir):
     pseudoace.import_logs(context, edn_logs_dir)
 
 
-@run.command('excise-tmp-data',
-             short_help='Excise temporaty data')
+@run.command('backup-db',
+             short_help='Backup the Datomic db.')
 @util.pass_command_context
-def excise_tmp_data(context):
-    """Excise temporary data from the migrated datomic database."""
-    pseudoace.excise_tmp_data(context)
-
-
-@run.command('backup-db-to-s3',
-             short_help='Transfers the Datomic db backup to S3')
-@util.pass_command_context
-def backup_db_to_s3(context):
-    """Back up the Datomic database to Amazon S3 storage."""
+def backup_db(context):
+    """Back up the Datomic database to the local disk."""
     os.chdir(context.path('datomic_free'))
     click.echo('Does the QA report looks correct?')
-    prompt = 'Backup Datomic Database to S3? [y/N]:'
+    prompt = 'Backup Datomic Database? [y/N]:'
     if not input(prompt).lower().startswith('y'):
         click.get_current_context().abort()
     data_release_version = context.data_release_version
     date_stamp = datetime.date.today().isoformat()
-    local_backup_path = context.path('datomic-db-backup')
-    local_backup_path = os.path.join(local_backup_path,
+    local_backup_path = os.path.join(context.path('datomic-db-backup'),
                                      date_stamp,
                                      context.db_name)
     arcname = '{}.tar.xz'.format(data_release_version)
@@ -169,22 +154,7 @@ def backup_db_to_s3(context):
         logger.info('Creating archive {} for upload', archive_path)
         with tarfile.open(archive_path, mode='w:xz') as tf:
             tf.add(local_backup_path, arcname=arcname)
-    ctx = click.get_current_context()
-    try:
-        logger.info('Uploading archive {} to S3', archive_path)
-        s3_uri = ctx.invoke(awscloudops.upload_file,
-                            path_to_upload=archive_path,
-                            path_in_bucket='db-migration/' + arcname)
-    except ClientError:
-        logger.error('Failed to upload file to S3')
-        logger.exception()
-        raise
-    else:
-        logger.info('Removing local datomic db backup archive {}', archive_path)
-        logger.info('Leaving datomic backup directory {} in place',
-                    local_backup_path)
-        os.remove(archive_path)
-    return 'Datomic database transferred to {uri}.'.format(uri=s3_uri)
+    return 'Datomic database compressed to {bp}.'.format(bp=archive_path)
 
 
 @root_command.command(
@@ -300,13 +270,7 @@ def process_steps(context, steps):
     headline_fmt = 'Migrating ACeDB {release} to Datomic, *Step {step}*'
     release = context.versions['acedb_database']
     conf = config.parse(section=notifications.__name__)
-    path_in_bucket = '/'.join(['db-migration',
-                               os.path.basename(context.logfile_path)])
     ctx = click.get_current_context()
-    upload_log_file = partial(ctx.invoke,
-                              awscloudops.upload_file,
-                              path_to_upload=context.logfile_path,
-                              path_in_bucket=path_in_bucket)
     step_idx = int(context.app_state.get(LAST_STEP_OK_STATE_KEY, '0'))
     step_n = step_idx + 1
     for (step_n, step) in enumerate(steps[step_idx:], start=step_n):
@@ -317,14 +281,11 @@ def process_steps(context, steps):
                 post_kw = dict(icon_emoji=':fireworks:')
             else:
                 post_kw = {}
-            try:
-                notifications.around(step_command,
-                                     conf,
-                                     headline,
-                                     step.description,
-                                     post_kw=post_kw)
-            finally:
-                upload_log_file()
+            notifications.around(step_command,
+                                 conf,
+                                 headline,
+                                 step.description,
+                                 post_kw=post_kw)
             context.app_state[LAST_STEP_OK_STATE_KEY] = step_n - 1
 
 @root_command.command('migrate-stage-1',
@@ -362,17 +323,17 @@ def migrate_stage_2(context):
 
         7. Run QA Report on Datomic DB
 
-        8. Backup Datomic database to Amazon S3 storage **
+        8. Backup Datomic database locally **
 
     ** Only performed if you confirm report output looks good (7).
 
     """
     steps = _get_convert_steps(context) + _get_import_steps(context)
-    steps.append(Step(('@{user} - How does the report look?'
+    steps.append(Step(('How does the report look? '
                        'Please answer the question in ssh console session '
-                       'to backup the datomic database to S3, '
+                       'to backup the datomic database '
                        'and complete the db migration '
-                       'process').format(user=context.user_profile),
-                      backup_db_to_s3,
+                       'process'),
+                      backup_db,
                       {}))
     process_steps(context, steps)

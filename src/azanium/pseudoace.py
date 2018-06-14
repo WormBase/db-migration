@@ -95,8 +95,9 @@ def qa_report(context, acedb_id_catalog_path):
     data_release = context.data_release_version
     report_filename = 'all_classes_report.{}.txt'.format(data_release)
     report_path = os.path.join(acedb_id_catalog_path, report_filename)
-    out_path = os.path.expanduser(
-        '~/{release}-report.csv'.format(release=data_release))
+    out_path = os.path.join(
+        context.base_path,
+        '{release}-report.csv'.format(release=data_release))
     run_pseudoace(context,
                   '--acedb-class-report=' + report_path,
                   '--report-filename=' + out_path,
@@ -116,6 +117,3 @@ def qa_report_to_html(report_path, title):
     html_report += markdown.markdown(md_table, ['markdown.extensions.extra'])
     html_report += '</body></html>'
     return html_report
-
-def excise_tmp_data(context):
-    run_pseudoace(context, 'excise-tmp-data', '--verbose')

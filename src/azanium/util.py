@@ -55,7 +55,11 @@ def echo_warning(message,
 
 def echo_error(message, err=True, fg='red', bold=True, notify=True):
     if notify:
-        notifications.notify(message, icon_emoji=':fire:', color='warning')
+        cnf = config.parse()
+        notifications.notify(cnf,
+                             message,
+                             icon_emoji=':fire:',
+                             color='warning')
     return _secho(message, err=err, fg=fg, bold=bold)
 
 
@@ -169,13 +173,6 @@ log_level_option = functools.partial(
     type=click.Choice(choices=('DEBUG', 'INFO', 'WARNING', 'ERROR')),
     help='Logging level.')
 
-aws_profile_option = functools.partial(
-    option,
-    '-p',
-    '--profile',
-    default=os.environ.get('AWS_DEFAULT_PROFILE', 'default'),
-    help='AWS profile')
-
 
 def download(url, local_filename, chunk_size=1024 * 10):
     """Download `url` into `local_filename'.
@@ -263,10 +260,8 @@ def make_executable(path, logger, mode=0o775, symlink_dir='~/.local/bin'):
 
 class CommandContext:
 
-    def __init__(self, base_path, profile, assume_role):
+    def __init__(self, base_path):
         self.base_path = base_path
-        self.profile = profile
-        self.assume_role = assume_role
         self.versions = get_deploy_versions()
         self.logfile_path = ''
 

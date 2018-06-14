@@ -48,37 +48,3 @@ class URL(click.types.ParamType):
         return value
 
 
-def smart_dir(path):
-    """Construct a click Path paramter type, dependant upon platform."""
-    path_param = click.types.Path(file_ok=False, writeable=True)
-    return path_param
-
-
-class PlatformAwareDirectory(click.types.ParamType):
-
-    name = 'platform-aware-directory'
-
-    # this is a string that should appear to identify the machine
-    # as an Amazon based AMI
-    aws_platform_marker = 'amzn'
-
-    def __init__(self):
-        self._param = click.types.Path(exists=self.is_aws_machine(),
-                                       file_okay=False,
-                                       dir_okay=True,
-                                       allow_dash=True,
-                                       readable=True,
-                                       writable=True)
-
-    def is_aws_machine(self):
-        return self.aws_platform_marker in platform.platform()
-
-    def convert(self, value, param, ctx):
-        try:
-            os.stat(value)
-        except OSError:
-            if not self._param.exists and value.startswith('/'):
-                value = os.path.join(os.path.expanduser('~'),
-                                     os.path.basename(value))
-        path = self._param.convert(value, param, ctx)
-        return path

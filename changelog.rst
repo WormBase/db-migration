@@ -5,7 +5,7 @@
 0.39 (unreleased)
 =================
 
-- Nothing changed yet.
+- Removed all AWS specific code, documentation and configuration.
 
 
 0.38 (2018-06-12)

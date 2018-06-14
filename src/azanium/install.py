@@ -34,6 +34,7 @@ Meta = collections.namedtuple('Meta', ('download_dir',
 
 DEFAULT_EBI_FTP_PATH_PREFIX = '/pub/databases/wormbase/staging/releases'
 
+
 def installer(func):
     """Decorate a click command as an ``installer``.
 
