@@ -1,25 +1,35 @@
 .. _db-migration-user-guide:
 
-============================
-Database Migration Procedure
-============================
-The database migration will be performed on an :term:`EC2` instance.
-Upon successful completion, the migrated Datomic database will be
-stored in :term:`S3` storage.
-
-The migration process will take approximately 3½ days to complete.
-
-`<Notifications :ref:`Notifications`> will be sent before and after each step of
-the migration process.
-
-*Any* person having a WormBase Amazon :term:`AWS` account will be
- capable of performing the migration procedure.
-
-.. todolist::
-
 .. toctree::
    :hidden:
    :maxdepth: 1
 
-   setup/index
-   commands
+   guide
+
+============================
+Database Migration Procedure
+============================
+The database migration can be performed on any host.
+Currently, it is performed on an :term:`EC2` instance.
+Upon successful completion, the following files will be available on the host
+used to run the migration commands:
+
+   Datomic Database:
+
+      /wormbase/datomic-db-backups/$WS_RELEASE.tar.xz
+
+   QA Report
+
+      /wormbase/$WS_RELEASE-report.csv
+
+   Log file:
+
+      /wormbase/logs/azanium.log
+
+The migration process usually takes approximately 3½ days to complete.
+There is currently a memory issue which necessitates splitting up the migration
+procedure into two stages.
+
+`<Notifications :ref:`Notifications`> can be sent before and after each step of
+the migration process, assuming the migration user configures notifications (A one-time task).
+
