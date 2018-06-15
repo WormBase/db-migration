@@ -3,7 +3,7 @@
 ============================
 Database Migration Procedure
 ============================
-The :term:`azanium` commands are all required to be invoked from the
+All :term:`azanium` migration commands are all required to be invoked from the
 same working directory, and from the same host machine.
 
 Software Setup

@@ -5,7 +5,7 @@ Glossary
    :sorted:
 
    `azanium`
-     The name of this software package.
+     The name of the command (and software) used to perform the database migration.
 
    `azanium run`
       The :term:`azanium` sub-command that enables one to run steps of
