@@ -9,9 +9,7 @@ from functools import partial
 
 import click
 
-from . import config
 from . import datomic
-from . import install
 from . import log
 from . import notifications
 from . import pseudoace
