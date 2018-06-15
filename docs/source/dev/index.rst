@@ -11,4 +11,3 @@ Development
    testing
    documentation
    releases
-   misc

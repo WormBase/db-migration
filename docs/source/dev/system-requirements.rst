@@ -1,8 +1,8 @@
 ===================
 System requirements
 ===================
-This code was developed against Python3.5 on ubuntu, and has been verified
-to work with Python3.4 on Amazon Linux (AWS AMI).
+This code was developed against Python3.5 on ubuntu, and has been
+verified to work with Python3.4 on Amazon Linux (AWS AMI).
 
 
 Install your system's  Development tool-chain:
@@ -26,8 +26,8 @@ Install your system's  Development tool-chain:
 
 Packages
 ========
-The following package list is for yum based systems (AWS linux, RedHat et al),
-using Python 3.4:
+The following package list is for yum based systems (AWS linux, RedHat
+et al), using Python 3.4:
 
 
 Python3.4 (Amazon AMI)

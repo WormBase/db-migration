@@ -4,82 +4,42 @@ Glossary
 .. glossary::
    :sorted:
 
-   azanium
+   `azanium`
      The name of this software package.
 
-   `azanium admin`
-      The :term:`azanium` sub-command used to administer WormBase AWS
-      accounts for the database migration.
-
    `azanium run`
-      The :term:`azanium` sub-command used on an :term:`AWS`
-      :term:`EC2` instance in order to perform the database migration.
+      The :term:`azanium` sub-command that enables one to run steps of
+      the db-migration individually.
 
-   `aws cli`
-      The `Amazon Command Line Interface`_
+   `datomic`
+      The database technology that this software migrates to.
 
-   AWS
-      Amazon Web Services - the umbrella term for all of the Amazon
-      services described in this project.
+   `ACeDB`
 
-   EC2
-      Amazon's Elastic Compute service.
+      The database technology that this software migrates from.
 
-   S3
-      Amazon S3 storage service.
-
-   ARN
-      `Amazon Resource Name`_
-
-   IAM
-      `Amazon Identity and Access Management`_
-
-   client commands
-      Commands issued from a host machine outside of the AWS network.
-
-   instance commands
-      Commands issued on the EC2 instance provisioned for the build.
-
-   Datomic
-      The new WormBase database technology.
-
-   Datomic Pro
-      The "pro" version of the Datomic software, also known as "Datomic On-Prem".
-      This version of the software requires a software license from the vendor (Cognitect Inc.),
-      and provides capabilities not available in the free version (e.g: libraries for interaction with AWS).
-
-   ACeDB
-
-      The current, legacy database technology.
-
-   CLI
+   `CLI`
       Command Line Interface.
 
-   screen
-      The most infamous program used to preserve sessions on remote
-      hosts.
+   `screen`
+      A program used to preserve sessions on remote hosts.
 
-   tmux
-      A newer program used to preserve sessions on remote hosts with
-      less irritating key bindings.
+   `tmux`
+      A program used to preserve sessions on remote hosts.
 
-   circusd
+   `circusd`
       A daemon that runs the circus_ process watcher.
 
-   pseudoace
-      The name of the software package used to migrate to the Datomic
+   `pseudoace`
+      The name of the WormBase software package used to migrate to the Datomic
       database.
 
-   Slack
+   `Slack`
       The messaging service used for WormBase inter-team communications.
 
-   Python3
+   `Python`
       The Python_ language.
 
-
-
-.. _`Amazon Resource Name`: http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
-.. _`Amazon Identity and Access Management`: http://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html
 .. _circus: https://circus.readthedocs.io/en/latest/
-.. _`Amazon Command Line Interface`: https://aws.amazon.com/cli/
+.. _datomic: https://www.datomic.com/
 .. _Python: https://www.python.org

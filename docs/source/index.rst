@@ -6,7 +6,6 @@
    :hidden:
 
    user/index.rst
-   admin/index.rst
    dev/index.rst
    glossary
    changelog
