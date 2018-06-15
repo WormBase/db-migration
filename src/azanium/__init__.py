@@ -1,6 +1,5 @@
 import os
 
-from botocore.exceptions import ClientError
 from configobj import ConfigObj
 import click
 
@@ -9,12 +8,12 @@ from . import log
 from . import notifications
 from . import util
 
-INSTANCE_BASE_PATH = '/wormbase'
+DEFAULT_BASE_PATH = '/wormbase'
 
 @util.command_group()
 @util.log_level_option()
 @util.option('-b', '--base-path',
-             default=INSTANCE_BASE_PATH,
+             default=DEFAULT_BASE_PATH,
              type=click.types.Path(exists=True,
                                    file_okay=False,
                                    dir_okay=True,
@@ -22,7 +21,9 @@ INSTANCE_BASE_PATH = '/wormbase'
                                    readable=True,
                                    writable=True),
              help=('The default base directory all software and data '
-                   'will be installed into.'))
+                   'will be installed into ({}).'.format(DEFAULT_BASE_PATH)))
+
+             
 @click.pass_context
 def root_command(ctx, log_level, base_path):
     """WormBase DB Migration Command Line Tool."""
