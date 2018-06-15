@@ -7,7 +7,6 @@ import click
 from . import config
 from . import log
 from . import notifications
-from . import params
 from . import util
 
 INSTANCE_BASE_PATH = '/wormbase'
