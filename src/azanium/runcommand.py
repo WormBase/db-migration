@@ -282,7 +282,6 @@ def process_steps(context, steps):
             else:
                 post_kw = {}
             notifications.around(step_command,
-                                 conf,
                                  headline,
                                  step.description,
                                  post_kw=post_kw)
