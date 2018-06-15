@@ -98,6 +98,8 @@ def setup_logging(logfile_path, log_level=logging.INFO):
                       logging.getLevelName(root_logger.logger.level))
 
 
-def get_logger(namespace=None, verbose=True, notify=True):
+def get_logger(namespace=None, verbose=True):
+    from . import config
     adapter = VerbosePrettyLogger if verbose else Logger
+    notify = verbose and config.parse().get('azanium.notifications')
     return adapter(logging.getLogger(namespace), notify=notify)
