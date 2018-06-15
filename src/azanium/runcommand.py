@@ -303,10 +303,6 @@ def migrate_stage_1(context):
         5. Sort EDN log files by timestamp
     """
     steps = []
-    ctx = click.get_current_context()
-    if not os.path.exists(context.path('acedb_database')):
-        steps = [Step('Installing all software and ACeDB',
-                      partial(install.all.invoke, ctx))]
     steps.extend(_get_convert_steps(context))
     process_steps(context, steps)
 
