@@ -8,6 +8,5 @@ Development
    system-requirements
    install
    coding-style
-   testing
    documentation
    releases
