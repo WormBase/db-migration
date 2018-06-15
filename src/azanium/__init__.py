@@ -67,5 +67,5 @@ def configure(slack_url=None):
 @click.argument('message')
 @util.pass_command_context
 def notify(context, message):
-    conf = config.parse(section=notifications.__name__)
-    return notifications.notify(conf, message)
+    return notifications.notify(message)
+

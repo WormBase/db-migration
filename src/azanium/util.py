@@ -298,7 +298,7 @@ class CommandContext:
                   **post_notify_kw):
         ctx = click.get_current_context()
         ctx.params = step_kwargs
-        conf = config.parse(section=__name__)
+        conf = config.parse()
         notify = functools.partial(notifications.notify, conf)
         attachments_pre = [notifications.Attachment(title=message)]
         notify(headline, attachments=attachments_pre)

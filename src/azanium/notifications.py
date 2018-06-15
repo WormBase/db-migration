@@ -1,10 +1,12 @@
 import collections
+import logging
 import importlib
 import os
 import time
 
 import requests
 
+from . import config
 from . import params
 
 DEFAULTS = dict(icon_emoji=':wormbase-db-dev:')
@@ -15,9 +17,8 @@ SLACK_HOOK_URL = params.URL(human_readable_name='Slack webhook URL',
                             path='/services/\w+/\w+/\w+')
 
 
-def _notify_noop(conf, *args, **kw):
-    log = importlib.import_module(__package__ + '.log')
-    logger = log.get_logger(__name__)
+def _notify_noop(*args, **kw):
+    logger = logging.getLogger(__name__)
     logger.warn('Notifications are not going to sent - '
                 'azanium not configured with slack URL')
 
@@ -65,19 +66,20 @@ def _notify(conf,
         logger.info('Notificaiton data: {}', repr(data))
 
 
-def notify(conf, headline, **kw):
-    delegate = _notify if conf else _notify_noop
-    return delegate(conf, headline, **kw)
+def notify(headline, **kw):
+    cnf = config.parse().get(__name__)
+    delegate = _notify if cnf else _notify_noop
+    return delegate(cnf, headline, **kw)
 
 
-def around(func, conf, headline, message, pre_kw=None, post_kw=None):
+def around(func, headline, message, pre_kw=None, post_kw=None):
     pre_kw = pre_kw if pre_kw else {}
     post_kw = post_kw if post_kw else {}
     post_kw.setdefault('color', 'good')
     attachments_pre = [Attachment(title=message)]
-    notify(conf, headline, attachments=attachments_pre, **pre_kw)
+    notify(headline, attachments=attachments_pre, **pre_kw)
     result = func()
-    notify(conf, headline + ' - *complete*', attachments=result, **post_kw)
+    notify(headline + ' - *complete*', attachments=result, **post_kw)
 
 
 class Attachment(collections.Mapping):
