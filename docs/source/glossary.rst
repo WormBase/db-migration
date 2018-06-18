@@ -2,7 +2,6 @@ Glossary
 ========
 
 .. glossary::
-   :sorted:
 
    `azanium`
      The name of the command (and software) used to perform the database migration.
