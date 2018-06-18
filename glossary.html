@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Glossary &mdash; azanium 0.38 documentation</title>
+  <title>Glossary &mdash; azanium 0.39 documentation</title>
   
 
   
@@ -30,9 +30,9 @@
   
 
   
-    <link rel="top" title="azanium 0.38 documentation" href="index.html"/>
+    <link rel="top" title="azanium 0.39 documentation" href="index.html"/>
         <link rel="next" title="Changelog" href="changelog.html"/>
-        <link rel="prev" title="Design decisions and other miscellaneous factoids" href="dev/misc.html"/> 
+        <link rel="prev" title="Releases" href="dev/releases.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.38
+                0.39
               </div>
             
           
@@ -83,7 +83,6 @@
             
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="user/index.html">Database Migration Procedure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="admin/index.html">Administration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dev/index.html">Development</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -134,56 +133,30 @@
   <div class="section" id="glossary">
 <h1>Glossary<a class="headerlink" href="#glossary" title="Permalink to this headline">¶</a></h1>
 <dl class="glossary docutils">
-<dt id="term-acedb">ACeDB</dt>
-<dd>The current, legacy database technology.</dd>
-<dt id="term-arn">ARN</dt>
-<dd><a class="reference external" href="http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html">Amazon Resource Name</a></dd>
-<dt id="term-aws">AWS</dt>
-<dd>Amazon Web Services - the umbrella term for all of the Amazon
-services described in this project.</dd>
-<dt id="term-aws-cli"><cite>aws cli</cite></dt>
-<dd>The <a class="reference external" href="https://aws.amazon.com/cli/">Amazon Command Line Interface</a></dd>
-<dt id="term-azanium">azanium</dt>
-<dd>The name of this software package.</dd>
-<dt id="term-azanium-admin"><cite>azanium admin</cite></dt>
-<dd>The <a class="reference internal" href="#term-azanium"><span class="xref std std-term">azanium</span></a> sub-command used to administer WormBase AWS
-accounts for the database migration.</dd>
+<dt id="term-azanium"><cite>azanium</cite></dt>
+<dd>The name of the command (and software) used to perform the database migration.</dd>
 <dt id="term-azanium-run"><cite>azanium run</cite></dt>
-<dd>The <a class="reference internal" href="#term-azanium"><span class="xref std std-term">azanium</span></a> sub-command used on an <a class="reference internal" href="#term-aws"><span class="xref std std-term">AWS</span></a>
-<a class="reference internal" href="#term-ec2"><span class="xref std std-term">EC2</span></a> instance in order to perform the database migration.</dd>
-<dt id="term-circusd">circusd</dt>
-<dd>A daemon that runs the <a class="reference external" href="https://circus.readthedocs.io/en/latest/">circus</a> process watcher.</dd>
-<dt id="term-cli">CLI</dt>
+<dd>The <a class="reference internal" href="#term-azanium"><span class="xref std std-term">azanium</span></a> sub-command that enables one to run steps of
+the db-migration individually.</dd>
+<dt id="term-datomic"><cite>datomic</cite></dt>
+<dd>The database technology that this software migrates to.</dd>
+<dt id="term-acedb"><cite>ACeDB</cite></dt>
+<dd>The database technology that this software migrates from.</dd>
+<dt id="term-cli"><cite>CLI</cite></dt>
 <dd>Command Line Interface.</dd>
-<dt id="term-client-commands">client commands</dt>
-<dd>Commands issued from a host machine outside of the AWS network.</dd>
-<dt id="term-datomic">Datomic</dt>
-<dd>The new WormBase database technology.</dd>
-<dt id="term-datomic-pro">Datomic Pro</dt>
-<dd>The &#8220;pro&#8221; version of the Datomic software, also known as &#8220;Datomic On-Prem&#8221;.
-This version of the software requires a software license from the vendor (Cognitect Inc.),
-and provides capabilities not available in the free version (e.g: libraries for interaction with AWS).</dd>
-<dt id="term-ec2">EC2</dt>
-<dd>Amazon&#8217;s Elastic Compute service.</dd>
-<dt id="term-iam">IAM</dt>
-<dd><a class="reference external" href="http://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html">Amazon Identity and Access Management</a></dd>
-<dt id="term-instance-commands">instance commands</dt>
-<dd>Commands issued on the EC2 instance provisioned for the build.</dd>
-<dt id="term-pseudoace">pseudoace</dt>
-<dd>The name of the software package used to migrate to the Datomic
+<dt id="term-screen"><cite>screen</cite></dt>
+<dd>A program used to preserve sessions on remote hosts.</dd>
+<dt id="term-tmux"><cite>tmux</cite></dt>
+<dd>A program used to preserve sessions on remote hosts.</dd>
+<dt id="term-circusd"><cite>circusd</cite></dt>
+<dd>A daemon that runs the <a class="reference external" href="https://circus.readthedocs.io/en/latest/">circus</a> process watcher.</dd>
+<dt id="term-pseudoace"><cite>pseudoace</cite></dt>
+<dd>The name of the WormBase software package used to migrate to the Datomic
 database.</dd>
-<dt id="term-python3">Python3</dt>
-<dd>The <a class="reference external" href="https://www.python.org">Python</a> language.</dd>
-<dt id="term-s3">S3</dt>
-<dd>Amazon S3 storage service.</dd>
-<dt id="term-screen">screen</dt>
-<dd>The most infamous program used to preserve sessions on remote
-hosts.</dd>
-<dt id="term-slack">Slack</dt>
+<dt id="term-slack"><cite>Slack</cite></dt>
 <dd>The messaging service used for WormBase inter-team communications.</dd>
-<dt id="term-tmux">tmux</dt>
-<dd>A newer program used to preserve sessions on remote hosts with
-less irritating key bindings.</dd>
+<dt id="term-python"><cite>Python</cite></dt>
+<dd>The <a class="reference external" href="https://www.python.org">Python</a> language.</dd>
 </dl>
 </div>
 
@@ -197,7 +170,7 @@ less irritating key bindings.</dd>
         <a href="changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="dev/misc.html" class="btn btn-neutral" title="Design decisions and other miscellaneous factoids" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="dev/releases.html" class="btn btn-neutral" title="Releases" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -228,7 +201,7 @@ less irritating key bindings.</dd>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.38',
+            VERSION:'0.39',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Database Migration Procedure &mdash; azanium 0.38 documentation</title>
+  <title>Database Migration Procedure &mdash; azanium 0.39 documentation</title>
   
 
   
@@ -30,8 +30,8 @@
   
 
   
-    <link rel="top" title="azanium 0.38 documentation" href="../index.html"/>
-        <link rel="next" title="Prerequisites" href="setup/index.html"/>
+    <link rel="top" title="azanium 0.39 documentation" href="../index.html"/>
+        <link rel="next" title="Development" href="../dev/index.html"/>
         <link rel="prev" title="🐛 azanium - WormBase Database Migration" href="../index.html"/> 
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.38
+                0.39
               </div>
             
           
@@ -83,11 +83,14 @@
             
                 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Database Migration Procedure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="setup/index.html">Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="commands.html">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#software-setup">Software Setup</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#enabling-slack-notificaitons">Enabling Slack notificaitons</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Administration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#resulting-products">Resulting Products</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
@@ -136,25 +139,121 @@
            <div itemprop="articleBody">
             
   <div class="section" id="database-migration-procedure">
-<span id="db-migration-user-guide"></span><h1>Database Migration Procedure<a class="headerlink" href="#database-migration-procedure" title="Permalink to this headline">¶</a></h1>
-<p>The database migration will be performed on an <a class="reference internal" href="../glossary.html#term-ec2"><span class="xref std std-term">EC2</span></a> instance.
-Upon successful completion, the migrated Datomic database will be
-stored in <a class="reference internal" href="../glossary.html#term-s3"><span class="xref std std-term">S3</span></a> storage.</p>
-<p>The migration process will take approximately 3½ days to complete.</p>
-<p><cite>&lt;Notifications :ref:`Notifications</cite>&gt; will be sent before and after each step of
-the migration process.</p>
-<dl class="docutils">
-<dt><em>Any</em> person having a WormBase Amazon <a class="reference internal" href="../glossary.html#term-aws"><span class="xref std std-term">AWS</span></a> account will be</dt>
-<dd>capable of performing the migration procedure.</dd>
-</dl>
-<div class="admonition-todo admonition">
-<p class="first admonition-title">Todo</p>
-<p class="last">Workout how to get datomic-pro distributed accross the team
-such that any staff member can install datomic-pro on the
-migration EC2 host.</p>
+<span id="db-migration-steps"></span><h1>Database Migration Procedure<a class="headerlink" href="#database-migration-procedure" title="Permalink to this headline">¶</a></h1>
+<p>All <a class="reference internal" href="../glossary.html#term-azanium"><span class="xref std std-term">azanium</span></a> migration commands are all required to be invoked from the
+same working directory, and from the same host machine.</p>
+<div class="section" id="software-setup">
+<h2>Software Setup<a class="headerlink" href="#software-setup" title="Permalink to this headline">¶</a></h2>
+<p>The migration software is a Python package (<a class="reference internal" href="../glossary.html#term-azanium"><span class="xref std std-term">azanium</span></a>).
+This will be used for running all migration commmands.
+Copy the <cite>$AZANIUM_WHEEL_URL</cite> url (The link listed with the <cite>.whl</cite>
+extension) listed in the downloads section of this repository&#8217;s
+<a class="reference external" href="https://github.com/Wormbase/db-migration/releases/latest">latest release page</a>.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>python3 -m pip install --user --upgrade pip
+pip3 install --user <span class="s2">&quot;</span><span class="nv">$AZANIUM_WHEEL_URL</span><span class="s2">&quot;</span>
+</pre></div>
 </div>
-<p class="todo-source">(The <a class="reference internal" href="commands.html#index-0"><em>original entry</em></a> is located in /home/matt/git/db-migration/docs/source/user/commands.rst, line 144.)</p>
-<div class="toctree-wrapper compound">
+<div class="section" id="enabling-slack-notificaitons">
+<h3>Enabling Slack notificaitons<a class="headerlink" href="#enabling-slack-notificaitons" title="Permalink to this headline">¶</a></h3>
+<p>To enable slack notifications of each build step to the
+<cite>#db-migratione-events</cite> channel in the WormBase slack, specify url to
+the configure command as shown below.
+The value for <cite>$WEBHOOK_URL</cite> is available from the WormBase slack management console
+for the WormBase organisation.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium configure --slack-url<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$WEBHOOK_URL</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="commands">
+<h2>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h2>
+<p>The following steps below will migrate the ACeDB database to Datomic.
+Then end result will be a Datomic database, compressed as an arhive on
+the host the migration is performed.</p>
+<dl class="docutils">
+<dt>The location of the file should be:</dt>
+<dd>/wormbase/datomic-db-backups/&lt;RELEASE&gt;.tar.xz</dd>
+</dl>
+<ol class="arabic">
+<li><p class="first">Connect via ssh to the machine where you&#8217;ll run the migration commands</p>
+<p>Use either a <cite>screen</cite> or <cite>tmux</cite> session, e.g:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>tmux new-session -s azanium-commands
+</pre></div>
+</div>
+<p>Clean up after any previous migration:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium clean-previous-state
+</pre></div>
+</div>
+</li>
+<li><p class="first">Patches</p>
+<p>If any patches need to be loaded, then run:</p>
+<p>azanium run acedb-dump</p>
+<p>Deposit any patch files in the directory <cite>/wormbase/acedb-dump</cite> directory.</p>
+</li>
+<li><p class="first">Run the migration</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium migrate-stage-1
+</pre></div>
+</div>
+<p>This command will execute steps for stage 1 of the migration:</p>
+<ol class="arabic simple">
+<li>Extract all .ace files from the ACeDB database for the current release.</li>
+<li>Compress all .ace files</li>
+<li>Convert .ace files to EDN logs</li>
+<li>Sort all EDN logs by timestamp</li>
+</ol>
+<div class="admonition attention">
+<p class="first admonition-title">Attention</p>
+<p class="last">restart the instance to free-up resources on the host (memory).</p>
+</div>
+<p>Continue the migration (Stage 2):</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium migrate-stage-2
+</pre></div>
+</div>
+<p>This command executes the remaining steps required to complete the migration.</p>
+<ol class="arabic" start="5">
+<li><p class="first">Create the Datomic database</p>
+</li>
+<li><p class="first">Import the EDN logs into the Datomic database</p>
+</li>
+<li><p class="first">Run a QA report on the database</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Once this step has completed, the user will be prompted
+in the tmux/screen shell session to confirm the next step, or abort.
+This will also be posted to the slack channel for
+tracking migration events (if notifications are enabled).</p>
+</div>
+</li>
+<li><p class="first">Backup the Datomic database</p>
+</li>
+<li><dl class="first docutils">
+<dt>Write migration procedure completion notification to the #db-migration-events</dt>
+<dd><p class="first">wormbase-db-dev slack channel.</p>
+<div class="last highlight-bash"><div class="highlight"><pre><span></span>azanium notify <span class="se">\</span>
+   <span class="s2">&quot;Migration of ACeDB WS254 to Datomic complete! :fireworks:&quot;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+</ol>
+</li>
+</ol>
+</div>
+<div class="section" id="resulting-products">
+<h2>Resulting Products<a class="headerlink" href="#resulting-products" title="Permalink to this headline">¶</a></h2>
+<p>The followings files are created by the migration:</p>
+<blockquote>
+<div><p>Datomic Database:</p>
+<blockquote>
+<div>/wormbase/datomic-db-backups/$WS_RELEASE.tar.xz</div></blockquote>
+<p>QA Report</p>
+<blockquote>
+<div>/wormbase/$WS_RELEASE-report.csv</div></blockquote>
+<p>Log file:</p>
+<blockquote>
+<div>/wormbase/logs/azanium.log</div></blockquote>
+</div></blockquote>
 </div>
 </div>
 
@@ -165,7 +264,7 @@ migration EC2 host.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="setup/index.html" class="btn btn-neutral float-right" title="Prerequisites" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../dev/index.html" class="btn btn-neutral float-right" title="Development" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../index.html" class="btn btn-neutral" title="🐛 azanium - WormBase Database Migration" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -199,7 +298,7 @@ migration EC2 host.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.38',
+            VERSION:'0.39',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
