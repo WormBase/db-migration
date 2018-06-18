@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.39 (unreleased)
+0.39 (2018-06-18)
 =================
 
 - Removed all AWS specific code, documentation and configuration.
