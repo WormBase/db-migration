@@ -47,19 +47,20 @@ def configure(ws_release_ftp_url, slack_url=None):
 
     - Notifications to Slack
     """
-    if slack_url is None:
-        click.echo('Slack URL not provided, integration will be disabled')
-        click.echo('No notifications will be sent for migration commands',
-                   color='red')
     if os.path.isfile(config.PATH):
         az_conf = config.parse()
     else:
         az_conf = ConfigObj()
     az_conf['sources'] = dict(ws_release=ws_release_ftp_url)
+    notifications_key = notifications.__name__
     if slack_url is not None:
-        notifications_key = notifications.__name__
         ncnf = az_conf.setdefault(notifications_key, notifications.DEFAULTS)
         ncnf.update(dict(slack_url=slack_url))
+    if notifications_key not in az_conf:
+        click.echo('Slack URL not provided, integration will be disabled')
+        click.echo('No notifications will be sent for migration commands',
+                   color='red')
+
     with open(config.PATH, 'wb') as fp:
         az_conf.write(fp)
 
