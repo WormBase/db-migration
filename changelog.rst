@@ -5,7 +5,9 @@
 0.40 (unreleased)
 =================
 
-- Nothing changed yet.
+- The FTP URL is now passed to the `azanium configure` command,
+  rather than partially parameterised in install commmand(s).
+- Fixed bugs with configuration code and logging. 
 
 
 0.39 (2018-06-18)
