@@ -85,7 +85,7 @@ The location of the file should be:
 
    .. code-block:: bash
 
-      azanium install $FTP_URL
+      azanium install
 
 3. Run the migration
 
