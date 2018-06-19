@@ -19,7 +19,20 @@ extension) listed in the downloads section of this repository's
    python3 -m pip install --user --upgrade pip
    pip3 install --user "$AZANIUM_WHEEL_URL"
 
-Enabling Slack notificaitons
+
+Configuration
+=============
+Each time the migration is run, it's required to configure the migration
+with the FTP URL of the release.
+
+.. code-block:: bash
+
+   azanium configure $FTP_URL
+
+This will persist the FTP release (and WS release version encoded in
+the URL) for use by all migration commands.
+
+Enabling Slack notifications
 ----------------------------
 To enable slack notifications of each build step to the
 `#db-migratione-events` channel in the WormBase slack, specify url to
@@ -36,7 +49,7 @@ To find this url:
 
 .. code-block:: bash
 
-   azanium configure --slack-url="$WEBHOOK_URL"
+   azanium configure $FTP_URL --slack-url="$WEBHOOK_URL"
 
 Commands
 ========
@@ -65,14 +78,14 @@ The location of the file should be:
 
 2. Install software
 
-   Below, ${FTP_URL} is the location of the WS release on an ftp server.
+   Below, $FTP_URL is the location of the WS release on an ftp server.
    This should be a fully-qualified URL, with the FTP scheme, e.g:
 
    `ftp://ftp.ebi.ac.uk/pub/databases/wormbase/staging/releases/WS266`
 
    .. code-block:: bash
 
-      azanium install ${FTP_URL}
+      azanium install $FTP_URL
 
 3. Run the migration
 

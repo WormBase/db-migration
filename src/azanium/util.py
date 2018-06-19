@@ -13,6 +13,7 @@ import shelve
 import subprocess
 import stat
 import tempfile
+import urllib.parse
 
 from pkg_resources import resource_filename
 import click
@@ -97,6 +98,21 @@ def markdown_table(rows):
             line.append(' |')
         lines.append(''.join(line))
     return os.linesep.join(lines)
+
+
+def split_ftp_url(ftp_url):
+    """Parse an ``ftp_url`` and return three components: host, path and the
+    WS_RELEASE version code.
+
+    :param ftp_url: The FTP url
+    :type ftp_url: str
+    :returns: tuple of host, path and WS_RELEASE version code.
+    :raises: ValueError if the FTP url is not valid. (must have ftp scheme)"""
+    pr = urllib.parse.urlparse(ftp_url)
+    if pr.scheme != 'ftp':
+        raise ValueError('Unsupported URL type. Must be ftp://...')
+    version = list(filter(None, pr.path.rsplit('/', 2)))[-1]
+    return (pr.netloc, pr.path, version)
 
 
 def local(cmd,
@@ -226,11 +242,21 @@ def ftp_download(host,
     return downloaded
 
 
+def get_ftp_url():
+    return config.parse().get('sources', {}).get('ws_release')
+
+
+def get_data_release_version():
+    return split_ftp_url(get_ftp_url())[-1]
+
+
 def get_deploy_versions(purpose='default'):
     path = resource_filename(__package__, 'cloud-config/versions.ini')
     with open(path) as fp:
         co = configobj.ConfigObj(infile=fp)
-    return dict(co)[purpose]
+    dv = dict(co)[purpose]
+    dv['acedb_database'] = dv['acedb_id_catalog'] = get_data_release_version()
+    return dv
 
 
 def jvm_mem_opts(pct_of_free_mem):
@@ -276,7 +302,7 @@ class CommandContext:
 
     @property
     def data_release_version(self):
-        return self.versions['acedb_database']
+        return get_data_release_version()
 
     @property
     def db_name(self):
@@ -304,12 +330,6 @@ class CommandContext:
         notify(headline, attachments=attachments_pre)
         rv = step_func(ctx)
         notify(headline + ' - *complete*', attachments=rv, **post_notify_kw)
-
-    def install_all_artefacts(self, installers, call):
-        installed = {}
-        for artefact in self.versions:
-            installed[artefact] = call(getattr(installers, artefact))
-        return installed
 
     def path(self, *args):
         return os.path.join(self.base_path, *args)

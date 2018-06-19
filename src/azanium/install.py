@@ -24,6 +24,8 @@ from .util import local
 from .util import make_executable
 from .util import option
 from .util import pass_command_context
+from .util import get_ftp_url
+from .util import split_ftp_url
 from .util import touch_dir
 
 logger = get_logger(__name__)
@@ -38,7 +40,7 @@ def mk_meta(cmd_ctx, func):
     tmpdir = tempfile.mkdtemp(suffix='-db-migration-downloads')
     download_dir = os.path.join(tmpdir, f_name)
     install_dir = cmd_ctx.path(f_name)
-    version = get_deploy_versions().get(f_name)
+    version = get_deploy_versions()[f_name]
     for path in (download_dir, install_dir):
         os.makedirs(path, exist_ok=True)
         meta = Meta(download_dir=download_dir,
@@ -69,9 +71,8 @@ def installer(func):
 
 
 @root_command.group(chain=True, invoke_without_command=True)
-@click.option('--ftp-url', default=None)
 @pass_command_context
-def installers(ctx, ftp_url=None):
+def installers(ctx):
     """Software installers for the WormBase database migration.
 
     All software will be installed under a common base path,
@@ -83,26 +84,19 @@ def pipeline(installers, *args, **kw):
     for install_command in installers:
         install_command(*args, **kw)
 
-
-def split_ftp_url(ftp_url):
-    pr = urllib.parse.urlparse(ftp_url)
-    version = list(filter(None, pr.path.rsplit('/', 2)))[-1]
-    return (pr.netloc, pr.path, version)
-
-
 def acedb_id_catalog(
         meta,
-        ftp_url,
-        file_selector_regexp='all_classes_report.{version}\.txt\.gz$'):
+        report_file_regexp='all_classes_report.{version}\.txt\.gz$'):
     """Installs the ACeDB id catalog use by QA report generation."""
-    (host, path, version) = split_ftp_url(ftp_url)
+    (host, path, version) = split_ftp_url(get_ftp_url())
     cwd = os.path.join(path, 'REPORTS')
-    file_selector_regexp = file_selector_regexp.format(version=version)
+    regexp = 'all_classes_report\.{}\.txt\.gz$'.format(version)
     downloaded = ftp_download(host,
-                              file_selector_regexp,
+                              regexp,
                               meta.download_dir,
                               logger,
                               initial_cwd=cwd)
+
     downloaded_path = downloaded[0]
     with gzip.open(downloaded_path) as gz_fp:
         filename = re.sub('^(?P<fn>.*)\.gz',
@@ -116,14 +110,14 @@ def acedb_id_catalog(
 
 
 @installers.command(short_help='Installs the ACeDB database.')
-@click.argument('ftp_url')
 @option('--file-selector-regexp',
         default='.*\.tar\.gz$',
         help='File selection regexp')
 @installer
-def acedb_database(meta, ftp_url, file_selector_regexp):
+def acedb_database(meta, file_selector_regexp):
     """Installs the ACeDB database system."""
     ctx = click.get_current_context()
+    ftp_url = get_ftp_url()
     ctx.invoke(acedb_id_catalog, mk_meta(meta.context, acedb_id_catalog), ftp_url)
     (host, path, version) = split_ftp_url(ftp_url)
     cwd = os.path.join(path, 'acedb')
@@ -158,7 +152,7 @@ def acedb_database(meta, ftp_url, file_selector_regexp):
                  'ACEDB-binaryLINUX_{version}.tar.gz'),
         help='URL for versioned ACeDB binaries')
 @installer
-def tace(meta, url_template=None, **kw):
+def tace(meta, url_template=None):
     """Installs the ACeDB "tace" binary program."""
     version = meta.version
     url = url_template.format(version=version)
@@ -182,7 +176,7 @@ def tace(meta, url_template=None, **kw):
         default='https://my.datomic.com/downloads/free/{version}',
         help='URL template for Datomic Free version')
 @installer
-def datomic_free(meta, url_template=None, **kw):
+def datomic_free(meta, url_template=None):
     """Installs Datomic (free version)."""
     install_dir = meta.install_dir
     version = meta.version
@@ -240,9 +234,8 @@ def pseudoace(meta, **kw):
 
 
 @root_command.command('install', short_help='Installs everything')
-@click.argument('ftp_url')
 @pass_command_context
-def install(context, ftp_url):
+def install(context):
     """Installs all software and data."""
     # Invoke all commands via the install group command chain.
     # This has the same effect as if run on command line, e.g:
@@ -257,7 +250,7 @@ def install(context, ftp_url):
         ctx.protected_args[:] = orig_protected_args
     attachments = []
     for name in install_cmd_names:
-        version = context.versions.get(name) or split_ftp_url(ftp_url)[-1]
+        version = context.versions.get(name) or context.data_release_version
         title = 'Installed {} (version: {})'.format(name, version)
         ts = os.path.getmtime(context.path(name))
         attachment = notifications.Attachment(title, ts=ts)

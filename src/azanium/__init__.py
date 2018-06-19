@@ -23,7 +23,7 @@ DEFAULT_BASE_PATH = '/wormbase'
              help=('The default base directory all software and data '
                    'will be installed into ({}).'.format(DEFAULT_BASE_PATH)))
 
-             
+
 @click.pass_context
 def root_command(ctx, log_level, base_path):
     """WormBase DB Migration Command Line Tool."""
@@ -38,10 +38,11 @@ def root_command(ctx, log_level, base_path):
 
 
 @root_command.command()
+@click.argument('ws_release_ftp_url')
 @click.option('--slack-url',
               default=None,
               type=notifications.SLACK_HOOK_URL)
-def configure(slack_url=None):
+def configure(ws_release_ftp_url, slack_url=None):
     """Configure azanium.
 
     - Notifications to Slack
@@ -50,12 +51,15 @@ def configure(slack_url=None):
         click.echo('Slack URL not provided, integration will be disabled')
         click.echo('No notifications will be sent for migration commands',
                    color='red')
-        return
-    notifications_key = notifications.__name__
-    new_data = dict(notifications.DEFAULTS, url=slack_url)
-    new_data.update(notifications.DEFAULTS)
-    az_conf = ConfigObj()
-    az_conf[notifications_key] = new_data
+    if os.path.isfile(config.PATH):
+        az_conf = config.parse()
+    else:
+        az_conf = ConfigObj()
+    az_conf['sources'] = dict(ws_release=ws_release_ftp_url)
+    if slack_url is not None:
+        notifications_key = notifications.__name__
+        ncnf = az_conf.setdefault(notifications_key, notifications.DEFAULTS)
+        ncnf.update(dict(slack_url=slack_url))
     with open(config.PATH, 'wb') as fp:
         az_conf.write(fp)
 
@@ -65,4 +69,3 @@ def configure(slack_url=None):
 @util.pass_command_context
 def notify(context, message):
     return notifications.notify(message)
-

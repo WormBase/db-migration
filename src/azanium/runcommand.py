@@ -15,12 +15,11 @@ from . import notifications
 from . import pseudoace
 from . import root_command
 from . import util
-
+from .install import installers
 
 logger = log.get_logger(namespace=__name__)
 
 LAST_STEP_OK_STATE_KEY = 'last-step-ok-idx'
-
 
 @root_command.group()
 @util.pass_command_context
@@ -107,14 +106,11 @@ def qa_report(context, acedb_id_catalog):
 
     """
     report_path = pseudoace.qa_report(context, acedb_id_catalog)
-    key_template = 'db-migration/{}-report.csv'
-    ws_version = context.versions['acedb_database']
-    bucket_path = key_template.format(ws_version)
+    ws_version = context.data_release_version
     title = 'QA Report for {}'
     title = title.format(ws_version)
-    invoke = click.get_current_context().invoke
-    title = 'QA report for {versions[acedb_database]} available in <{path}>'
-    title = title.format(versions=context.versions, loc=report_path)
+    title = 'QA report for {version} available in <{path}>'
+    title = title.format(version=ws_version, loc=report_path)
     pretext = ('*Please check this looks correct '
                'before backing-up the datomic database*')
     attachment = notifications.Attachment(title, pretext=pretext)
@@ -160,7 +156,7 @@ def backup_db(context):
     short_help='Removes data from a previous migration run.')
 @util.pass_command_context
 def clean_previous_state(context):
-    to_remove = set(context.versions) | {
+    to_remove = set(installers.commands) | {
         'acedb-dump',
         'edn-logs',
         'datomic-db-backup'
@@ -266,7 +262,7 @@ def reset_to_step(context):
 
 def process_steps(context, steps):
     headline_fmt = 'Migrating ACeDB {release} to Datomic, *Step {step}*'
-    release = context.versions['acedb_database']
+    release = context.data_release_version
     ctx = click.get_current_context()
     step_idx = int(context.app_state.get(LAST_STEP_OK_STATE_KEY, '0'))
     step_n = step_idx + 1
