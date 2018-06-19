@@ -290,8 +290,13 @@ class CommandContext:
         self.base_path = base_path
         self.logfile_path = ''
 
-    verisons = property(get_deploy_versions)
-    data_release_version = property(get_data_release_version)
+    @property
+    def verisons(self):
+        return get_deploy_versions()
+
+    @property
+    def data_release_version(self):
+        return get_data_release_version()
 
     @property
     def java_cmd(self):
