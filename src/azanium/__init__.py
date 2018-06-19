@@ -47,18 +47,15 @@ def configure(slack_url=None):
     - Notifications to Slack
     """
     if slack_url is None:
-        click.echo('Slack URL not provided, integration diabled')
+        click.echo('Slack URL not provided, integration will be disabled')
         click.echo('No notifications will be sent for migration commands',
                    color='red')
         return
     notifications_key = notifications.__name__
-    new_data = dict(url=slack_url)
-    if os.path.exists(config.PATH):
-        az_conf = config.parse()
-    else:
-        az_conf = ConfigObj()
-        new_data.update(notifications.DEFAULTS)
-    az_conf[notifications_key].update(new_data)
+    new_data = dict(notifications.DEFAULTS, url=slack_url)
+    new_data.update(notifications.DEFAULTS)
+    az_conf = ConfigObj()
+    az_conf[notifications_key] = new_data
     with open(config.PATH, 'wb') as fp:
         az_conf.write(fp)
 
