@@ -23,7 +23,7 @@ def parse(path=PATH, section=None):
             conf = ConfigObj(infile=fp)
     except FileNotFoundError:
         # avoid circular import
-        logger = logging.get_logger(namespace=__name__)
+        logger = logging.getLogger(__name__)
         logger.error(__package__ + ' has not been configured.')
         return None
     return conf[section] if section is not None else conf
