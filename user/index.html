@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Database Migration Procedure &mdash; azanium 0.39 documentation</title>
+  <title>Database Migration Procedure &mdash; azanium 0.40 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.39 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.40 documentation" href="../index.html"/>
         <link rel="next" title="Development" href="../dev/index.html"/>
         <link rel="prev" title="🐛 azanium - WormBase Database Migration" href="../index.html"/> 
 
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.39
+                0.40
               </div>
             
           
@@ -83,8 +83,9 @@
             
                 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Database Migration Procedure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#software-setup">Software Setup</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#enabling-slack-notificaitons">Enabling Slack notificaitons</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#software-setup">Software Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#enabling-slack-notifications">Enabling Slack notifications</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#commands">Commands</a></li>
@@ -153,14 +154,35 @@ extension) listed in the downloads section of this repository&#8217;s
 pip3 install --user <span class="s2">&quot;</span><span class="nv">$AZANIUM_WHEEL_URL</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
-<div class="section" id="enabling-slack-notificaitons">
-<h3>Enabling Slack notificaitons<a class="headerlink" href="#enabling-slack-notificaitons" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>Each time the migration is run, it&#8217;s required to configure the migration
+with the FTP URL of the release.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium configure <span class="nv">$FTP_URL</span>
+</pre></div>
+</div>
+<p>This will persist the FTP release (and WS release version encoded in
+the URL) for use by all migration commands.</p>
+<div class="section" id="enabling-slack-notifications">
+<h3>Enabling Slack notifications<a class="headerlink" href="#enabling-slack-notifications" title="Permalink to this headline">¶</a></h3>
 <p>To enable slack notifications of each build step to the
 <cite>#db-migratione-events</cite> channel in the WormBase slack, specify url to
 the configure command as shown below.
 The value for <cite>$WEBHOOK_URL</cite> is available from the WormBase slack management console
 for the WormBase organisation.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium configure --slack-url<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$WEBHOOK_URL</span><span class="s2">&quot;</span>
+<dl class="docutils">
+<dt>To find this url:</dt>
+<dd><ol class="first last arabic simple">
+<li>Visit <a class="reference external" href="https://api.slack.com/apps">https://api.slack.com/apps</a></li>
+<li>Click the active &#8220;azanium&#8221; application  listed under &#8220;Your Apps&#8221;</li>
+<li>Click &#8220;Incoming Webhooks&#8221; under &#8220;Features&#8221; (left side-menu)</li>
+<li>In the listing of Webhook URLs, click the top-most (latest)
+Webhook URL, listed against the <cite>#db-migration-events</cite> channel.</li>
+</ol>
+</dd>
+</dl>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium configure <span class="nv">$FTP_URL</span> --slack-url<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$WEBHOOK_URL</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -185,10 +207,13 @@ the host the migration is performed.</p>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Patches</p>
-<p>If any patches need to be loaded, then run:</p>
-<p>azanium run acedb-dump</p>
-<p>Deposit any patch files in the directory <cite>/wormbase/acedb-dump</cite> directory.</p>
+<li><p class="first">Install software</p>
+<p>Below, $FTP_URL is the location of the WS release on an ftp server.
+This should be a fully-qualified URL, with the FTP scheme, e.g:</p>
+<p><cite>ftp://ftp.ebi.ac.uk/pub/databases/wormbase/staging/releases/WS266</cite></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium install <span class="nv">$FTP_URL</span>
+</pre></div>
+</div>
 </li>
 <li><p class="first">Run the migration</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>azanium migrate-stage-1
@@ -298,7 +323,7 @@ tracking migration events (if notifications are enabled).</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.39',
+            VERSION:'0.40',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

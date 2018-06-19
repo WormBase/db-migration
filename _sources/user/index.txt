@@ -19,7 +19,20 @@ extension) listed in the downloads section of this repository's
    python3 -m pip install --user --upgrade pip
    pip3 install --user "$AZANIUM_WHEEL_URL"
 
-Enabling Slack notificaitons
+
+Configuration
+=============
+Each time the migration is run, it's required to configure the migration
+with the FTP URL of the release.
+
+.. code-block:: bash
+
+   azanium configure $FTP_URL
+
+This will persist the FTP release (and WS release version encoded in
+the URL) for use by all migration commands.
+
+Enabling Slack notifications
 ----------------------------
 To enable slack notifications of each build step to the
 `#db-migratione-events` channel in the WormBase slack, specify url to
@@ -27,9 +40,16 @@ the configure command as shown below.
 The value for `$WEBHOOK_URL` is available from the WormBase slack management console
 for the WormBase organisation.
 
+To find this url:
+   1. Visit https://api.slack.com/apps
+   2. Click the active "azanium" application  listed under "Your Apps"
+   3. Click "Incoming Webhooks" under "Features" (left side-menu)
+   4. In the listing of Webhook URLs, click the top-most (latest)
+      Webhook URL, listed against the `#db-migration-events` channel.
+
 .. code-block:: bash
 
-   azanium configure --slack-url="$WEBHOOK_URL"
+   azanium configure $FTP_URL --slack-url="$WEBHOOK_URL"
 
 Commands
 ========
@@ -56,13 +76,16 @@ The location of the file should be:
 
       azanium clean-previous-state
 
-2. Patches
+2. Install software
 
-   If any patches need to be loaded, then run:
+   Below, $FTP_URL is the location of the WS release on an ftp server.
+   This should be a fully-qualified URL, with the FTP scheme, e.g:
 
-   azanium run acedb-dump
+   `ftp://ftp.ebi.ac.uk/pub/databases/wormbase/staging/releases/WS266`
 
-   Deposit any patch files in the directory `/wormbase/acedb-dump` directory.
+   .. code-block:: bash
+
+      azanium install $FTP_URL
 
 3. Run the migration
 
