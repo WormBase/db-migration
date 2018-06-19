@@ -63,13 +63,16 @@ The location of the file should be:
 
       azanium clean-previous-state
 
-2. Patches
+2. Install software
 
-   If any patches need to be loaded, then run:
+   Below, ${FTP_URL} is the location of the WS release on an ftp server.
+   This should be a fully-qualified URL, with the FTP scheme, e.g:
 
-   azanium run acedb-dump
+   `ftp://ftp.ebi.ac.uk/pub/databases/wormbase/staging/releases/WS266`
 
-   Deposit any patch files in the directory `/wormbase/acedb-dump` directory.
+   .. code-block:: bash
+
+      azanium install ${FTP_URL}
 
 3. Run the migration
 

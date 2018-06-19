@@ -30,9 +30,22 @@ logger = get_logger(__name__)
 
 Meta = collections.namedtuple('Meta', ('download_dir',
                                        'install_dir',
-                                       'version'))
+                                       'version',
+                                       'context'))
 
-DEFAULT_EBI_FTP_PATH_PREFIX = '/pub/databases/wormbase/staging/releases'
+def mk_meta(cmd_ctx, func):
+    f_name = func.__name__
+    tmpdir = tempfile.mkdtemp(suffix='-db-migration-downloads')
+    download_dir = os.path.join(tmpdir, f_name)
+    install_dir = cmd_ctx.path(f_name)
+    version = get_deploy_versions().get(f_name)
+    for path in (download_dir, install_dir):
+        os.makedirs(path, exist_ok=True)
+        meta = Meta(download_dir=download_dir,
+                    install_dir=install_dir,
+                    version=version,
+                    context=cmd_ctx)
+    return meta
 
 
 def installer(func):
@@ -45,16 +58,7 @@ def installer(func):
     """
     @pass_command_context
     def cmd_proxy(cmd_ctx, *args, **kw):
-        f_name = func.__name__
-        tmpdir = tempfile.mkdtemp(suffix='-db-migration-downloads')
-        download_dir = os.path.join(tmpdir, f_name)
-        install_dir = cmd_ctx.path(f_name)
-        version = get_deploy_versions()[f_name]
-        for path in (download_dir, install_dir):
-            os.makedirs(path, exist_ok=True)
-        meta = Meta(download_dir=download_dir,
-                    install_dir=install_dir,
-                    version=version)
+        meta = mk_meta(cmd_ctx, func)
         ctx = click.get_current_context()
         return ctx.invoke(func, meta, *args[1:], **kw)
 
@@ -65,44 +69,40 @@ def installer(func):
 
 
 @root_command.group(chain=True, invoke_without_command=True)
+@click.option('--ftp-url', default=None)
 @pass_command_context
-def install(ctx):
+def installers(ctx, ftp_url=None):
     """Software installers for the WormBase database migration.
 
     All software will be installed under a common base path,
     as specified to the parent command.
     """
 
-
-@install.resultcallback()
-def pipeline(installers):
+@installers.resultcallback()
+def pipeline(installers, *args, **kw):
     for install_command in installers:
-        install_command()
+        install_command(*args, **kw)
 
 
-@install.command(short_help='Installs the ACeDB ID catalog for QA report.')
-@option('--ftp-host',
-        default='ftp.ebi.ac.uk',
-        help='FTP hostname for ACeDB data.')
-@option('--remote-path-template',
-        default=DEFAULT_EBI_FTP_PATH_PREFIX + '/{version}/REPORTS',
-        help='Path to the file(s) containing compressed database.')
-@option('--file-selector-regexp',
-        default='all_classes_report.{version}\.txt\.gz$',
-        help='File selection regexp')
-@installer
-def acedb_id_catalog(meta,
-                     ftp_host,
-                     remote_path_template,
-                     file_selector_regexp):
+def split_ftp_url(ftp_url):
+    pr = urllib.parse.urlparse(ftp_url)
+    version = list(filter(None, pr.path.rsplit('/', 2)))[-1]
+    return (pr.netloc, pr.path, version)
+
+
+def acedb_id_catalog(
+        meta,
+        ftp_url,
+        file_selector_regexp='all_classes_report.{version}\.txt\.gz$'):
     """Installs the ACeDB id catalog use by QA report generation."""
-    format_path = remote_path_template.format
-    file_selector_regexp = file_selector_regexp.format(version=meta.version)
-    downloaded = ftp_download(ftp_host,
+    (host, path, version) = split_ftp_url(ftp_url)
+    cwd = os.path.join(path, 'REPORTS')
+    file_selector_regexp = file_selector_regexp.format(version=version)
+    downloaded = ftp_download(host,
                               file_selector_regexp,
                               meta.download_dir,
                               logger,
-                              initial_cwd=format_path(version=meta.version))
+                              initial_cwd=cwd)
     downloaded_path = downloaded[0]
     with gzip.open(downloaded_path) as gz_fp:
         filename = re.sub('^(?P<fn>.*)\.gz',
@@ -115,29 +115,23 @@ def acedb_id_catalog(meta,
         return fp.name
 
 
-@install.command(short_help='Installs the ACeDB database.')
-@option('--ftp-host',
-        default='ftp.ebi.ac.uk',
-        help='FTP hostname for ACeDB data.')
-@option('--remote-path-template',
-        default=DEFAULT_EBI_FTP_PATH_PREFIX + '/{version}/acedb',
-        help='Path to the file(s) containing compressed database.')
+@installers.command(short_help='Installs the ACeDB database.')
+@click.argument('ftp_url')
 @option('--file-selector-regexp',
         default='.*\.tar\.gz$',
         help='File selection regexp')
 @installer
-def acedb_database(meta,
-                   ftp_host,
-                   remote_path_template,
-                   file_selector_regexp):
+def acedb_database(meta, ftp_url, file_selector_regexp):
     """Installs the ACeDB database system."""
-    format_path = remote_path_template.format
-    version = meta.version
+    ctx = click.get_current_context()
+    ctx.invoke(acedb_id_catalog, mk_meta(meta.context, acedb_id_catalog), ftp_url)
+    (host, path, version) = split_ftp_url(ftp_url)
+    cwd = os.path.join(path, 'acedb')
     wspec_dir = os.path.join(meta.install_dir, 'wspec')
     ftp_get = functools.partial(ftp_download,
                                 logger=logger,
-                                initial_cwd=format_path(version=version))
-    downloaded = ftp_get(ftp_host, file_selector_regexp, meta.download_dir)
+                                initial_cwd=cwd)
+    downloaded = ftp_get(host, file_selector_regexp, meta.download_dir)
     for path in downloaded:
         with tarfile.open(path) as tf:
             logger.info('Extracting {} to {}', path, meta.install_dir)
@@ -158,13 +152,13 @@ def acedb_database(meta,
     return meta.install_dir
 
 
-@install.command(short_help='Installs the ACeDB "tace" binary')
+@installers.command(short_help='Installs the ACeDB "tace" binary')
 @option('-t', '--url-template',
         default=('ftp://ftp.sanger.ac.uk/pub/acedb/MONTHLY/'
                  'ACEDB-binaryLINUX_{version}.tar.gz'),
         help='URL for versioned ACeDB binaries')
 @installer
-def tace(meta, url_template):
+def tace(meta, url_template=None, **kw):
     """Installs the ACeDB "tace" binary program."""
     version = meta.version
     url = url_template.format(version=version)
@@ -183,12 +177,12 @@ def tace(meta, url_template):
     return tace_path
 
 
-@install.command(short_help='Installs datomic-free')
+@installers.command(short_help='Installs datomic-free')
 @option('-t', '--url-template',
         default='https://my.datomic.com/downloads/free/{version}',
         help='URL template for Datomic Free version')
 @installer
-def datomic_free(meta, url_template):
+def datomic_free(meta, url_template=None, **kw):
     """Installs Datomic (free version)."""
     install_dir = meta.install_dir
     version = meta.version
@@ -218,9 +212,9 @@ def datomic_free(meta, url_template):
     return install_dir
 
 
-@install.command(short_help='Installs pseudoace')
+@installers.command(short_help='Installs pseudoace')
 @installer
-def pseudoace(meta):
+def pseudoace(meta, **kw):
     """Installs pseudoace."""
     download_dir = meta.download_dir
     install_dir = meta.install_dir
@@ -245,24 +239,25 @@ def pseudoace(meta):
     return install_dir
 
 
-@install.command('all', short_help='Installs everything')
+@root_command.command('install', short_help='Installs everything')
+@click.argument('ftp_url')
 @pass_command_context
-def all(context):
+def install(context, ftp_url):
     """Installs all software and data."""
     # Invoke all commands via the install group command chain.
     # This has the same effect as if run on command line, e.g:
     # azanium install dataomic_free pseudoace acedb_database ..
     ctx = click.get_current_context()
-    install_cmd_names = sorted(context.versions)
+    install_cmd_names = sorted(installers.commands)
     orig_protected_args = ctx.protected_args[:]
     ctx.protected_args.extend(install_cmd_names)
     try:
-        install.invoke(ctx)
+        installers.invoke(ctx)
     finally:
         ctx.protected_args[:] = orig_protected_args
     attachments = []
     for name in install_cmd_names:
-        version = context.versions[name]
+        version = context.versions.get(name) or split_ftp_url(ftp_url)[-1]
         title = 'Installed {} (version: {})'.format(name, version)
         ts = os.path.getmtime(context.path(name))
         attachment = notifications.Attachment(title, ts=ts)
