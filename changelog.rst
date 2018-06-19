@@ -5,7 +5,7 @@
 0.41 (unreleased)
 =================
 
-- Nothing changed yet.
+- Fixed bootstrapping issue.
 
 
 0.40 (2018-06-19)
