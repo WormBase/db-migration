@@ -288,8 +288,10 @@ class CommandContext:
 
     def __init__(self, base_path):
         self.base_path = base_path
-        self.versions = get_deploy_versions()
         self.logfile_path = ''
+
+    verisons = property(get_deploy_versions)
+    data_release_version = property(get_data_release_version)
 
     @property
     def java_cmd(self):
@@ -299,10 +301,6 @@ class CommandContext:
     def pseudoace_jar_path(self):
         jar_name = 'pseudoace-{[pseudoace]}.jar'.format(self.versions)
         return os.path.join(self.path('pseudoace'), jar_name)
-
-    @property
-    def data_release_version(self):
-        return get_data_release_version()
 
     @property
     def db_name(self):
