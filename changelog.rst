@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.42 (unreleased)
+0.42 (2018-06-19)
 =================
 
 - Various bug fixes.
