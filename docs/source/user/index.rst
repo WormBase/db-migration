@@ -27,6 +27,13 @@ the configure command as shown below.
 The value for `$WEBHOOK_URL` is available from the WormBase slack management console
 for the WormBase organisation.
 
+To find this url:
+   1. Visit https://api.slack.com/apps
+   2. Click the active "azanium" application  listed under "Your Apps"
+   3. Click "Incoming Webhooks" under "Features" (left side-menu)
+   4. In the listing of Webhook URLs, click the top-most (latest)
+      Webhook URL, listed against the `#db-migration-events` channel.
+
 .. code-block:: bash
 
    azanium configure --slack-url="$WEBHOOK_URL"
