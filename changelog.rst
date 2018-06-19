@@ -5,7 +5,7 @@
 0.42 (unreleased)
 =================
 
-- Nothing changed yet.
+- Various bug fixes.
 
 
 0.41 (2018-06-19)
