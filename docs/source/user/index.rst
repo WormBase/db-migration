@@ -78,11 +78,6 @@ The location of the file should be:
 
 2. Install software
 
-   Below, $FTP_URL is the location of the WS release on an ftp server.
-   This should be a fully-qualified URL, with the FTP scheme, e.g:
-
-   `ftp://ftp.ebi.ac.uk/pub/databases/wormbase/staging/releases/WS266`
-
    .. code-block:: bash
 
       azanium install
