@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.40 (unreleased)
+0.40 (2018-06-19)
 =================
 
 - The FTP URL is now passed to the `azanium configure` command,
