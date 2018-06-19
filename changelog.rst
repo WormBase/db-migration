@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.41 (unreleased)
+0.41 (2018-06-19)
 =================
 
 - Fixed bootstrapping issue.
