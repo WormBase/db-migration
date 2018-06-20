@@ -106,9 +106,7 @@ def qa_report(context, acedb_id_catalog):
 
     """
     report_path = pseudoace.qa_report(context, acedb_id_catalog)
-    ws_version = context.data_release_version
-    title = 'QA Report for {}'
-    title = title.format(ws_version)
+    ws_version = util.get_data_release_version()
     title = 'QA report for {version} available in <{path}>'
     title = title.format(version=ws_version, loc=report_path)
     pretext = ('*Please check this looks correct '
@@ -134,7 +132,7 @@ def backup_db(context):
     prompt = 'Backup Datomic Database? [y/N]:'
     if not input(prompt).lower().startswith('y'):
         click.get_current_context().abort()
-    data_release_version = context.data_release_version
+    data_release_version = util.get_data_release_version()
     date_stamp = datetime.date.today().isoformat()
     local_backup_path = os.path.join(context.path('datomic-db-backup'),
                                      date_stamp,
@@ -262,7 +260,7 @@ def reset_to_step(context):
 
 def process_steps(context, steps):
     headline_fmt = 'Migrating ACeDB {release} to Datomic, *Step {step}*'
-    release = context.data_release_version
+    release = util.get_data_release_version()
     ctx = click.get_current_context()
     step_idx = int(context.app_state.get(LAST_STEP_OK_STATE_KEY, '0'))
     step_n = step_idx + 1
