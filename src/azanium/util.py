@@ -291,7 +291,7 @@ class CommandContext:
         self.logfile_path = ''
 
     @property
-    def verisons(self):
+    def versions(self):
         return get_deploy_versions()
 
     @property
