@@ -19,6 +19,13 @@ extension) listed in the downloads section of this repository's
    python3 -m pip install --user --upgrade pip
    pip3 install --user "$AZANIUM_WHEEL_URL"
 
+The program `azanium` should now be installed.
+Verify this by using the `--help` command:
+
+.. code-block:: bash
+
+   azanium --help
+
 
 Configuration
 =============
@@ -39,7 +46,7 @@ command.  The value for `$WEBHOOK_URL` is available from the WormBase
 slack management console for the WormBase organisation.
 
 To find the Webhook URL:
-   1. Visit https://api.slack.com/apps
+   1. Visit the `Slack API Apps page` (must be logged in as a maanger)
    2. Click the active "azanium" application  listed under "Your Apps"
    3. Click "Incoming Webhooks" under "Features" (left side-menu)
    4. In the listing of Webhook URLs, click the top-most (latest)
@@ -87,28 +94,14 @@ The location of the file should be:
 
    .. code-block:: bash
 
-      azanium migrate-stage-1
+      azanium migrate
 
-   This command will execute steps for stage 1 of the migration:
+   This command will execute all the steps required to perform the migration:
 
    1. Extract all .ace files from the ACeDB database for the current release.
    2. Compress all .ace files
    3. Convert .ace files to EDN logs
    4. Sort all EDN logs by timestamp
-
-
-   .. attention::
-
-      restart the instance to free-up resources on the host (memory).
-
-   Continue the migration (Stage 2):
-
-   .. code-block:: bash
-
-      azanium migrate-stage-2
-
-   This command executes the remaining steps required to complete the migration.
-
    5. Create the Datomic database
    6. Import the EDN logs into the Datomic database
    7. Run a QA report on the database
@@ -146,5 +139,34 @@ The followings files are created by the migration:
       /wormbase/logs/azanium.log
 
 
+Other Resources
+---------------
+
+  Datomic transactor logs directory:
+
+  	/wormbase/datomic_free/log
+
+  circus log (`circus` is the hypervisor for running the transactor):
+
+  	/wormbase/datomic_free/log
+
+
+Other commands
+--------------
+The following **may** be useful when manual intervention is required.
+
+  Reset the migration to a step (prompts):
+
+  .. code-block:: bash
+
+     azanium reset-to-step
+
+  Manually restart the transactor:
+
+  .. code-block:: bash
+
+     circusctl restart datomic-transactor
+
 
 .. _`latest release page`: https://github.com/Wormbase/db-migration/releases/latest
+.. _`Slack API Apps page`: https://api.slack.com/apps

@@ -86,6 +86,9 @@ def create_database(context, datomic_path):
 def ace_to_edn(context, acedb_dump_dir, edn_logs_dir):
     """Converts ACeDB dump files (.ace) to EDN log files."""
     pseudoace.acedb_dump_to_edn_logs(context, acedb_dump_dir, edn_logs_dir)
+    # restart the transactor to force jvm return memory to speed up later steps.
+    util.local('circusctl restart datomic-transactor')
+    time.sleep(2)
     return edn_logs_dir
 
 
@@ -172,10 +175,11 @@ Step = collections.namedtuple('Step', ('description', 'func', 'kwargs'))
 
 LOGS_DIR = 'edn-logs'
 
-def _get_convert_steps(context):
-    dump_dir = context.path('acedb-dump')
-    logs_dir = context.path(LOGS_DIR)
+def _get_steps(context):
     datomic_path = context.path('datomic_free')
+    dump_dir = context.path('acedb-dump')
+    id_catalog_path = context.path('acedb_id_catalog')
+    logs_dir = context.path(LOGS_DIR)
     steps = [
         Step('Dumping all ACeDB files',
              acedb_dump,
@@ -191,24 +195,26 @@ def _get_convert_steps(context):
              dict(acedb_dump_dir=dump_dir, edn_logs_dir=logs_dir)),
         Step('Sorting EDN logs by timestamp',
              sort_edn_logs,
-             dict(edn_logs_dir=logs_dir))]
-    return steps
-
-def _get_import_steps(context):
-    logs_dir = context.path(LOGS_DIR)
-    id_catalog_path = context.path('acedb_id_catalog')
-    steps = [
+             dict(edn_logs_dir=logs_dir)),
         Step('Import EDN logs into Datomic database',
              import_logs,
              dict(edn_logs_dir=logs_dir)),
         Step('Running QA report on Datomic database',
              qa_report,
-             dict(acedb_id_catalog=id_catalog_path))]
+             dict(acedb_id_catalog=id_catalog_path)),
+        Step(('How does the report look? '
+              'Please answer the question in ssh console session '
+              'to backup the datomic database '
+              'and complete the db migration '
+              'process'),
+             backup_db,
+             {})
+    ]
     return steps
 
 
 def available_reset_steps(context):
-    steps = _get_convert_steps(context) + _get_import_steps(context)
+    steps = _get_steps(context)
     last_ok_step_n = context.app_state[LAST_STEP_OK_STATE_KEY]
     avail_steps = collections.OrderedDict()
     for (step_n, t) in enumerate(steps[:last_ok_step_n - 1], start=1):
@@ -278,10 +284,10 @@ def process_steps(context, steps):
                                  post_kw=post_kw)
             context.app_state[LAST_STEP_OK_STATE_KEY] = step_n - 1
 
-@root_command.command('migrate-stage-1',
+@root_command.command('migrate',
                       short_help='Run initial db migration steps.')
 @util.pass_command_context
-def migrate_stage_1(context):
+def migrate(context):
     """Steps:
         1. Dump ACeDB files (.ace files)
 
@@ -292,19 +298,6 @@ def migrate_stage_1(context):
         4. Convert .ace files to EDN logs
 
         5. Sort EDN log files by timestamp
-    """
-    steps = []
-    steps.extend(_get_convert_steps(context))
-    process_steps(context, steps)
-
-@root_command.command('migrate-stage-2',
-                      short_help='Completes db migration steps')
-@util.pass_command_context
-def migrate_stage_2(context):
-    """Import the EDN files into datomic.
-
-    Steps:
-
         6. Import EDN logs into Datomic database
 
         7. Run QA Report on Datomic DB
@@ -312,14 +305,6 @@ def migrate_stage_2(context):
         8. Backup Datomic database locally **
 
     ** Only performed if you confirm report output looks good (7).
-
     """
-    steps = _get_convert_steps(context) + _get_import_steps(context)
-    steps.append(Step(('How does the report look? '
-                       'Please answer the question in ssh console session '
-                       'to backup the datomic database '
-                       'and complete the db migration '
-                       'process'),
-                      backup_db,
-                      {}))
+    steps = _get_steps(context)
     process_steps(context, steps)
