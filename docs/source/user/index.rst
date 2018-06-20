@@ -29,8 +29,6 @@ with the FTP URL of the release.
 
    azanium configure $FTP_URL
 
-This will persist the FTP release (and WS release version encoded in
-the URL) for use by all migration commands.
 
 Enabling Slack notifications
 ----------------------------
