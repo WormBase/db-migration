@@ -11,36 +11,53 @@ import tempfile
 import urllib.parse
 import zipfile
 
+
 import click
 
+from . import config
 from . import github
+from . import log
 from . import notifications
 from . import root_command
-from .log import get_logger
-from .util import download
-from .util import ftp_download
-from .util import get_deploy_versions
-from .util import local
-from .util import make_executable
-from .util import option
-from .util import pass_command_context
-from .util import get_ftp_url
-from .util import split_ftp_url
-from .util import touch_dir
+from . import util
 
-logger = get_logger(__name__)
+logger = log.get_logger(__name__)
 
 Meta = collections.namedtuple('Meta', ('download_dir',
                                        'install_dir',
                                        'version',
                                        'context'))
 
+def preliminary_checks():
+    # check github release of wb pipeline is done
+    # check that the az configuration file is present
+    # warn if slack notifications are not to be sent (not configured)
+    conf = config.parse()
+    if not conf:
+        msg = __package__ + ' has not been configured.'
+        util.echo_error(msg)
+        raise click.Abort(msg)
+    ws_release_version = util.get_data_release_version()
+    if not ws_release_version:
+        msg = 'azanium configure has not been run'
+        raise click.Abort(msg)
+    if not github.is_released(ws_release_version):
+        msg  = 'The wormbase-pipeline repo has not been tagged on github'
+        raise click.Abort(msg)
+    if notifications.__name__ not in conf:
+        logger.warn('Slack notifications are not enabled -'
+                    'integration has been disabled')
+        logger.warn('It is safe to re-run the "azanium configure" command ' 
+                    'after the current command exits, should you wish to '
+                    'enable notifications')
+
+
 def mk_meta(cmd_ctx, func):
     f_name = func.__name__
     tmpdir = tempfile.mkdtemp(suffix='-db-migration-downloads')
     download_dir = os.path.join(tmpdir, f_name)
     install_dir = cmd_ctx.path(f_name)
-    version = get_deploy_versions()[f_name]
+    version = util.get_deploy_versions()[f_name]
     for path in (download_dir, install_dir):
         os.makedirs(path, exist_ok=True)
         meta = Meta(download_dir=download_dir,
@@ -58,10 +75,11 @@ def installer(func):
 
     Wraps the command function in a function for result chaining.
     """
-    @pass_command_context
+    @util.pass_command_context
     def cmd_proxy(cmd_ctx, *args, **kw):
-        meta = mk_meta(cmd_ctx, func)
+        preliminary_checks()
         ctx = click.get_current_context()
+        meta = mk_meta(cmd_ctx, func)
         return ctx.invoke(func, meta, *args[1:], **kw)
 
     def command_proxy(*args, **kw):
@@ -71,7 +89,7 @@ def installer(func):
 
 
 @root_command.group(chain=True, invoke_without_command=True)
-@pass_command_context
+@util.pass_command_context
 def installers(ctx):
     """Software installers for the WormBase database migration.
 
@@ -88,14 +106,14 @@ def acedb_id_catalog(
         meta,
         report_file_regexp='all_classes_report.{version}\.txt\.gz$'):
     """Installs the ACeDB id catalog use by QA report generation."""
-    (host, path, version) = split_ftp_url(get_ftp_url())
+    (host, path, version) = util.split_ftp_url(util.get_ftp_url())
     cwd = os.path.join(path, 'REPORTS')
     regexp = 'all_classes_report\.{}\.txt\.gz$'.format(version)
-    downloaded = ftp_download(host,
-                              regexp,
-                              meta.download_dir,
-                              logger,
-                              initial_cwd=cwd)
+    downloaded = util.ftp_download(host,
+                                   regexp,
+                                   meta.download_dir,
+                                   logger,
+                                   initial_cwd=cwd)
 
     downloaded_path = downloaded[0]
     with gzip.open(downloaded_path) as gz_fp:
@@ -110,19 +128,19 @@ def acedb_id_catalog(
 
 
 @installers.command(short_help='Installs the ACeDB database.')
-@option('--file-selector-regexp',
-        default='.*\.tar\.gz$',
-        help='File selection regexp')
+@util.option('--file-selector-regexp',
+             default='.*\.tar\.gz$',
+             help='File selection regexp')
 @installer
 def acedb_database(meta, file_selector_regexp):
     """Installs the ACeDB database system."""
     ctx = click.get_current_context()
-    ftp_url = get_ftp_url()
+    ftp_url = util.get_ftp_url()
     ctx.invoke(acedb_id_catalog, mk_meta(meta.context, acedb_id_catalog), ftp_url)
-    (host, path, version) = split_ftp_url(ftp_url)
+    (host, path, version) = util.split_ftp_url(ftp_url)
     cwd = os.path.join(path, 'acedb')
     wspec_dir = os.path.join(meta.install_dir, 'wspec')
-    ftp_get = functools.partial(ftp_download,
+    ftp_get = functools.partial(util.ftp_download,
                                 logger=logger,
                                 initial_cwd=cwd)
     downloaded = ftp_get(host, file_selector_regexp, meta.download_dir)
@@ -142,39 +160,39 @@ def acedb_database(meta, file_selector_regexp):
     with open(passwd_path, 'a') as fp:
         logger.info('Adding {} to {}', username, passwd_path)
         fp.write(username + os.linesep)
-    touch_dir(meta.install_dir)
+    util.touch_dir(meta.install_dir)
     return meta.install_dir
 
 
 @installers.command(short_help='Installs the ACeDB "tace" binary')
-@option('-t', '--url-template',
-        default=('ftp://ftp.sanger.ac.uk/pub/acedb/MONTHLY/'
-                 'ACEDB-binaryLINUX_{version}.tar.gz'),
-        help='URL for versioned ACeDB binaries')
+@util.option('-t', '--url-template',
+             default=('ftp://ftp.sanger.ac.uk/pub/acedb/MONTHLY/'
+                      'ACEDB-binaryLINUX_{version}.tar.gz'),
+             help='URL for versioned ACeDB binaries')
 @installer
 def tace(meta, url_template=None):
     """Installs the ACeDB "tace" binary program."""
     version = meta.version
     url = url_template.format(version=version)
     pr = urllib.parse.urlparse(url)
-    downloaded = ftp_download(pr.netloc,
-                              os.path.basename(pr.path),
-                              meta.download_dir,
-                              logger,
-                              initial_cwd=os.path.dirname(pr.path))
+    downloaded = util.ftp_download(pr.netloc,
+                                   os.path.basename(pr.path),
+                                   meta.download_dir,
+                                   logger,
+                                   initial_cwd=os.path.dirname(pr.path))
     local_path = downloaded[0]
     with tarfile.open(local_path) as tf:
         tf.extract('./tace', path=meta.install_dir)
     tace_path = os.path.join(meta.install_dir, 'tace')
-    touch_dir(meta.install_dir)
-    make_executable(tace_path, logger)
+    util.touch_dir(meta.install_dir)
+    util.make_executable(tace_path, logger)
     return tace_path
 
 
 @installers.command(short_help='Installs datomic-free')
-@option('-t', '--url-template',
-        default='https://my.datomic.com/downloads/free/{version}',
-        help='URL template for Datomic Free version')
+@util.option('-t', '--url-template',
+             default='https://my.datomic.com/downloads/free/{version}',
+             help='URL template for Datomic Free version')
 @installer
 def datomic_free(meta, url_template=None):
     """Installs Datomic (free version)."""
@@ -186,21 +204,21 @@ def datomic_free(meta, url_template=None):
     download_path = os.path.join(meta.download_dir, local_filename)
     logger.info('Downloading and extracting {} to {}', fullname, install_dir)
     tmpdir = tempfile.mkdtemp()
-    with zipfile.ZipFile(download(url, download_path)) as zf:
+    with zipfile.ZipFile(util.download(url, download_path)) as zf:
         zf.extractall(tmpdir)
     os.rmdir(install_dir)
     shutil.move(os.path.join(tmpdir, fullname), install_dir)
-    touch_dir(install_dir)
+    util.touch_dir(install_dir)
     logger.info('Installed {} into {}', fullname, install_dir)
     logger.info('Setting environment variable DATOMIC_HOME={}', install_dir)
     bin_dir = os.path.join(install_dir, 'bin')
     for filename in os.listdir(bin_dir):
         bin_path = os.path.join(bin_dir, filename)
-        make_executable(bin_path, logger, symlink_dir=None)
+        util.make_executable(bin_path, logger, symlink_dir=None)
     os.chdir(install_dir)
     mvn_install = os.path.join('bin', 'maven-install')
     logger.info('Installing datomic via {}', os.path.abspath(mvn_install))
-    mvn_install_out = local(mvn_install)
+    mvn_install_out = util.local(mvn_install)
     logger.info('Installed datomic_free')
     logger.debug(mvn_install_out)
     return install_dir
@@ -228,18 +246,19 @@ def pseudoace(meta, **kw):
     os.rename(tmp_src_path, src_path)
     shutil.rmtree(install_dir)
     shutil.move(src_path, install_dir)
-    touch_dir(install_dir)
+    util.touch_dir(install_dir)
     logger.info('Extracted {} to {}', archive_filename, install_dir)
     return install_dir
 
 
 @root_command.command('install', short_help='Installs everything')
-@pass_command_context
+@util.pass_command_context
 def install(context):
     """Installs all software and data."""
     # Invoke all commands via the install group command chain.
     # This has the same effect as if run on command line, e.g:
     # azanium install dataomic_free pseudoace acedb_database ..
+    preliminary_checks()
     ctx = click.get_current_context()
     install_cmd_names = sorted(installers.commands)
     orig_protected_args = ctx.protected_args[:]
@@ -249,8 +268,9 @@ def install(context):
     finally:
         ctx.protected_args[:] = orig_protected_args
     attachments = []
+    versions = util.get_deploy_versions()
     for name in install_cmd_names:
-        version = context.versions.get(name) or context.data_release_version
+        version = versions[name]
         title = 'Installed {} (version: {})'.format(name, version)
         ts = os.path.getmtime(context.path(name))
         attachment = notifications.Attachment(title, ts=ts)

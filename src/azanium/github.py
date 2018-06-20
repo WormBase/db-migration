@@ -9,6 +9,9 @@ import github3
 from . import config
 
 
+WB_PIPELINE_REPO = 'WormBase/wormbase-pipeline'
+
+
 def _prompt(question):
     answer = ''
     while not answer:
@@ -86,6 +89,9 @@ def publish_release(reporoot, version, bundle_path):
         asset = release.upload_asset('application/zip', filename, fp)
     return asset
 
+def is_released(ws_version):
+    repo = repo_from_path(WB_PIPELINE_REPO)
+    return bool(repo.release_from_tag(ws_version))
 
 def read_released_file(repo, data_version, path):
     tags = (t.as_dict() for t in repo.tags())

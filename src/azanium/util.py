@@ -56,9 +56,7 @@ def echo_warning(message,
 
 def echo_error(message, err=True, fg='red', bold=True, notify=True):
     if notify:
-        cnf = config.parse()
-        notifications.notify(cnf,
-                             message,
+        notifications.notify(message,
                              icon_emoji=':fire:',
                              color='warning')
     return _secho(message, err=err, fg=fg, bold=bold)
@@ -185,7 +183,7 @@ log_level_option = functools.partial(
     option,
     '-l',
     '--log-level',
-    default='INFO',
+    default='ERROR',
     type=click.Choice(choices=('DEBUG', 'INFO', 'WARNING', 'ERROR')),
     help='Logging level.')
 
@@ -247,7 +245,10 @@ def get_ftp_url():
 
 
 def get_data_release_version():
-    return split_ftp_url(get_ftp_url())[-1]
+    ftp_url = get_ftp_url()
+    if not ftp_url:
+        raise ValueError('FTP URL has not been configured.')
+    return split_ftp_url(ftp_url)[-1]
 
 
 def get_deploy_versions(purpose='default'):
@@ -291,20 +292,13 @@ class CommandContext:
         self.logfile_path = ''
 
     @property
-    def versions(self):
-        return get_deploy_versions()
-
-    @property
-    def data_release_version(self):
-        return get_data_release_version()
-
-    @property
     def java_cmd(self):
         return 'java -server ' + jvm_mem_opts(0.75)
 
     @property
     def pseudoace_jar_path(self):
-        jar_name = 'pseudoace-{[pseudoace]}.jar'.format(self.versions)
+        versions = get_deploy_versions()
+        jar_name = 'pseudoace-{[pseudoace]}.jar'.format(versions)
         return os.path.join(self.path('pseudoace'), jar_name)
 
     @property
@@ -318,28 +312,13 @@ class CommandContext:
             state = self._app_state = app_state()
         return state
 
-    def exec_step(self,
-                  step_n,
-                  headline,
-                  message,
-                  step_func,
-                  step_kwargs,
-                  **post_notify_kw):
-        ctx = click.get_current_context()
-        ctx.params = step_kwargs
-        conf = config.parse()
-        notify = functools.partial(notifications.notify, conf)
-        attachments_pre = [notifications.Attachment(title=message)]
-        notify(headline, attachments=attachments_pre)
-        rv = step_func(ctx)
-        notify(headline + ' - *complete*', attachments=rv, **post_notify_kw)
 
     def path(self, *args):
         return os.path.join(self.base_path, *args)
 
     def datomic_url(self,
                     default_prefix='datomic:free://localhost:4334/'):
-        default_url = default_prefix + self.data_release_version
+        default_url = default_prefix + get_data_release_version()
         return os.environ.get('DATOMIC_URI', default_url)
 
 

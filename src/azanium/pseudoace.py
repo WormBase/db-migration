@@ -22,15 +22,25 @@ def run_pseudoace(context, *args):
     logger.info(out)
 
 
+def is_wormbase_pipeline_tagged():
+    gh_repo_path = 'WormBase/wormbase-pipeline'
+    gh_file_path = 'wspec/models.wrm.annot'
+    repo = github.repo_from_path(gh_repo_path)
+    version = util.get_data_release_version()
+    annot_file_content = github.read_released_file(repo,
+                                                   version,
+                                                   gh_file_path)
+    return annot_file_content
+
+
 def source_annotated_models_file(context):
     """Sources the annotated models file from github.
 
     Returns the local filename. """
     # Get the annotated models file separately from github.
-    gh_repo_path = 'WormBase/wormbase-pipeline'
     gh_file_path = 'wspec/models.wrm.annot'
-    repo = github.repo_from_path(gh_repo_path)
-    version = context.data_release_version
+    repo = github.repo_from_path(github.WB_PIPELINE_REPO)
+    version = util.get_data_release_version()
     annot_file_content = github.read_released_file(repo,
                                                    version,
                                                    gh_file_path)
@@ -92,7 +102,7 @@ def import_logs(context, edn_logs_dir):
 
 
 def qa_report(context, acedb_id_catalog_path):
-    data_release = context.data_release_version
+    data_release = util.get_data_release_version()
     report_filename = 'all_classes_report.{}.txt'.format(data_release)
     report_path = os.path.join(acedb_id_catalog_path, report_filename)
     out_path = os.path.join(

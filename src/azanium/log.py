@@ -48,8 +48,8 @@ class VerboseLogMethod:
         def logprint_dispatch(method, msg, *args, **kw):
             level = getattr(logging, self._name.upper())
             if obj.logger.isEnabledFor(level):
-                self._printer(msg.format(*args, **kw))
-            return method(msg, *args, **kw)
+                return method(msg, *args, **kw)
+            return None
 
         return functools.partial(logprint_dispatch, method)
 
@@ -82,7 +82,7 @@ class VerbosePrettyLogger(Logger):
         return super(VerbosePrettyLogger, self).exception(msg, *args, **kw)
 
 
-def setup_logging(logfile_path, log_level=logging.INFO):
+def setup_logging(logfile_path, log_level='INFO'):
     log_dir = os.path.dirname(logfile_path)
     log_filename = os.path.basename(logfile_path)
     os.makedirs(log_dir, exist_ok=True)
@@ -90,9 +90,9 @@ def setup_logging(logfile_path, log_level=logging.INFO):
     logging.basicConfig(filename=log_path,
                         format='{asctime:12s} {levelname:5s} {name} {message}',
                         style='{',
-                        level=log_level)
+                        level=getattr(logging, log_level))
     root_logger = get_logger(__package__)
-    root_logger.setLevel(log_level)
+    root_logger.setLevel(getattr(logging, log_level))
     root_logger.debug('Logging to {} at level {}',
                       log_path,
                       logging.getLevelName(root_logger.logger.level))
