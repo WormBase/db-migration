@@ -128,7 +128,7 @@ The followings files are created by the migration:
 
    Datomic Database:
 
-      /wormbase/datomic-db-backups/$WS_RELEASE.tar.xz
+      /wormbase/datomic-db-backup/$WS_RELEASE.tar.xz
 
    QA Report
 
