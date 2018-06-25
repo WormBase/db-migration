@@ -1,14 +1,20 @@
 import collections
 import datetime
+import functools
+import getpass
+import gzip
 import os
 import psutil
+import re
 import shutil
+import stat
 import tarfile
 import time
 from functools import partial
 
 import click
 
+from . import artefact
 from . import datomic
 from . import log
 from . import notifications
@@ -25,6 +31,71 @@ LAST_STEP_OK_STATE_KEY = 'last-step-ok-idx'
 @util.pass_command_context
 def run(context):
     """Commands for executing the database migration."""
+
+
+def acedb_id_catalog(
+        meta,
+        report_file_regexp='all_classes_report.{version}\.txt\.gz$'):
+    """Installs the ACeDB id catalog use by QA report generation."""
+    (host, path, version) = util.split_ftp_url(util.get_ftp_url())
+    cwd = os.path.join(path, 'REPORTS')
+    regexp = 'all_classes_report\.{}\.txt\.gz$'.format(version)
+    downloaded = util.ftp_download(host,
+                                   regexp,
+                                   meta.download_dir,
+                                   logger,
+                                   initial_cwd=cwd)
+
+    downloaded_path = downloaded[0]
+    with gzip.open(downloaded_path) as gz_fp:
+        filename = re.sub('^(?P<fn>.*)\.gz',
+                          '\g<fn>',
+                          os.path.basename(downloaded_path))
+        out_path = os.path.join(meta.install_dir, filename)
+        with open(out_path, 'wb') as fp:
+            logger.info('Writing {}', fp.name)
+            fp.write(gz_fp.read())
+        return fp.name
+
+
+@run.command('acedb-database', short_help='Downlaod the ACeDB database release.')
+@util.option('--file-selector-regexp',
+             default='.*\.tar\.gz$',
+             help='File selection regexp')
+@artefact.prepared
+def acedb_database(context, afct, file_selector_regexp,
+                   acedb_dir=None,
+                   acedb_id_catalog_dir=None):
+    """Fetches all data, then installs and configures the ACeDB database."""
+    ctx = click.get_current_context()
+    ftp_url = util.get_ftp_url()
+    aidc_afct = artefact.prepare(context, acedb_id_catalog)
+    ctx.invoke(acedb_id_catalog, aidc_afct, ftp_url)
+    (host, path, version) = util.split_ftp_url(ftp_url)
+    cwd = os.path.join(path, 'acedb')
+    wspec_dir = os.path.join(afct.install_dir, 'wspec')
+    ftp_get = functools.partial(util.ftp_download,
+                                logger=logger,
+                                initial_cwd=cwd)
+    downloaded = ftp_get(host, file_selector_regexp, afct.download_dir)
+    for path in downloaded:
+        with tarfile.open(path) as tf:
+            logger.info('Extracting {} to {}', path, afct.install_dir)
+            tf.extractall(path=afct.install_dir)
+
+    # Enable the Dump command (requires adding user to ACeDB pw file)
+    passwd_path = os.path.join(wspec_dir, 'passwd.wrm')
+    mode = 0o644
+    logger.info('Changing permissions of {} to {}',
+                passwd_path,
+                stat.filemode(mode))
+    os.chmod(passwd_path, mode)
+    username = getpass .getuser()
+    with open(passwd_path, 'a') as fp:
+        logger.info('Adding {} to {}', username, passwd_path)
+        fp.write(username + os.linesep)
+    util.touch_dir(afct.install_dir)
+    return afct.install_dir
 
 
 @run.command('acedb-compress-dump',
@@ -180,7 +251,13 @@ def _get_steps(context):
     dump_dir = context.path('acedb-dump')
     id_catalog_path = context.path('acedb_id_catalog')
     logs_dir = context.path(LOGS_DIR)
+    acedb_dir = context.path('acedb_database')
+    acedb_id_catalog_dir = context.path('acedb_id_catalog')
     steps = [
+        Step('Fetch ACeDB data for release',
+             acedb_database,
+             dict(acedb_dir=acedb_dir,
+                  acedb_id_catalog_dir=acedb_id_catalog_dir)),
         Step('Dumping all ACeDB files',
              acedb_dump,
              dict(dump_dir=dump_dir)),
