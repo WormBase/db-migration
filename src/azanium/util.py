@@ -244,8 +244,9 @@ def get_ftp_url():
     return config.parse().get('sources', {}).get('ws_release')
 
 
-def get_data_release_version():
-    ftp_url = get_ftp_url()
+def get_data_release_version(ftp_url=None):
+    if ftp_url is None:
+        ftp_url = get_ftp_url()
     if not ftp_url:
         raise ValueError('FTP URL has not been configured.')
     return split_ftp_url(ftp_url)[-1]
