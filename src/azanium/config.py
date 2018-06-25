@@ -22,7 +22,7 @@ def parse(path=PATH, section=None):
         with open(path) as fp:
             conf = ConfigObj(infile=fp)
     except FileNotFoundError:
-        conf = {}
+        conf = ConfigObj()
     return conf[section] if section is not None else conf
 
 
