@@ -362,7 +362,7 @@ def process_steps(context, steps):
             context.app_state[LAST_STEP_OK_STATE_KEY] = step_n - 1
 
 @root_command.command('migrate',
-                      short_help='Run initial db migration steps.')
+                      short_help='Run all db-migration steps.')
 @util.pass_command_context
 def migrate(context):
     """Steps:
