@@ -1,14 +1,20 @@
 import collections
 import datetime
+import functools
+import getpass
+import gzip
 import os
 import psutil
+import re
 import shutil
+import stat
 import tarfile
 import time
 from functools import partial
 
 import click
 
+from . import artefact
 from . import datomic
 from . import log
 from . import notifications
@@ -25,6 +31,71 @@ LAST_STEP_OK_STATE_KEY = 'last-step-ok-idx'
 @util.pass_command_context
 def run(context):
     """Commands for executing the database migration."""
+
+
+def acedb_id_catalog(
+        meta,
+        report_file_regexp='all_classes_report.{version}\.txt\.gz$'):
+    """Installs the ACeDB id catalog use by QA report generation."""
+    (host, path, version) = util.split_ftp_url(util.get_ftp_url())
+    cwd = os.path.join(path, 'REPORTS')
+    regexp = 'all_classes_report\.{}\.txt\.gz$'.format(version)
+    downloaded = util.ftp_download(host,
+                                   regexp,
+                                   meta.download_dir,
+                                   logger,
+                                   initial_cwd=cwd)
+
+    downloaded_path = downloaded[0]
+    with gzip.open(downloaded_path) as gz_fp:
+        filename = re.sub('^(?P<fn>.*)\.gz',
+                          '\g<fn>',
+                          os.path.basename(downloaded_path))
+        out_path = os.path.join(meta.install_dir, filename)
+        with open(out_path, 'wb') as fp:
+            logger.info('Writing {}', fp.name)
+            fp.write(gz_fp.read())
+        return fp.name
+
+
+@run.command('acedb-database', short_help='Downlaod the ACeDB database release.')
+@util.option('--file-selector-regexp',
+             default='.*\.tar\.gz$',
+             help='File selection regexp')
+@artefact.prepared
+def acedb_database(context, afct, file_selector_regexp,
+                   acedb_dir=None,
+                   acedb_id_catalog_dir=None):
+    """Fetches all data, then installs and configures the ACeDB database."""
+    ctx = click.get_current_context()
+    ftp_url = util.get_ftp_url()
+    aidc_afct = artefact.prepare(context, acedb_id_catalog)
+    ctx.invoke(acedb_id_catalog, aidc_afct, ftp_url)
+    (host, path, version) = util.split_ftp_url(ftp_url)
+    cwd = os.path.join(path, 'acedb')
+    wspec_dir = os.path.join(afct.install_dir, 'wspec')
+    ftp_get = functools.partial(util.ftp_download,
+                                logger=logger,
+                                initial_cwd=cwd)
+    downloaded = ftp_get(host, file_selector_regexp, afct.download_dir)
+    for path in downloaded:
+        with tarfile.open(path) as tf:
+            logger.info('Extracting {} to {}', path, afct.install_dir)
+            tf.extractall(path=afct.install_dir)
+
+    # Enable the Dump command (requires adding user to ACeDB pw file)
+    passwd_path = os.path.join(wspec_dir, 'passwd.wrm')
+    mode = 0o644
+    logger.info('Changing permissions of {} to {}',
+                passwd_path,
+                stat.filemode(mode))
+    os.chmod(passwd_path, mode)
+    username = getpass .getuser()
+    with open(passwd_path, 'a') as fp:
+        logger.info('Adding {} to {}', username, passwd_path)
+        fp.write(username + os.linesep)
+    util.touch_dir(afct.install_dir)
+    return afct.install_dir
 
 
 @run.command('acedb-compress-dump',
@@ -86,6 +157,9 @@ def create_database(context, datomic_path):
 def ace_to_edn(context, acedb_dump_dir, edn_logs_dir):
     """Converts ACeDB dump files (.ace) to EDN log files."""
     pseudoace.acedb_dump_to_edn_logs(context, acedb_dump_dir, edn_logs_dir)
+    # restart the transactor to force jvm return memory to speed up later steps.
+    util.local('circusctl restart datomic-transactor')
+    time.sleep(2)
     return edn_logs_dir
 
 
@@ -106,9 +180,7 @@ def qa_report(context, acedb_id_catalog):
 
     """
     report_path = pseudoace.qa_report(context, acedb_id_catalog)
-    ws_version = context.data_release_version
-    title = 'QA Report for {}'
-    title = title.format(ws_version)
+    ws_version = util.get_data_release_version()
     title = 'QA report for {version} available in <{path}>'
     title = title.format(version=ws_version, loc=report_path)
     pretext = ('*Please check this looks correct '
@@ -134,7 +206,7 @@ def backup_db(context):
     prompt = 'Backup Datomic Database? [y/N]:'
     if not input(prompt).lower().startswith('y'):
         click.get_current_context().abort()
-    data_release_version = context.data_release_version
+    data_release_version = util.get_data_release_version()
     date_stamp = datetime.date.today().isoformat()
     local_backup_path = os.path.join(context.path('datomic-db-backup'),
                                      date_stamp,
@@ -174,11 +246,18 @@ Step = collections.namedtuple('Step', ('description', 'func', 'kwargs'))
 
 LOGS_DIR = 'edn-logs'
 
-def _get_convert_steps(context):
-    dump_dir = context.path('acedb-dump')
-    logs_dir = context.path(LOGS_DIR)
+def _get_steps(context):
     datomic_path = context.path('datomic_free')
+    dump_dir = context.path('acedb-dump')
+    id_catalog_path = context.path('acedb_id_catalog')
+    logs_dir = context.path(LOGS_DIR)
+    acedb_dir = context.path('acedb_database')
+    acedb_id_catalog_dir = context.path('acedb_id_catalog')
     steps = [
+        Step('Fetch ACeDB data for release',
+             acedb_database,
+             dict(acedb_dir=acedb_dir,
+                  acedb_id_catalog_dir=acedb_id_catalog_dir)),
         Step('Dumping all ACeDB files',
              acedb_dump,
              dict(dump_dir=dump_dir)),
@@ -193,24 +272,26 @@ def _get_convert_steps(context):
              dict(acedb_dump_dir=dump_dir, edn_logs_dir=logs_dir)),
         Step('Sorting EDN logs by timestamp',
              sort_edn_logs,
-             dict(edn_logs_dir=logs_dir))]
-    return steps
-
-def _get_import_steps(context):
-    logs_dir = context.path(LOGS_DIR)
-    id_catalog_path = context.path('acedb_id_catalog')
-    steps = [
+             dict(edn_logs_dir=logs_dir)),
         Step('Import EDN logs into Datomic database',
              import_logs,
              dict(edn_logs_dir=logs_dir)),
         Step('Running QA report on Datomic database',
              qa_report,
-             dict(acedb_id_catalog=id_catalog_path))]
+             dict(acedb_id_catalog=id_catalog_path)),
+        Step(('How does the report look? '
+              'Please answer the question in ssh console session '
+              'to backup the datomic database '
+              'and complete the db migration '
+              'process'),
+             backup_db,
+             {})
+    ]
     return steps
 
 
 def available_reset_steps(context):
-    steps = _get_convert_steps(context) + _get_import_steps(context)
+    steps = _get_steps(context)
     last_ok_step_n = context.app_state[LAST_STEP_OK_STATE_KEY]
     avail_steps = collections.OrderedDict()
     for (step_n, t) in enumerate(steps[:last_ok_step_n - 1], start=1):
@@ -262,7 +343,7 @@ def reset_to_step(context):
 
 def process_steps(context, steps):
     headline_fmt = 'Migrating ACeDB {release} to Datomic, *Step {step}*'
-    release = context.data_release_version
+    release = util.get_data_release_version()
     ctx = click.get_current_context()
     step_idx = int(context.app_state.get(LAST_STEP_OK_STATE_KEY, '0'))
     step_n = step_idx + 1
@@ -280,10 +361,10 @@ def process_steps(context, steps):
                                  post_kw=post_kw)
             context.app_state[LAST_STEP_OK_STATE_KEY] = step_n - 1
 
-@root_command.command('migrate-stage-1',
-                      short_help='Run initial db migration steps.')
+@root_command.command('migrate',
+                      short_help='Run all db-migration steps.')
 @util.pass_command_context
-def migrate_stage_1(context):
+def migrate(context):
     """Steps:
         1. Dump ACeDB files (.ace files)
 
@@ -294,19 +375,6 @@ def migrate_stage_1(context):
         4. Convert .ace files to EDN logs
 
         5. Sort EDN log files by timestamp
-    """
-    steps = []
-    steps.extend(_get_convert_steps(context))
-    process_steps(context, steps)
-
-@root_command.command('migrate-stage-2',
-                      short_help='Completes db migration steps')
-@util.pass_command_context
-def migrate_stage_2(context):
-    """Import the EDN files into datomic.
-
-    Steps:
-
         6. Import EDN logs into Datomic database
 
         7. Run QA Report on Datomic DB
@@ -314,14 +382,6 @@ def migrate_stage_2(context):
         8. Backup Datomic database locally **
 
     ** Only performed if you confirm report output looks good (7).
-
     """
-    steps = _get_convert_steps(context) + _get_import_steps(context)
-    steps.append(Step(('How does the report look? '
-                       'Please answer the question in ssh console session '
-                       'to backup the datomic database '
-                       'and complete the db migration '
-                       'process'),
-                      backup_db,
-                      {}))
+    steps = _get_steps(context)
     process_steps(context, steps)

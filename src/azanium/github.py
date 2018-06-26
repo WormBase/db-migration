@@ -9,6 +9,9 @@ import github3
 from . import config
 
 
+WB_PIPELINE_REPO = 'WormBase/wormbase-pipeline'
+
+
 def _prompt(question):
     answer = ''
     while not answer:
@@ -34,12 +37,12 @@ def login(scopes=('user', 'repo')):
     yield gh
 
 
-def repo_from_path(repo_path):
+def repo_from_path(repo_path, gh=github3):
     (org_name, _, repo_name) = repo_path.partition('/')
-    return github3.repository(org_name, repo_name)
+    return gh.repository(org_name, repo_name)
 
 
-def download_release_binary(repo_path, tag, to_directory=None):
+def download_release_binary(repo_path, tag, to_directory=None, gh=github3):
     """Download a release binary from `repo_path` to `to_directory`.
 
     `to_directory` will be the current working direcnutory by default.
@@ -55,7 +58,7 @@ def download_release_binary(repo_path, tag, to_directory=None):
     :returns: The path to the saved file.
     :rtype: str
     """
-    repo = repo_from_path(repo_path)
+    repo = repo_from_path(repo_path, gh=gh)
     release = repo.release_from_tag(tag)
     asset = next(release.assets(), None)
     asset_tarball_name = '{name}-{version}.tar.gz'.format(name=repo.name,
@@ -85,6 +88,11 @@ def publish_release(reporoot, version, bundle_path):
         filename = os.path.basename(fp.name)
         asset = release.upload_asset('application/zip', filename, fp)
     return asset
+
+
+def is_released(ws_version):
+    repo = repo_from_path(WB_PIPELINE_REPO)
+    return bool(repo.release_from_tag(ws_version))
 
 
 def read_released_file(repo, data_version, path):

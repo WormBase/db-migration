@@ -4,6 +4,7 @@ from configobj import ConfigObj
 import click
 
 from . import config
+from . import github
 from . import log
 from . import notifications
 from . import util
@@ -51,7 +52,9 @@ def configure(ws_release_ftp_url, slack_url=None):
         az_conf = config.parse()
     else:
         az_conf = ConfigObj()
-    az_conf['sources'] = dict(ws_release=ws_release_ftp_url)
+    ws_release_version = util.get_data_release_version(ws_release_ftp_url)
+    az_conf['sources'] = dict(ws_release=ws_release_ftp_url,
+                              is_released=github.is_released(ws_release_version))
     notifications_key = notifications.__name__
     if slack_url is not None:
         ncnf = az_conf.setdefault(notifications_key, notifications.DEFAULTS)
