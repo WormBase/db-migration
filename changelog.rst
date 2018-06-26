@@ -4,9 +4,11 @@
 
 0.42 (unreleased)
 =================
-
-- Various bug fixes.
-
+- Configuration of WormBase FTP URL an Slack URL done via configure command.
+- Made slack configuration optional, persistent across migration runs.
+- Downloading of ACeDB data moved from install step as the first migration step.
+- Various bug fixes around the configuration command.
+- Updated documentation to match changes to commands.
 
 0.41 (2018-06-19)
 =================
