@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Database Migration Procedure &mdash; azanium 0.42 documentation</title>
+  <title>Database Migration Procedure &mdash; azanium 0.43 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.42 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.43 documentation" href="../index.html"/>
         <link rel="next" title="Development" href="../dev/index.html"/>
         <link rel="prev" title="🐛 azanium - WormBase Database Migration" href="../index.html"/> 
 
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.42
+                0.43
               </div>
             
           
@@ -89,7 +89,11 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#commands">Commands</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#resulting-products">Resulting Products</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#resulting-products">Resulting Products</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#other-resources">Other Resources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#other-commands">Other commands</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development</a></li>
@@ -141,40 +145,56 @@
             
   <div class="section" id="database-migration-procedure">
 <span id="db-migration-steps"></span><h1>Database Migration Procedure<a class="headerlink" href="#database-migration-procedure" title="Permalink to this headline">¶</a></h1>
-<p>All <a class="reference internal" href="../glossary.html#term-azanium"><span class="xref std std-term">azanium</span></a> migration commands are all required to be invoked from the
-same working directory, and from the same host machine.</p>
+<p><a class="reference internal" href="../glossary.html#term-azanium"><span class="xref std std-term">azanium</span></a>, the migration software is a Python package, which
+will be used for running all migration commands.  All commands are all
+required to be invoked from the same working directory, and from the
+same host machine.</p>
+<p>The sections below will need to be repeated for each migration run.</p>
 <div class="section" id="software-setup">
 <h2>Software Setup<a class="headerlink" href="#software-setup" title="Permalink to this headline">¶</a></h2>
-<p>The migration software is a Python package (<a class="reference internal" href="../glossary.html#term-azanium"><span class="xref std std-term">azanium</span></a>).
-This will be used for running all migration commmands.
-Copy the <cite>$AZANIUM_WHEEL_URL</cite> url (The link listed with the <cite>.whl</cite>
-extension) listed in the downloads section of this repository&#8217;s
-<a class="reference external" href="https://github.com/Wormbase/db-migration/releases/latest">latest release page</a>.</p>
+<p>Install via the URL: <cite>$AZANIUM_WHEEL_URL</cite>.
+This URL can be obtained by copying the link with the <cite>.whl</cite> extension,
+listed under the section &#8220;Assets&#8221; on <a class="reference external" href="https://github.com/Wormbase/db-migration/releases/latest">latest release page</a>.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>python3 -m pip install --user --upgrade pip
 pip3 install --user <span class="s2">&quot;</span><span class="nv">$AZANIUM_WHEEL_URL</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p>Verify installation has succeeded this by using the <cite>&#8211;help</cite> command:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium --help
 </pre></div>
 </div>
 </div>
 <div class="section" id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
-<p>Each time the migration is run, it&#8217;s required to configure the migration
-with the FTP URL of the release.</p>
+<p>For each migration run, the software needs to be configured with the
+FTP URL pointing to the data release:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>azanium configure <span class="nv">$FTP_URL</span>
 </pre></div>
 </div>
-<p>This will persist the FTP release (and WS release version encoded in
-the URL) for use by all migration commands.</p>
 <div class="section" id="enabling-slack-notifications">
 <h3>Enabling Slack notifications<a class="headerlink" href="#enabling-slack-notifications" title="Permalink to this headline">¶</a></h3>
-<p>To enable slack notifications of each build step to the
-<cite>#db-migratione-events</cite> channel in the WormBase slack, specify url to
-the configure command as shown below.
-The value for <cite>$WEBHOOK_URL</cite> is available from the WormBase slack management console
-for the WormBase organisation.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The configuration of the slack URL need only be done once, and will
+persist across migration runs.</p>
+</div>
+<p>Migration steps can optionally broadcast messages to a WormBase slack
+channel to inform interested parties about the progress of the
+migration.</p>
+<p>To enable slack notifications to the <cite>#db-migration-events</cite> channel
+in the WormBase slack, specify the <cite>$WEBHOOK_URL</cite> as the value for
+<cite>&#8211;slack-url</cite> option to the configure command.</p>
+<p>The value for <cite>$WEBHOOK_URL</cite> is available from the WormBase
+slack management console for the WormBase organisation.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">To obtain the Webhook URL using the following instructions, you
+must be logged in as an administrator to the WormBase Slack</p>
+</div>
 <dl class="docutils">
-<dt>To find this url:</dt>
+<dt>To find the Webhook URL:</dt>
 <dd><ol class="first last arabic simple">
-<li>Visit <a class="reference external" href="https://api.slack.com/apps">https://api.slack.com/apps</a></li>
+<li>Visit the <cite>Slack API Apps page</cite> (must be logged in as a manager)</li>
 <li>Click the active &#8220;azanium&#8221; application  listed under &#8220;Your Apps&#8221;</li>
 <li>Click &#8220;Incoming Webhooks&#8221; under &#8220;Features&#8221; (left side-menu)</li>
 <li>In the listing of Webhook URLs, click the top-most (latest)
@@ -182,16 +202,18 @@ Webhook URL, listed against the <cite>#db-migration-events</cite> channel.</li>
 </ol>
 </dd>
 </dl>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium configure <span class="nv">$FTP_URL</span> --slack-url<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$WEBHOOK_URL</span><span class="s2">&quot;</span>
+<p>An example of configuring the Slack Webhook URL in conjunction with
+the <cite>$FTP_URL</cite> required to specify the release:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium configure <span class="nv">$FTP_URL</span> --slack-url<span class="o">=</span><span class="nv">$WEBHOOK_URL</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="section" id="commands">
 <h2>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h2>
-<p>The following steps below will migrate the ACeDB database to Datomic.
-Then end result will be a Datomic database, compressed as an arhive on
-the host the migration is performed.</p>
+<p>The following steps below will migrate the ACeDB database to Datomic.</p>
+<p>The end result will be a Datomic database, compressed as an archive on
+the host the migration is performed upon.</p>
 <dl class="docutils">
 <dt>The location of the file should be:</dt>
 <dd>/wormbase/datomic-db-backups/&lt;RELEASE&gt;.tar.xz</dd>
@@ -208,58 +230,45 @@ the host the migration is performed.</p>
 </div>
 </li>
 <li><p class="first">Install software</p>
-<p>Below, $FTP_URL is the location of the WS release on an ftp server.
-This should be a fully-qualified URL, with the FTP scheme, e.g:</p>
-<p><cite>ftp://ftp.ebi.ac.uk/pub/databases/wormbase/staging/releases/WS266</cite></p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>azanium install
 </pre></div>
 </div>
 </li>
 <li><p class="first">Run the migration</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium migrate-stage-1
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium migrate
 </pre></div>
 </div>
-<p>This command will execute steps for stage 1 of the migration:</p>
-<ol class="arabic simple">
-<li>Extract all .ace files from the ACeDB database for the current release.</li>
-<li>Compress all .ace files</li>
-<li>Convert .ace files to EDN logs</li>
-<li>Sort all EDN logs by timestamp</li>
-</ol>
-<div class="admonition attention">
-<p class="first admonition-title">Attention</p>
-<p class="last">restart the instance to free-up resources on the host (memory).</p>
-</div>
-<p>Continue the migration (Stage 2):</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium migrate-stage-2
-</pre></div>
-</div>
-<p>This command executes the remaining steps required to complete the migration.</p>
-<ol class="arabic" start="5">
+<p>This command will execute all the steps required to perform the migration:</p>
+<ol class="arabic">
+<li><p class="first">Extract all .ace files from the ACeDB database for the current release.</p>
+</li>
+<li><p class="first">Compress all .ace files</p>
+</li>
+<li><p class="first">Convert .ace files to EDN logs</p>
+</li>
+<li><p class="first">Sort all EDN logs by timestamp</p>
+</li>
 <li><p class="first">Create the Datomic database</p>
 </li>
 <li><p class="first">Import the EDN logs into the Datomic database</p>
 </li>
-<li><p class="first">Run a QA report on the database</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Once this step has completed, the user will be prompted
-in the tmux/screen shell session to confirm the next step, or abort.
+<li><p class="first">Run a QA report on the database
+.. note:: Once this step has completed, the user will be prompted</p>
+<blockquote>
+<div><p>in the tmux/screen shell session to confirm the next step, or abort.
 This will also be posted to the slack channel for
 tracking migration events (if notifications are enabled).</p>
-</div>
+</div></blockquote>
 </li>
 <li><p class="first">Backup the Datomic database</p>
 </li>
-<li><dl class="first docutils">
-<dt>Write migration procedure completion notification to the #db-migration-events</dt>
-<dd><p class="first">wormbase-db-dev slack channel.</p>
-<div class="last highlight-bash"><div class="highlight"><pre><span></span>azanium notify <span class="se">\</span>
-   <span class="s2">&quot;Migration of ACeDB WS254 to Datomic complete! :fireworks:&quot;</span>
+<li><p class="first">Notify watchers of the slack channel that the migration has completed.</p>
+<p>If slack integration was configured, you can use:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium notify <span class="se">\</span>
+    <span class="s2">&quot;Migration of ACeDB WS254 to Datomic complete! :fireworks:&quot;</span>
 </pre></div>
 </div>
-</dd>
-</dl>
+<p>Otherwise, write a message manually to the <cite>#db-migration-events</cite> slack channel.</p>
 </li>
 </ol>
 </li>
@@ -271,7 +280,7 @@ tracking migration events (if notifications are enabled).</p>
 <blockquote>
 <div><p>Datomic Database:</p>
 <blockquote>
-<div>/wormbase/datomic-db-backups/$WS_RELEASE.tar.xz</div></blockquote>
+<div>/wormbase/datomic-db-backup/$WS_RELEASE.tar.xz</div></blockquote>
 <p>QA Report</p>
 <blockquote>
 <div>/wormbase/$WS_RELEASE-report.csv</div></blockquote>
@@ -279,6 +288,31 @@ tracking migration events (if notifications are enabled).</p>
 <blockquote>
 <div>/wormbase/logs/azanium.log</div></blockquote>
 </div></blockquote>
+<div class="section" id="other-resources">
+<h3>Other Resources<a class="headerlink" href="#other-resources" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><p>Datomic transactor logs directory:</p>
+<blockquote>
+<div>/wormbase/datomic_free/log</div></blockquote>
+<p>circus log file (<cite>circus</cite> is the hypervisor for running the transactor):</p>
+<blockquote>
+<div>/wormbase/circus-datomic-transactor.log</div></blockquote>
+</div></blockquote>
+</div>
+<div class="section" id="other-commands">
+<h3>Other commands<a class="headerlink" href="#other-commands" title="Permalink to this headline">¶</a></h3>
+<p>The following <em>may</em> be useful when manual intervention is required.</p>
+<p>Reset the migration to a step (prompts):</p>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>azanium reset-to-step
+</pre></div>
+</div>
+<p>Manually restart the transactor:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>circusctl restart datomic-transactor
+</pre></div>
+</div>
+</div></blockquote>
+</div>
 </div>
 </div>
 
@@ -323,7 +357,7 @@ tracking migration events (if notifications are enabled).</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.42',
+            VERSION:'0.43',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

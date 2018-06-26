@@ -3,59 +3,85 @@
 ============================
 Database Migration Procedure
 ============================
-All :term:`azanium` migration commands are all required to be invoked from the
-same working directory, and from the same host machine.
+:term:`azanium`, the migration software is a Python package, which
+will be used for running all migration commands.  All commands are all
+required to be invoked from the same working directory, and from the
+same host machine.
+
+The sections below will need to be repeated for each migration run.
 
 Software Setup
 ==============
-The migration software is a Python package (:term:`azanium`).
-This will be used for running all migration commmands.
-Copy the `$AZANIUM_WHEEL_URL` url (The link listed with the `.whl`
-extension) listed in the downloads section of this repository's
-`latest release page`_.
+Install via the URL: `$AZANIUM_WHEEL_URL`.
+This URL can be obtained by copying the link with the `.whl` extension,
+listed under the section "Assets" on `latest release page`_.
 
 .. code-block:: bash
 
    python3 -m pip install --user --upgrade pip
    pip3 install --user "$AZANIUM_WHEEL_URL"
 
+Verify installation has succeeded this by using the `--help` command:
+
+.. code-block:: bash
+
+   azanium --help
+
 
 Configuration
 =============
-Each time the migration is run, it's required to configure the migration
-with the FTP URL of the release.
+For each migration run, the software needs to be configured with the
+FTP URL pointing to the data release:
 
 .. code-block:: bash
 
    azanium configure $FTP_URL
 
-This will persist the FTP release (and WS release version encoded in
-the URL) for use by all migration commands.
-
 Enabling Slack notifications
 ----------------------------
-To enable slack notifications of each build step to the
-`#db-migratione-events` channel in the WormBase slack, specify url to
-the configure command as shown below.
-The value for `$WEBHOOK_URL` is available from the WormBase slack management console
-for the WormBase organisation.
 
-To find this url:
-   1. Visit https://api.slack.com/apps
+.. note::
+
+   The configuration of the slack URL need only be done once, and will
+   persist across migration runs.
+
+Migration steps can optionally broadcast messages to a WormBase slack
+channel to inform interested parties about the progress of the
+migration.
+
+To enable slack notifications to the `#db-migration-events` channel
+in the WormBase slack, specify the `$WEBHOOK_URL` as the value for
+`--slack-url` option to the configure command.
+
+The value for `$WEBHOOK_URL` is available from the WormBase
+slack management console for the WormBase organisation.
+
+.. important::
+
+   To obtain the Webhook URL using the following instructions, you
+   must be logged in as an administrator to the WormBase Slack
+
+To find the Webhook URL:
+   1. Visit the `Slack API Apps page` (must be logged in as a manager)
    2. Click the active "azanium" application  listed under "Your Apps"
    3. Click "Incoming Webhooks" under "Features" (left side-menu)
    4. In the listing of Webhook URLs, click the top-most (latest)
       Webhook URL, listed against the `#db-migration-events` channel.
 
+An example of configuring the Slack Webhook URL in conjunction with
+the `$FTP_URL` required to specify the release:
+
+
 .. code-block:: bash
 
-   azanium configure $FTP_URL --slack-url="$WEBHOOK_URL"
+   azanium configure $FTP_URL --slack-url=$WEBHOOK_URL
 
 Commands
 ========
 The following steps below will migrate the ACeDB database to Datomic.
-Then end result will be a Datomic database, compressed as an arhive on
-the host the migration is performed.
+
+The end result will be a Datomic database, compressed as an archive on
+the host the migration is performed upon.
 
 The location of the file should be:
    /wormbase/datomic-db-backups/<RELEASE>.tar.xz
@@ -69,7 +95,6 @@ The location of the file should be:
 
       tmux new-session -s azanium-commands
 
-
    Clean up after any previous migration:
 
    .. code-block:: bash
@@ -77,11 +102,6 @@ The location of the file should be:
       azanium clean-previous-state
 
 2. Install software
-
-   Below, $FTP_URL is the location of the WS release on an ftp server.
-   This should be a fully-qualified URL, with the FTP scheme, e.g:
-
-   `ftp://ftp.ebi.ac.uk/pub/databases/wormbase/staging/releases/WS266`
 
    .. code-block:: bash
 
@@ -91,46 +111,32 @@ The location of the file should be:
 
    .. code-block:: bash
 
-      azanium migrate-stage-1
+      azanium migrate
 
-   This command will execute steps for stage 1 of the migration:
+   This command will execute all the steps required to perform the migration:
 
    1. Extract all .ace files from the ACeDB database for the current release.
    2. Compress all .ace files
    3. Convert .ace files to EDN logs
    4. Sort all EDN logs by timestamp
-
-
-   .. attention::
-
-      restart the instance to free-up resources on the host (memory).
-
-   Continue the migration (Stage 2):
-
-   .. code-block:: bash
-
-      azanium migrate-stage-2
-
-   This command executes the remaining steps required to complete the migration.
-
    5. Create the Datomic database
    6. Import the EDN logs into the Datomic database
    7. Run a QA report on the database
-
       .. note:: Once this step has completed, the user will be prompted
 	        in the tmux/screen shell session to confirm the next step, or abort.
 	        This will also be posted to the slack channel for
 	        tracking migration events (if notifications are enabled).
-
    8. Backup the Datomic database
+   9. Notify watchers of the slack channel that the migration has completed.
 
-   9. Write migration procedure completion notification to the #db-migration-events
-       wormbase-db-dev slack channel.
+      If slack integration was configured, you can use:
 
-       .. code-block:: bash
+      .. code-block:: bash
 
-          azanium notify \
+	 azanium notify \
 	     "Migration of ACeDB WS254 to Datomic complete! :fireworks:"
+
+      Otherwise, write a message manually to the `#db-migration-events` slack channel.
 
 
 Resulting Products
@@ -139,7 +145,7 @@ The followings files are created by the migration:
 
    Datomic Database:
 
-      /wormbase/datomic-db-backups/$WS_RELEASE.tar.xz
+      /wormbase/datomic-db-backup/$WS_RELEASE.tar.xz
 
    QA Report
 
@@ -150,5 +156,34 @@ The followings files are created by the migration:
       /wormbase/logs/azanium.log
 
 
+Other Resources
+---------------
+
+  Datomic transactor logs directory:
+
+  	/wormbase/datomic_free/log
+
+  circus log file (`circus` is the hypervisor for running the transactor):
+
+  	/wormbase/circus-datomic-transactor.log
+
+
+Other commands
+--------------
+The following *may* be useful when manual intervention is required.
+
+Reset the migration to a step (prompts):
+
+  .. code-block:: bash
+
+     azanium reset-to-step
+
+  Manually restart the transactor:
+
+  .. code-block:: bash
+
+     circusctl restart datomic-transactor
+
 
 .. _`latest release page`: https://github.com/Wormbase/db-migration/releases/latest
+.. _`Slack API Apps page`: https://api.slack.com/apps
