@@ -14,14 +14,9 @@
 - Various bug fixes around the configuration command.
 - Updated documentation to match changes to commands.
 
-0.42 (unreleased)
-=================
-
 0.41 (2018-06-19)
 =================
-
 - Fixed bootstrapping issue.
-
 
 0.40 (2018-06-19)
 =================
