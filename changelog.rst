@@ -2,6 +2,10 @@
  Changelog
 ===========
 
+0.44 (unreleased)
+=================
+- Nothing changed yet.
+
 0.43 (2018-06-26)
 =================
 - Configuration of WormBase FTP URL an Slack URL done via configure command.
@@ -9,6 +13,9 @@
 - Downloading of ACeDB data moved from install step as the first migration step.
 - Various bug fixes around the configuration command.
 - Updated documentation to match changes to commands.
+
+0.42 (unreleased)
+=================
 
 0.41 (2018-06-19)
 =================
