@@ -2,13 +2,7 @@
  Changelog
 ===========
 
-0.43 (unreleased)
-=================
-
-- Nothing changed yet.
-
-
-0.42 (2018-06-19)
+0.42 (unreleased)
 =================
 - Configuration of WormBase FTP URL an Slack URL done via configure command.
 - Made slack configuration optional, persistent across migration runs.
