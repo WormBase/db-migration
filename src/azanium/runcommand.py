@@ -182,7 +182,7 @@ def qa_report(context, acedb_id_catalog):
     report_path = pseudoace.qa_report(context, acedb_id_catalog)
     ws_version = util.get_data_release_version()
     title = 'QA report for {version} available in <{path}>'
-    title = title.format(version=ws_version, loc=report_path)
+    title = title.format(version=ws_version, path=report_path)
     pretext = ('*Please check this looks correct '
                'before backing-up the datomic database*')
     attachment = notifications.Attachment(title, pretext=pretext)
