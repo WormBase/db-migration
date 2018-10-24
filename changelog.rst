@@ -4,7 +4,9 @@
 
 0.44 (unreleased)
 =================
-- Nothing changed yet.
+- Updated to latest version of pseudoace.
+- Fixed typo (#35)
+- Added missing requriement.
 
 0.43 (2018-06-26)
 =================
