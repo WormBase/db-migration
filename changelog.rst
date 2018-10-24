@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.44 (unreleased)
+0.43 (2018-10-24)
 =================
 - Updated to latest version of pseudoace.
 - Fixed typo (#35)
