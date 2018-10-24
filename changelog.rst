@@ -2,6 +2,12 @@
  Changelog
 ===========
 
+0.45 (unreleased)
+=================
+
+- Nothing changed yet.
+
+
 0.44 (2018-10-24)
 =================
 - Updated to latest version of pseudoace.
