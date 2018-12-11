@@ -5,7 +5,7 @@
 0.46 (unreleased)
 =================
 
-- Nothing changed yet.
+- Addressed github-reported security vulnerability in package dependencies.
 
 
 0.45 (2018-12-11)
