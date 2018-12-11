@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.45 (unreleased)
+0.45 (2018-12-11)
 =================
 
 - Bumped versions of datomic and pseudoace.
