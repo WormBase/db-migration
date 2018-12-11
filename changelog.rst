@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.46 (unreleased)
+0.46 (2018-12-11)
 =================
 
 - Addressed github-reported security vulnerability in package dependencies.
