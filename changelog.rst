@@ -5,7 +5,7 @@
 0.45 (unreleased)
 =================
 
-- Nothing changed yet.
+- Bumped versions of datomic and pseudoace.
 
 
 0.44 (2018-10-24)
