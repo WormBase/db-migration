@@ -1,6 +1,6 @@
 configobj==5.0.6
 Markdown==2.6.8
-PyYAML==3.12
+PyYAML==4.2b2
 awacs==0.6.2
 click==6.7
 docutils==0.13.1
