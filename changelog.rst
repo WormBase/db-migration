@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.47 (unreleased)
+0.47 (2019-07-18)
 =================
 - Modify the way pseudoace is invoked via java jar file.
 - Apply any patches from the PATCHES directory on the FTP site.
