@@ -14,7 +14,11 @@ logger = log.get_logger(namespace=__name__)
 
 def run_pseudoace(context, *args):
     cmd = [context.java_cmd,
-           '-jar', context.pseudoace_jar_path,
+           '-cp',
+           context.pseudoace_jar_path,
+           'clojure.main',
+           '-m',
+           'pseudoace.cli',
            '--url=' + context.datomic_url()]
     cmd.extend(list(args))
     logger.info('Running pseudoace command: {}', ' '.join(cmd))
