@@ -4,19 +4,17 @@
 
 0.47 (unreleased)
 =================
-
-- Nothing changed yet.
+- Modify the way pseudoace is invoked via java jar file.
+- Apply any patches from the PATCHES directory on the FTP site.
 
 
 0.46 (2018-12-11)
 =================
-
 - Addressed github-reported security vulnerability in package dependencies.
 
 
 0.45 (2018-12-11)
 =================
-
 - Bumped versions of datomic and pseudoace.
 
 
