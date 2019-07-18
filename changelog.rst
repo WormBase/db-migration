@@ -2,6 +2,12 @@
  Changelog
 ===========
 
+0.48 (unreleased)
+=================
+
+- Nothing changed yet.
+
+
 0.47 (2019-07-18)
 =================
 - Modify the way pseudoace is invoked via java jar file.
