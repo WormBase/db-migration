@@ -105,6 +105,14 @@ def import_logs(context, edn_logs_dir):
                   'import-logs')
 
 
+def apply_patches(context):
+    patches_ftp_url = '{}/acedb/PATCHES'.format(util.get_ftp_url())
+    run_pseudoace(context,
+                  '--patches-ftp-url=' + patches_ftp_url,
+                  '--verbose',
+                  'apply-patches')
+
+
 def qa_report(context, acedb_id_catalog_path):
     data_release = util.get_data_release_version()
     report_filename = 'all_classes_report.{}.txt'.format(data_release)

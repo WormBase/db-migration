@@ -196,6 +196,13 @@ def import_logs(context, edn_logs_dir):
     pseudoace.import_logs(context, edn_logs_dir)
 
 
+@run.command('apply-patches')
+@util.pass_command_context
+def apply_patches(context):
+    """Convert ACe patches to EDN and transact to the local datomic database."""
+    pseudoace.apply_patches(context)
+
+
 @run.command('backup-db',
              short_help='Backup the Datomic db.')
 @util.pass_command_context
@@ -276,6 +283,9 @@ def _get_steps(context):
         Step('Import EDN logs into Datomic database',
              import_logs,
              dict(edn_logs_dir=logs_dir)),
+        Step('Apply ACe patches from the PATCHES directory on the FTP site.',
+             apply_patches,
+             {}),
         Step('Running QA report on Datomic database',
              qa_report,
              dict(acedb_id_catalog=id_catalog_path)),
@@ -375,11 +385,14 @@ def migrate(context):
         4. Convert .ace files to EDN logs
 
         5. Sort EDN log files by timestamp
+
         6. Import EDN logs into Datomic database
 
-        7. Run QA Report on Datomic DB
+        7. Apply any ACe patches from the PATCHES directory on the FTP site.
 
-        8. Backup Datomic database locally **
+        8. Run QA Report on Datomic DB
+
+        9. Backup Datomic database locally **
 
     ** Only performed if you confirm report output looks good (7).
     """
