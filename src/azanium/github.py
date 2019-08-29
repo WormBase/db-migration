@@ -61,7 +61,7 @@ def download_release_binary(repo_path, tag, to_directory=None, gh=github3):
     repo = repo_from_path(repo_path, gh=gh)
     release = repo.release_from_tag(tag)
     asset = next(release.assets(), None)
-    asset_tarball_name = '{name}-{version}.tar.gz'.format(name=repo.name,
+    asset_tarball_name = '{name}-{version}.tar.xz'.format(name=repo.name,
                                                           version=tag)
     if asset is None or asset.name != asset_tarball_name:
         msg = 'Expected asset {!r} has not been uploaded to github releases'

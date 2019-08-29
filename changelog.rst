@@ -4,8 +4,7 @@
 
 0.48 (unreleased)
 =================
-
-- Nothing changed yet.
+- Fixed locating of pseudoace release archive.
 
 
 0.47 (2019-07-18)
