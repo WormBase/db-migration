@@ -2,6 +2,12 @@
  Changelog
 ===========
 
+0.49 (unreleased)
+=================
+
+- Nothing changed yet.
+
+
 0.48 (2019-08-29)
 =================
 - Fixed locating of pseudoace release archive.
