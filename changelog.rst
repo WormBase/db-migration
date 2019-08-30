@@ -5,7 +5,7 @@
 0.49 (unreleased)
 =================
 
-- Nothing changed yet.
+- Bumped version of pseudoace.
 
 
 0.48 (2019-08-29)
@@ -52,7 +52,7 @@
 
 - The FTP URL is now passed to the `azanium configure` command,
   rather than partially parameterised in install commmand(s).
-- Fixed bugs with configuration code and logging. 
+- Fixed bugs with configuration code and logging.
 
 
 0.39 (2018-06-18)
