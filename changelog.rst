@@ -2,6 +2,11 @@
  Changelog
 ===========
 
+0.51 (2019-09-03)
+=================
+
+- Bumped version of pseudoace to pull in bugfix.
+
 0.50 (2019-09-03)
 =================
 
