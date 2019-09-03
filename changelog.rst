@@ -5,7 +5,7 @@
 0.50 (unreleased)
 =================
 
-- Nothing changed yet.
+- Bumped version of pseudoace to pull in bugfix.
 
 
 0.49 (2019-08-30)
