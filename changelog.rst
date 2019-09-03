@@ -2,6 +2,12 @@
  Changelog
 ===========
 
+0.51 (unreleased)
+=================
+
+- Nothing changed yet.
+
+
 0.52 (unreleased)
 =================
 
