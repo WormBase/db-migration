@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.52 (unreleased)
+0.52 (2019-09-09)
 =================
 
 - Pull in new version of pseudoace for bugfix.
