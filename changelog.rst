@@ -5,7 +5,7 @@
 0.53 (unreleased)
 =================
 
-- Nothing changed yet.
+- Bumped version of pseudoace for bug fixes.
 
 
 0.52 (2019-09-09)
