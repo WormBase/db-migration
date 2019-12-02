@@ -13,6 +13,7 @@ import shelve
 import subprocess
 import stat
 import tempfile
+import time
 import urllib.parse
 
 from pkg_resources import resource_filename
@@ -341,3 +342,15 @@ def touch_dir(path):
     assert os.path.isdir(path)
     with tempfile.NamedTemporaryFile(dir=path, suffix='azanium', mode='wb'):
         pass
+
+
+def retries(attempts, callback):
+    while attempts > 0:
+        try:
+            callback()
+        except LocalCommandError as lce:
+            attempts -= 1
+            click.echo("Retrying %d more times..." % attempts)
+        time.sleep(0.5)
+    return attempts > 0
+
