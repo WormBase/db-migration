@@ -158,8 +158,9 @@ def ace_to_edn(context, acedb_dump_dir, edn_logs_dir):
     """Converts ACeDB dump files (.ace) to EDN log files."""
     pseudoace.acedb_dump_to_edn_logs(context, acedb_dump_dir, edn_logs_dir)
     # restart the transactor to force jvm return memory to speed up later steps.
-    util.local('circusctl restart datomic-transactor')
-    time.sleep(2)
+    # wrapped with retries due to circusctl bug.
+    util.retries(3, lambda : util.local('python -m circus.circusctl --timeout=5 restart datomic-transactor',
+                                   timeout=6))
     return edn_logs_dir
 
 
