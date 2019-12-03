@@ -127,6 +127,22 @@ def qa_report(context, acedb_id_catalog_path):
     return out_path
 
 
+def homol_import(context, acedump_dir, log_dir):
+    am_filename = source_annotated_models_file(context)
+    models_path = os.path.join(context.path('acedb_database'),
+                               'wspec',
+                               am_filename)
+    homol_logs_dir = context.path('homol-edn-logs')
+    os.makedirs(homol_logs_dir, exist_ok=True)
+    run_pseudoace(context,
+                  '--models-filename=' + models_path,
+                  '--acedump-dir=' + acedump_dir,
+                  '--log-dir=' + log_dir,
+                  '--homol-log-dir=' + homol_logs_dir,
+                  '--verbose=true',
+                  'homol-import')
+
+
 class QADialect(csv.excel):
     quoting = csv.QUOTE_ALL
 

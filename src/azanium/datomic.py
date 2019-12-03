@@ -9,8 +9,8 @@ from . import util
 logger = log.get_logger(namespace=__name__)
 
 
-def backup_db(context, local_backup_path):
-    from_uri = context.datomic_url()
+def backup_db(context, local_backup_path, db_name):
+    from_uri = context.datomic_url(db_name)
     to_uri = 'file://' + local_backup_path
     cmd = ['bin/datomic',
            util.jvm_mem_opts(0.20),

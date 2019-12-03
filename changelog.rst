@@ -5,7 +5,9 @@
 0.54 (unreleased)
 =================
 
-- Nothing changed yet.
+- Apply retry logic when restarting datomic transactor.
+- Bumped version of pseudoace.
+- Added two new steps to the migration process (produce homology database).
 
 
 0.53 (2019-10-08)

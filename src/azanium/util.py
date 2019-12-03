@@ -319,8 +319,9 @@ class CommandContext:
         return os.path.join(self.base_path, *args)
 
     def datomic_url(self,
+                    db_name,
                     default_prefix='datomic:free://localhost:4334/'):
-        default_url = default_prefix + get_data_release_version()
+        default_url = default_prefix + db_name
         return os.environ.get('DATOMIC_URI', default_url)
 
 

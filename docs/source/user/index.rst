@@ -122,12 +122,10 @@ The location of the file should be:
    5. Create the Datomic database
    6. Import the EDN logs into the Datomic database
    7. Run a QA report on the database
-      .. note:: Once this step has completed, the user will be prompted
-	        in the tmux/screen shell session to confirm the next step, or abort.
-	        This will also be posted to the slack channel for
-	        tracking migration events (if notifications are enabled).
    8. Backup the Datomic database
-   9. Notify watchers of the slack channel that the migration has completed.
+   9. Create a homology database
+   10. Backup the homology database.
+   11. Notify watchers of the slack channel that the migration has completed.
 
       If slack integration was configured, you can use:
 

@@ -207,23 +207,24 @@ def apply_patches(context):
 @run.command('backup-db',
              short_help='Backup the Datomic db.')
 @util.pass_command_context
-def backup_db(context):
+def backup_db(context, db_name_suffix=None):
     """Back up the Datomic database to the local disk."""
     os.chdir(context.path('datomic_free'))
-    click.echo('Does the QA report looks correct?')
-    prompt = 'Backup Datomic Database? [y/N]:'
-    if not input(prompt).lower().startswith('y'):
-        click.get_current_context().abort()
+    click.echo('Please check the QA report looks correct.')
     data_release_version = util.get_data_release_version()
+    if db_name_suffix is not None:
+        db_name = '{}-{}'.format(data_release_version, db_name_suffix)
+    else:
+        db_name = data_release_version
     date_stamp = datetime.date.today().isoformat()
     local_backup_path = os.path.join(context.path('datomic-db-backup'),
                                      date_stamp,
                                      context.db_name)
-    arcname = '{}.tar.xz'.format(data_release_version)
+    arcname = '{}.tar.xz'.format(db_name)
     archive_path = os.path.join(os.path.dirname(local_backup_path),
                                 arcname)
     if not os.path.isdir(local_backup_path):
-        datomic.backup_db(context, local_backup_path)
+        datomic.backup_db(context, local_backup_path, db_name)
     if not os.path.isfile(archive_path):
         logger.info('Creating archive {} for upload', archive_path)
         with tarfile.open(archive_path, mode='w:xz') as tf:
@@ -290,14 +291,16 @@ def _get_steps(context):
         Step('Running QA report on Datomic database',
              qa_report,
              dict(acedb_id_catalog=id_catalog_path)),
-        Step(('How does the report look? '
-              'Please answer the question in ssh console session '
-              'to backup the datomic database '
-              'and complete the db migration '
-              'process'),
+        Step('Backup main migration database.',
              backup_db,
-             {})
-    ]
+             {}),
+        Step('Create the homology database.',
+             pseudoace.homol_import,
+             dict(log_dir=logs_dir,
+                  acedump_dir=dump_dir)),
+        Step('Backup the homology database',
+             backup_db,
+             dict(db_name_suffix='homol'))]
     return steps
 
 
@@ -353,7 +356,7 @@ def reset_to_step(context):
     click.echo('Migration step is now set to {}'.format(step_n))
 
 def process_steps(context, steps):
-    headline_fmt = 'Migrating ACeDB {release} to Datomic, *Step {step}*'
+    headline_fmt = 'Migrating ACeDB {releaes} to Datomic, *Step {step}*'
     release = util.get_data_release_version()
     ctx = click.get_current_context()
     step_idx = int(context.app_state.get(LAST_STEP_OK_STATE_KEY, '0'))
@@ -393,9 +396,12 @@ def migrate(context):
 
         8. Run QA Report on Datomic DB
 
-        9. Backup Datomic database locally **
+        9. Backup Datomic database locally.
 
-    ** Only performed if you confirm report output looks good (7).
+       10. Create homology database.
+
+       11. Backup homology database.
+
     """
     steps = _get_steps(context)
     process_steps(context, steps)
