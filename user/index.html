@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Database Migration Procedure &mdash; azanium 0.53 documentation</title>
+  <title>Database Migration Procedure &mdash; azanium 0.54 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.53 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.54 documentation" href="../index.html"/>
         <link rel="next" title="Development" href="../dev/index.html"/>
         <link rel="prev" title="🐛 azanium - WormBase Database Migration" href="../index.html"/> 
 
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.53
+                0.54
               </div>
             
           
@@ -239,38 +239,27 @@ the host the migration is performed upon.</p>
 </pre></div>
 </div>
 <p>This command will execute all the steps required to perform the migration:</p>
-<ol class="arabic">
-<li><p class="first">Extract all .ace files from the ACeDB database for the current release.</p>
-</li>
-<li><p class="first">Compress all .ace files</p>
-</li>
-<li><p class="first">Convert .ace files to EDN logs</p>
-</li>
-<li><p class="first">Sort all EDN logs by timestamp</p>
-</li>
-<li><p class="first">Create the Datomic database</p>
-</li>
-<li><p class="first">Import the EDN logs into the Datomic database</p>
-</li>
-<li><p class="first">Run a QA report on the database
-.. note:: Once this step has completed, the user will be prompted</p>
+<ol class="arabic simple">
+<li>Extract all .ace files from the ACeDB database for the current release.</li>
+<li>Compress all .ace files</li>
+<li>Convert .ace files to EDN logs</li>
+<li>Sort all EDN logs by timestamp</li>
+<li>Create the Datomic database</li>
+<li>Import the EDN logs into the Datomic database</li>
+<li>Run a QA report on the database</li>
+<li>Backup the Datomic database</li>
+<li>Create a homology database</li>
+<li>Backup the homology database.</li>
+<li>Notify watchers of the slack channel that the migration has completed.</li>
+</ol>
 <blockquote>
-<div><p>in the tmux/screen shell session to confirm the next step, or abort.
-This will also be posted to the slack channel for
-tracking migration events (if notifications are enabled).</p>
-</div></blockquote>
-</li>
-<li><p class="first">Backup the Datomic database</p>
-</li>
-<li><p class="first">Notify watchers of the slack channel that the migration has completed.</p>
-<p>If slack integration was configured, you can use:</p>
+<div><p>If slack integration was configured, you can use:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>azanium notify <span class="se">\</span>
     <span class="s2">&quot;Migration of ACeDB WS254 to Datomic complete! :fireworks:&quot;</span>
 </pre></div>
 </div>
 <p>Otherwise, write a message manually to the <cite>#db-migration-events</cite> slack channel.</p>
-</li>
-</ol>
+</div></blockquote>
 </li>
 </ol>
 </div>
@@ -280,7 +269,7 @@ tracking migration events (if notifications are enabled).</p>
 <blockquote>
 <div><p>Datomic Database:</p>
 <blockquote>
-<div>/wormbase/datomic-db-backup/$WS_RELEASE.tar.xz</div></blockquote>
+<div>/wormbase/datomic-db-backup/<a href="#id1"><span class="problematic" id="id2">*</span></a>/$WS_RELEASE.tar.xz</div></blockquote>
 <p>QA Report</p>
 <blockquote>
 <div>/wormbase/$WS_RELEASE-report.csv</div></blockquote>
@@ -357,7 +346,7 @@ tracking migration events (if notifications are enabled).</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.53',
+            VERSION:'0.54',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
