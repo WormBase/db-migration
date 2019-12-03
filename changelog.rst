@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.54 (unreleased)
+0.54 (2019-12-03)
 =================
 
 - Apply retry logic when restarting datomic transactor.
