@@ -356,7 +356,7 @@ def reset_to_step(context):
     click.echo('Migration step is now set to {}'.format(step_n))
 
 def process_steps(context, steps):
-    headline_fmt = 'Migrating ACeDB {releaes} to Datomic, *Step {step}*'
+    headline_fmt = 'Migrating ACeDB {release} to Datomic, *Step {step}*'
     release = util.get_data_release_version()
     ctx = click.get_current_context()
     step_idx = int(context.app_state.get(LAST_STEP_OK_STATE_KEY, '0'))
