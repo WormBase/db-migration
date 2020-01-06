@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.55 (unreleased)
+0.55 (2020-01-06)
 =================
 
 - Provide default for `db_name` when invoking Context.datomic_url.
