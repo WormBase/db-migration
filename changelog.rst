@@ -5,7 +5,7 @@
 0.55 (unreleased)
 =================
 
-- Nothing changed yet.
+- Provide default for `db_name` when invoking Context.datomic_url.
 
 
 0.54 (2019-12-03)
