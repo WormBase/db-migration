@@ -219,7 +219,7 @@ def backup_db(context, db_name_suffix=None):
     date_stamp = datetime.date.today().isoformat()
     local_backup_path = os.path.join(context.path('datomic-db-backup'),
                                      date_stamp,
-                                     context.db_name)
+                                     db_name)
     arcname = '{}.tar.xz'.format(db_name)
     archive_path = os.path.join(os.path.dirname(local_backup_path),
                                 arcname)

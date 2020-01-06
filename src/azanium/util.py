@@ -305,7 +305,7 @@ class CommandContext:
 
     @property
     def db_name(self):
-        return self.datomic_url().rsplit('/', 1)[1]
+        return get_data_release_version()
 
     @property
     def app_state(self):
@@ -319,8 +319,10 @@ class CommandContext:
         return os.path.join(self.base_path, *args)
 
     def datomic_url(self,
-                    db_name,
+                    db_name=None,
                     default_prefix='datomic:free://localhost:4334/'):
+        if db_name is None:
+            db_name = self.db_name
         default_url = default_prefix + db_name
         return os.environ.get('DATOMIC_URI', default_url)
 
