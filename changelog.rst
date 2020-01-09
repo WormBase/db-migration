@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.56 (unreleased)
+0.56 (2020-01-09)
 =================
 
 - Fixed command to populate homology db.
