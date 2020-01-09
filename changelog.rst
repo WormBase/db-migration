@@ -5,7 +5,7 @@
 0.56 (unreleased)
 =================
 
-- Nothing changed yet.
+- Fixed command to populate homology db.
 
 
 0.55 (2020-01-06)
