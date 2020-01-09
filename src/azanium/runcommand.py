@@ -251,6 +251,12 @@ def clean_previous_state(context):
         # file removed manually perhaps?
         pass
 
+@root_command.command('homol-import',
+                      short_help='Creates the homology database')
+@util.pass_command_context
+def homol_import(context, acedump_dir, log_dir):
+    pseudoace.homol_import(context, acedump_dir, log_dir)
+
 Step = collections.namedtuple('Step', ('description', 'func', 'kwargs'))
 
 LOGS_DIR = 'edn-logs'
@@ -295,9 +301,8 @@ def _get_steps(context):
              backup_db,
              {}),
         Step('Create the homology database.',
-             pseudoace.homol_import,
-             dict(log_dir=logs_dir,
-                  acedump_dir=dump_dir)),
+             homol_import,
+             dict(acedump_dir=dump_dir, log_dir=logs_dir)),
         Step('Backup the homology database',
              backup_db,
              dict(db_name_suffix='homol'))]
