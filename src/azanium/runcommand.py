@@ -191,6 +191,7 @@ def qa_report(context, acedb_id_catalog):
 
 
 @run.command('import-logs')
+@click.argument('edn_logs_dir')
 @util.pass_command_context
 def import_logs(context, edn_logs_dir):
     """Imports EDN logs into a Datomic database ."""
@@ -367,20 +368,21 @@ def process_steps(context, steps):
     release = util.get_data_release_version()
     ctx = click.get_current_context()
     step_idx = int(context.app_state.get(LAST_STEP_OK_STATE_KEY, '0'))
-    step_n = step_idx + 1
-    for (step_n, step) in enumerate(steps[step_idx:], start=step_n):
+    start_n = step_idx + 1
+    for (step_n, step) in enumerate(steps[start_n:], start=start_n):
         step_command = partial(ctx.invoke, step.func, **step.kwargs)
         headline = headline_fmt.format(release=release, step=step_n)
         with logger:
-            if step_idx == len(steps):
-                post_kw = dict(icon_emoji=':fireworks:')
-            else:
-                post_kw = {}
             notifications.around(step_command,
                                  headline,
-                                 step.description,
-                                 post_kw=post_kw)
-            context.app_state[LAST_STEP_OK_STATE_KEY] = step_n - 1
+                                 step.description)
+            # if the steps above fails, an exception will be thrown (uncaught),
+            # such that exception is propergated (i.e will be visible verbatim in slack)
+            # only write the "last step ok" to disk when successful.
+            context.app_state[LAST_STEP_OK_STATE_KEY] = step_n
+    notifications.notify('{} migration'.format(release),
+                         notifications.Attachment(title='*all done!*'),
+                         icon_emoji=':fireworks:')
 
 @root_command.command('migrate',
                       short_help='Run all db-migration steps.')
