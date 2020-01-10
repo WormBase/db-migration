@@ -12,14 +12,15 @@ from . import util
 logger = log.get_logger(namespace=__name__)
 
 
-def run_pseudoace(context, *args):
+def run_pseudoace(context, *args, **kw):
+    url = context.datomic_url(db_name=kw.get('db_name'))
     cmd = [context.java_cmd,
            '-cp',
            context.pseudoace_jar_path,
            'clojure.main',
            '-m',
            'pseudoace.cli',
-           '--url=' + context.datomic_url()]
+           '--url=' + url]
     cmd.extend(list(args))
     logger.info('Running pseudoace command: {}', ' '.join(cmd))
     out = util.local(cmd)
@@ -140,7 +141,8 @@ def homol_import(context, acedump_dir, log_dir):
                   '--log-dir=' + log_dir,
                   '--homol-log-dir=' + homol_logs_dir,
                   '--verbose=true',
-                  'homol-import')
+                  'homol-import',
+                  db_name='homol')
 
 
 class QADialect(csv.excel):

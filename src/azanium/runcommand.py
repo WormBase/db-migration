@@ -253,6 +253,8 @@ def clean_previous_state(context):
 
 @root_command.command('homol-import',
                       short_help='Creates the homology database')
+@click.argument('acedump_dir')
+@click.argument('log_dir')
 @util.pass_command_context
 def homol_import(context, acedump_dir, log_dir):
     pseudoace.homol_import(context, acedump_dir, log_dir)
