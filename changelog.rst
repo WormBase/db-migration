@@ -5,7 +5,8 @@
 0.57 (unreleased)
 =================
 
-- Nothing changed yet.
+- Fixed recording/resetting of current step.
+- Fixed click integration for homology import command.
 
 
 0.56 (2020-01-09)
