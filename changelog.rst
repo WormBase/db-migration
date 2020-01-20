@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.57 (unreleased)
+0.57 (2020-01-20)
 =================
 
 - Fixed recording/resetting of current step.
