@@ -11,6 +11,10 @@ from . import util
 
 logger = log.get_logger(namespace=__name__)
 
+gh_repo_path = 'WormBase/wormbase-pipeline'
+
+annot_models_gh_file_path = 'wspec/models.wrm.annot'
+
 
 def run_pseudoace(context, *args, **kw):
     url = context.datomic_url(db_name=kw.get('db_name'))
@@ -26,31 +30,23 @@ def run_pseudoace(context, *args, **kw):
     out = util.local(cmd)
     logger.info(out)
 
-
-def is_wormbase_pipeline_tagged():
-    gh_repo_path = 'WormBase/wormbase-pipeline'
-    gh_file_path = 'wspec/models.wrm.annot'
-    repo = github.repo_from_path(gh_repo_path)
-    version = util.get_data_release_version()
+def _read_annotated_models(version):
+    """Read the contents of the annotated models file from github."""
+    repo = github.repo_from_path(github.WB_PIPELINE_REPO)
     annot_file_content = github.read_released_file(repo,
                                                    version,
-                                                   gh_file_path)
+                                                   annot_models_gh_file_path)
     return annot_file_content
 
 
 def source_annotated_models_file(context):
-    """Sources the annotated models file from github.
+    """Sources the annotated models file from github into a local file.
 
     Returns the local filename. """
-    # Get the annotated models file separately from github.
-    gh_file_path = 'wspec/models.wrm.annot'
-    repo = github.repo_from_path(github.WB_PIPELINE_REPO)
-    version = util.get_data_release_version()
-    annot_file_content = github.read_released_file(repo,
-                                                   version,
-                                                   gh_file_path)
     target_dir = context.base_path
-    am_local_filename = os.path.basename(gh_file_path) + '.' + version
+    version = util.get_data_release_version()
+    annot_file_content = _read_annotated_models(version)
+    am_local_filename = os.path.basename(annot_models_gh_file_path) + '.' + version
     am_local_path = os.path.join(target_dir, am_local_filename)
     with open(am_local_path, mode='wb') as fp:
         fp.write(annot_file_content)
