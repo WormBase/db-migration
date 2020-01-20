@@ -376,7 +376,7 @@ def process_steps(context, steps):
             notifications.around(step_command,
                                  headline,
                                  step.description)
-            # if the steps above fails, an exception will be thrown (uncaught),
+            # if a step (above) fails, an exception will be thrown (uncaught),
             # such that exception is propergated (i.e will be visible verbatim in slack)
             # only write the "last step ok" to disk when successful.
             context.app_state[LAST_STEP_OK_STATE_KEY] = step_n
