@@ -106,7 +106,7 @@ def datomic_free(context, afct, url_template=None):
     tmpdir = tempfile.mkdtemp()
     with zipfile.ZipFile(util.download(url, download_path)) as zf:
         zf.extractall(tmpdir)
-    os.rmdir(install_dir)
+    shutil.rmtree(install_dir)
     shutil.move(os.path.join(tmpdir, fullname), install_dir)
     util.touch_dir(install_dir)
     logger.info('Installed {} into {}', fullname, install_dir)
