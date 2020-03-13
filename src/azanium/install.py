@@ -19,24 +19,25 @@ from . import util
 logger = log.get_logger(__name__)
 
 
+def abort(msg):
+    util.echo_error(msg)
+    raise click.Abort(msg)
+
+
 def preliminary_checks():
     # check github release of wb pipeline is done
     # check that the az configuration file is present
     # warn if slack notifications are not to be sent (not configured)
     conf = config.parse()
     if not conf:
-        msg = ' '.join([__package__,
-                        ' has not been configured, run: '
-                        '"azanium configure" to fix this'])
-        util.echo_error(msg)
-        raise click.Abort(msg)
+        abort( ' '.join([__package__,
+                         ' has not been configured, run: '
+                         '"azanium configure" to fix this']))
     ws_release_version = util.get_data_release_version()
     if not ws_release_version:
-        msg = 'azanium configure has not been run'
-        raise click.Abort(msg)
+        abort('azanium configure has not been run')
     if not conf['sources'].as_bool('is_released'):
-        msg  = 'The wormbase-pipeline repo has not been tagged on github'
-        raise click.Abort(msg)
+        abort('The wormbase-pipeline repo has not been tagged on github')
     if notifications.__name__ not in conf:
         warning_msgs = [
             'Slack notifications are not enabled - integration has been disabled',
