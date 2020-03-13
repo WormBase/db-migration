@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.58 (unreleased)
+0.58 (2020-03-13)
 =================
 
 - Ensured error messages are echoed to console during preliminary checks.
