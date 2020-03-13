@@ -5,7 +5,7 @@
 0.58 (unreleased)
 =================
 
-- Nothing changed yet.
+- Ensured error messages are echoed to console during preliminary checks.
 
 
 0.57 (2020-01-20)
