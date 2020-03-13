@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.59 (unreleased)
+0.59 (2020-03-13)
 =================
 
 - Fixed issue with datomic_free installer not being re-entrant.
