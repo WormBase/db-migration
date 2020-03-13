@@ -5,7 +5,7 @@
 0.59 (unreleased)
 =================
 
-- Nothing changed yet.
+- Fixed issue with datomic_free installer not being re-entrant.
 
 
 0.58 (2020-03-13)
