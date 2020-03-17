@@ -368,8 +368,8 @@ def process_steps(context, steps):
     release = util.get_data_release_version()
     ctx = click.get_current_context()
     step_idx = int(context.app_state.get(LAST_STEP_OK_STATE_KEY, '0'))
-    start_n = step_idx + 1
-    for (step_n, step) in enumerate(steps[start_n:], start=start_n):
+    step_n = step_idx + 1
+    for (step_n, step) in enumerate(steps[step_idx:], start=step_n):
         step_command = partial(ctx.invoke, step.func, **step.kwargs)
         headline = headline_fmt.format(release=release, step=step_n)
         with logger:
