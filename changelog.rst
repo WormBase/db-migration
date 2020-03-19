@@ -5,7 +5,7 @@
 0.60 (unreleased)
 =================
 
-- Nothing changed yet.
+- Bumped version of pseudoace to bring in bug-fix for homology pipeline.
 
 
 0.59 (2020-03-13)
