@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.60 (unreleased)
+0.60 (2020-03-19)
 =================
 
 - Bumped version of pseudoace to bring in bug-fix for homology pipeline.
