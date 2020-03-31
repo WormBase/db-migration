@@ -239,12 +239,16 @@ def backup_db(context, db_name_suffix=None):
 @util.pass_command_context
 def clean_previous_state(context):
     to_remove = set(installers.commands) | {
+        'acedb_database',
+        'acedb_id_catalog',
         'acedb-dump',
         'edn-logs',
+        'homol-edn-logs',
         'datomic-db-backup'
     }
     force_rmdir = partial(shutil.rmtree, ignore_errors=True)
     for name in to_remove:
+        logger.info('Removing directory: {}', name)
         force_rmdir(context.path(name))
     try:
         os.remove(os.path.expanduser('~/.db-migration.db'))
