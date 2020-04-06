@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.7.0 (unreleased)
+0.7.0 (2020-04-06)
 ==================
 
 - Bumped version of pseduoace for CLI homology command fix.

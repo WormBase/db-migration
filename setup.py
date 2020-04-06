@@ -15,7 +15,7 @@ INSTALL_REQUIRES = _read_file('requirements.txt').splitlines()
 
 setup(
     name='azanium',
-    version='0.61.dev0',
+    version='0.7.0',
     url='http://www.wormmbase.org/',
     author='Matt Russell, EMBL-EBI',
     author_email='matthew.russell@wormbase.org',
