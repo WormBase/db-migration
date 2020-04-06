@@ -2,8 +2,8 @@
  Changelog
 ===========
 
-0.61 (unreleased)
-=================
+0.7.0 (unreleased)
+==================
 
 - Bumped version of pseduoace for CLI homology command fix.
 
