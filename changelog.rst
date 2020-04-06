@@ -5,7 +5,7 @@
 0.61 (unreleased)
 =================
 
-- Nothing changed yet.
+- Bumped version of pseduoace for CLI homology command fix.
 
 
 0.60 (2020-03-19)
