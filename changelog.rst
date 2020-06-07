@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.7.1 (unreleased)
+0.7.1 (2020-06-07)
 ==================
 
 - Bring in pseudoace 0.7.1 for import-logs command line bug fix.
