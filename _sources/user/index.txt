@@ -117,9 +117,9 @@ The location of the file should be:
 
    1. Extract all .ace files from the ACeDB database for the current release.
    2. Compress all .ace files
-   3. Convert .ace files to EDN logs
-   4. Sort all EDN logs by timestamp
-   5. Create the Datomic database
+   3. Create the Datomic database
+   4. Convert .ace files to EDN logs
+   5. Sort all EDN logs by timestamp
    6. Import the EDN logs into the Datomic database
    7. Run a QA report on the database
    8. Backup the Datomic database

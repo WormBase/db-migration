@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Database Migration Procedure &mdash; azanium 0.7.0 documentation</title>
+  <title>Database Migration Procedure &mdash; azanium 0.7.1 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.7.0 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.7.1 documentation" href="../index.html"/>
         <link rel="next" title="Development" href="../dev/index.html"/>
         <link rel="prev" title="🐛 azanium - WormBase Database Migration" href="../index.html"/> 
 
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.1
               </div>
             
           
@@ -242,9 +242,9 @@ the host the migration is performed upon.</p>
 <ol class="arabic simple">
 <li>Extract all .ace files from the ACeDB database for the current release.</li>
 <li>Compress all .ace files</li>
+<li>Create the Datomic database</li>
 <li>Convert .ace files to EDN logs</li>
 <li>Sort all EDN logs by timestamp</li>
-<li>Create the Datomic database</li>
 <li>Import the EDN logs into the Datomic database</li>
 <li>Run a QA report on the database</li>
 <li>Backup the Datomic database</li>
@@ -346,7 +346,7 @@ the host the migration is performed upon.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.7.0',
+            VERSION:'0.7.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
