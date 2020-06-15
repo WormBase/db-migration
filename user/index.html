@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Database Migration Procedure &mdash; azanium 0.7.1 documentation</title>
+  <title>Database Migration Procedure &mdash; azanium 0.7.2 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.7.1 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.7.2 documentation" href="../index.html"/>
         <link rel="next" title="Development" href="../dev/index.html"/>
         <link rel="prev" title="🐛 azanium - WormBase Database Migration" href="../index.html"/> 
 
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.7.1
+                0.7.2
               </div>
             
           
@@ -234,7 +234,7 @@ the host the migration is performed upon.</p>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Run the migration</p>
+<li><p class="first">Run the main migration</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>azanium migrate
 </pre></div>
 </div>
@@ -248,20 +248,41 @@ the host the migration is performed upon.</p>
 <li>Import the EDN logs into the Datomic database</li>
 <li>Run a QA report on the database</li>
 <li>Backup the Datomic database</li>
-<li>Create a homology database</li>
-<li>Backup the homology database.</li>
-<li>Notify watchers of the slack channel that the migration has completed.</li>
+</ol>
+</li>
 </ol>
 <blockquote>
-<div><p>If slack integration was configured, you can use:</p>
+<div><ol class="arabic simple" start="4">
+<li>Run the homology migration</li>
+</ol>
+<blockquote>
+<div><p>Ensure there is enough memory to perform this step.
+The easiest way to ensure this is to reboot the instance before
+running the command for this step.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium migrate-homol
+</pre></div>
+</div>
+<ol class="arabic simple">
+<li>Create a homology database</li>
+<li>Backup the homology database.</li>
+</ol>
+</div></blockquote>
+<ol class="arabic simple" start="5">
+<li>Notify watchers of completion of the process.</li>
+</ol>
+<blockquote>
+<div><ol class="arabic">
+<li><p class="first">Notify watchers of the slack channel that the migration has completed.</p>
+<p>If slack integration was configured, you can use (e.g):</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>azanium notify <span class="se">\</span>
     <span class="s2">&quot;Migration of ACeDB WS254 to Datomic complete! :fireworks:&quot;</span>
 </pre></div>
 </div>
 <p>Otherwise, write a message manually to the <cite>#db-migration-events</cite> slack channel.</p>
-</div></blockquote>
 </li>
 </ol>
+</div></blockquote>
+</div></blockquote>
 </div>
 <div class="section" id="resulting-products">
 <h2>Resulting Products<a class="headerlink" href="#resulting-products" title="Permalink to this headline">¶</a></h2>
@@ -346,7 +367,7 @@ the host the migration is performed upon.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.7.1',
+            VERSION:'0.7.2',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
