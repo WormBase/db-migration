@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.7.2 (unreleased)
+0.7.2 (2020-06-15)
 ==================
 
 - Added separate top-level command for running homology migration.
