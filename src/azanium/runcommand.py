@@ -258,11 +258,9 @@ def clean_previous_state(context):
 
 @root_command.command('homol-import',
                       short_help='Creates the homology database')
-@click.argument('acedump_dir')
-@click.argument('log_dir')
 @util.pass_command_context
-def homol_import(context, acedump_dir, log_dir):
-    pseudoace.homol_import(context, acedump_dir, log_dir)
+def homol_import(context):
+    pseudoace.homol_import(context)
 
 Step = collections.namedtuple('Step', ('description', 'func', 'kwargs'))
 
@@ -306,13 +304,7 @@ def _get_steps(context):
              dict(acedb_id_catalog=id_catalog_path)),
         Step('Backup main migration database.',
              backup_db,
-             {}),
-        Step('Create the homology database.',
-             homol_import,
-             dict(acedump_dir=dump_dir, log_dir=logs_dir)),
-        Step('Backup the homology database',
-             backup_db,
-             dict(db_name_suffix='homol'))]
+             {})]
     return steps
 
 
@@ -381,8 +373,9 @@ def process_steps(context, steps):
             notifications.around(step_command,
                                  headline,
                                  step.description)
-            # if a step (above) fails, an exception will be thrown (uncaught),
-            # such that exception is propergated (i.e will be visible verbatim in slack)
+            # if a step (above) fails, an exception will be thrown
+            # (uncaught), such that exception is propergated (i.e will
+            # be visible verbatim in slack)
             # only write the "last step ok" to disk when successful.
             context.app_state[LAST_STEP_OK_STATE_KEY] = step_n
     notifications.notify('{} migration'.format(release),
@@ -393,7 +386,9 @@ def process_steps(context, steps):
                       short_help='Run all db-migration steps.')
 @util.pass_command_context
 def migrate(context):
-    """Steps:
+    """Migrate the main WormBase ACeDB database to Datomic.
+
+    Steps:
         1. Dump ACeDB files (.ace files)
 
         2. Compress ACedB files using gzip
@@ -408,14 +403,30 @@ def migrate(context):
 
         7. Apply any ACe patches from the PATCHES directory on the FTP site.
 
-        8. Run QA Report on Datomic DB
-
-        9. Backup Datomic database locally.
-
-       10. Create homology database.
-
-       11. Backup homology database.
+        8. Backup Datomic database locally.
 
     """
     steps = _get_steps(context)
     process_steps(context, steps)
+
+
+@root_command.command('migrate-homol',
+                      short_help='Run homology db migration steps.')
+@util.pass_command_context
+def migrate_homol(context):
+    """Migrate the homology database."""
+    ctx = click.get_current_context()
+    headline_fmt = ''.join(['Migrating ACeDB homology for',
+                            '{release} to Datomic, *Step {step}*'])
+    release = util.get_data_release_version()
+    with logger:
+        notifications.around(partial(ctx.invoke, homol_import),
+                             headline_fmt.format(release=release,
+                                                 step=1),
+                             'Create the homology database')
+        notifications.around(partial(ctx.invoke,
+                                     backup_db,
+                                     dict(db_name_suffix='homol')),
+                             headline_fmt.format(release=release,
+                                                 step=2),
+                             'Backup the homology database')

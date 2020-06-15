@@ -107,7 +107,7 @@ The location of the file should be:
 
       azanium install
 
-3. Run the migration
+3. Run the main migration
 
    .. code-block:: bash
 
@@ -123,11 +123,25 @@ The location of the file should be:
    6. Import the EDN logs into the Datomic database
    7. Run a QA report on the database
    8. Backup the Datomic database
-   9. Create a homology database
-   10. Backup the homology database.
-   11. Notify watchers of the slack channel that the migration has completed.
 
-      If slack integration was configured, you can use:
+ 4. Run the homology migration
+
+   Ensure there is enough memory to perform this step.
+   The easiest way to ensure this is to reboot the instance before
+   running the command for this step.
+
+   .. code-block:: bash
+
+      azanium migrate-homol
+
+   1. Create a homology database
+   2. Backup the homology database.
+
+ 5. Notify watchers of completion of the process.
+
+   1. Notify watchers of the slack channel that the migration has completed.
+
+      If slack integration was configured, you can use (e.g):
 
       .. code-block:: bash
 

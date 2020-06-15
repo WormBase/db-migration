@@ -124,12 +124,14 @@ def qa_report(context, acedb_id_catalog_path):
     return out_path
 
 
-def homol_import(context, acedump_dir, log_dir):
+def homol_import(context):
     am_filename = source_annotated_models_file(context)
+    acedump_dir = context.path('acedb-dump')
     models_path = os.path.join(context.path('acedb_database'),
                                'wspec',
                                am_filename)
     homol_logs_dir = context.path('homol-edn-logs')
+    log_dir = context.path('edn-logs')
     os.makedirs(homol_logs_dir, exist_ok=True)
     run_pseudoace(context,
                   '--models-filename=' + models_path,
