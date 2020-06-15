@@ -5,14 +5,13 @@
 0.7.2 (unreleased)
 ==================
 
-- Nothing changed yet.
-
+- Added separate top-level command for running homology migration.
+- Bumped version of pseudoace to 0.7.2 to bring in fixes for homology command.
 
 0.7.1 (2020-06-07)
 ==================
 
 - Bring in pseudoace 0.7.1 for import-logs command line bug fix.
-
 
 0.7.0 (2020-04-06)
 ==================
