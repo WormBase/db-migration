@@ -359,13 +359,14 @@ def reset_to_step(context):
                               default=abs(last_ok_step_n - 1),
                               type=int,
                               show_default=True)
+    step_n_req -= 1
     if step_n_req < last_ok_step_n:
         if click.confirm('Reset step to {}?'.format(step_n_req), abort=True):
             context.app_state[LAST_STEP_OK_STATE_KEY] = step_n_req
     elif step_n_req > last_ok_step_n:
         error('Refusing to set migration step to a future step')
     step_n = context.app_state[LAST_STEP_OK_STATE_KEY]
-    click.echo('Migration step is now set to {}'.format(step_n))
+    click.echo('Migration step is now set to {}'.format(step_n + 1))
 
 def process_steps(context, steps):
     headline_fmt = 'Migrating ACeDB {release} to Datomic, *Step {step}*'
