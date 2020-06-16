@@ -5,7 +5,7 @@
 0.7.4 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Fixed temp directory cleanup in installers.
 
 
 0.7.3 (2020-06-16)
