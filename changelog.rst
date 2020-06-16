@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.7.4 (unreleased)
+0.7.4 (2020-06-16)
 ==================
 
 - Fixed temp directory cleanup in installers.
