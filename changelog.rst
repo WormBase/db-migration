@@ -5,7 +5,7 @@
 0.7.3 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Bumped version of pseudoace to 0.7.3 (bring in CLI fix).
 
 
 0.7.2 (2020-06-15)
