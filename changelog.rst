@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.7.5 (unreleased)
+0.7.5 (2020-06-19)
 ==================
 
 - Configure and start transactor before homol migration run.
