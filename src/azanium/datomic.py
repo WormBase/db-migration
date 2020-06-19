@@ -43,5 +43,6 @@ def configure_transactor(context, datomic_path):
         conf.write(outfile=outfile)
     logger.info('Starting datomic transactor via circusd')
     util.local('circusd --daemon ' + circus_ini_path)
-    time.sleep(2)
+    logger.info('Waiting for transactor to become available')
+    time.sleep(5)
     logger.info('Started datomic transactor')
