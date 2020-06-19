@@ -5,7 +5,8 @@
 0.7.5 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Configure and start transactor before homol migration run.
+- Fixed slack notify invocation at end of main migration.
 
 
 0.7.4 (2020-06-16)
