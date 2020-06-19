@@ -419,6 +419,8 @@ def migrate_homol(context):
     headline_fmt = ''.join(['Migrating ACeDB homology for',
                             '{release} to Datomic, *Step {step}*'])
     release = util.get_data_release_version()
+    datomic_path = context.path('datomic_free')
+    datomic.configure_transactor(context, datomic_path)
     with logger:
         notifications.around(partial(ctx.invoke, homol_import),
                              headline_fmt.format(release=release,
