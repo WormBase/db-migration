@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.7.6 (unreleased)
+0.7.6 (2020-06-19)
 ==================
 
 - Increase transactor start wait time.
