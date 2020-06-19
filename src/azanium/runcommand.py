@@ -379,7 +379,7 @@ def process_steps(context, steps):
             # only write the "last step ok" to disk when successful.
             context.app_state[LAST_STEP_OK_STATE_KEY] = step_n
     notifications.notify('{} migration'.format(release),
-                         notifications.Attachment(title='*all done!*'),
+                         attachments=[notifications.Attachment(title='*all done!*')],
                          icon_emoji=':fireworks:')
 
 @root_command.command('migrate',
