@@ -5,7 +5,7 @@
 0.7.6 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Increase transactor start wait time.
 
 
 0.7.5 (2020-06-19)
