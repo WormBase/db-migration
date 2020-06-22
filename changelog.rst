@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.7.7 (unreleased)
+0.7.7 (2020-06-22)
 ==================
 
 - Bump version of pseudoace.
