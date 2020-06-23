@@ -5,7 +5,7 @@
 0.7.8 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Fixed backup-db step for homology migration.
 
 
 0.7.7 (2020-06-22)
