@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.7.8 (unreleased)
+0.7.8 (2020-06-23)
 ==================
 
 - Fixed backup-db step for homology migration.
