@@ -220,15 +220,15 @@ def backup_db(context, db_name=None):
     local_backup_path = os.path.join(context.path('datomic-db-backup'),
                                      date_stamp,
                                      db_name)
-    arcname = '{}.tar.xz'.format(db_name)
+    archive_filename = '{}.tar.xz'.format(db_name)
     archive_path = os.path.join(os.path.dirname(local_backup_path),
-                                arcname)
+                                archive_filename)
     if not os.path.isdir(local_backup_path):
         datomic.backup_db(context, local_backup_path, db_name)
     if not os.path.isfile(archive_path):
         logger.info('Creating archive {} for upload', archive_path)
         with tarfile.open(archive_path, mode='w:xz') as tf:
-            tf.add(local_backup_path, arcname=arcname)
+            tf.add(local_backup_path, arcname=db_name)
     result =  'Datomic database compressed to {bp}.'.format(bp=archive_path)
     click.echo(result)
     return result
