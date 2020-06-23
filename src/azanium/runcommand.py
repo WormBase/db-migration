@@ -207,16 +207,15 @@ def apply_patches(context):
 
 @run.command('backup-db',
              short_help='Backup the Datomic db.')
+@util.option('--db-name',
+             default=None,
+             help='Datomic database name to backup to')
 @util.pass_command_context
-def backup_db(context, db_name_suffix=None):
+def backup_db(context, db_name=None):
     """Back up the Datomic database to the local disk."""
     os.chdir(context.path('datomic_free'))
-    click.echo('Please check the QA report looks correct.')
-    data_release_version = util.get_data_release_version()
-    if db_name_suffix is not None:
-        db_name = '{}-{}'.format(data_release_version, db_name_suffix)
-    else:
-        db_name = data_release_version
+    if db_name is None:
+        db_name = util.get_data_release_version()
     date_stamp = datetime.date.today().isoformat()
     local_backup_path = os.path.join(context.path('datomic-db-backup'),
                                      date_stamp,
@@ -230,7 +229,9 @@ def backup_db(context, db_name_suffix=None):
         logger.info('Creating archive {} for upload', archive_path)
         with tarfile.open(archive_path, mode='w:xz') as tf:
             tf.add(local_backup_path, arcname=arcname)
-    return 'Datomic database compressed to {bp}.'.format(bp=archive_path)
+    result =  'Datomic database compressed to {bp}.'.format(bp=archive_path)
+    click.echo(result)
+    return result
 
 
 @root_command.command(
@@ -428,7 +429,7 @@ def migrate_homol(context):
                              'Create the homology database')
         notifications.around(partial(ctx.invoke,
                                      backup_db,
-                                     dict(db_name_suffix='homol')),
+                                     dict(db_name='homol')),
                              headline_fmt.format(release=release,
                                                  step=2),
                              'Backup the homology database')
