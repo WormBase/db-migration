@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Database Migration Procedure &mdash; azanium 0.7.8 documentation</title>
+  <title>Database Migration Procedure &mdash; azanium 0.7.9 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.7.8 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.7.9 documentation" href="../index.html"/>
         <link rel="next" title="Development" href="../dev/index.html"/>
         <link rel="prev" title="🐛 azanium - WormBase Database Migration" href="../index.html"/> 
 
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.7.8
+                0.7.9
               </div>
             
           
@@ -168,7 +168,7 @@ pip3 install --user <span class="s2">&quot;</span><span class="nv">$AZANIUM_WHEE
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
 <p>For each migration run, the software needs to be configured with the
 FTP URL pointing to the data release:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium configure <span class="nv">$FTP_URL</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>azanium configure <span class="nv">$FTP_URL</span> <span class="nv">$RELEASE_TAG</span>
 </pre></div>
 </div>
 <div class="section" id="enabling-slack-notifications">
@@ -367,7 +367,7 @@ running the command for this step.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.7.8',
+            VERSION:'0.7.9',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
