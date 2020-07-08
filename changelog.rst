@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.7.9 (unreleased)
+0.7.9 (2020-07-08)
 ==================
 
 - Specify release tag when configuring.
