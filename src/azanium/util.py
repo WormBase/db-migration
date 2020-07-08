@@ -252,6 +252,8 @@ def get_data_release_version(ftp_url=None):
         raise ValueError('FTP URL has not been configured.')
     return split_ftp_url(ftp_url)[-1]
 
+def ws_release_tag():
+    return config.parse().get('sources', {}).get('ws_release_tag')
 
 def get_deploy_versions(purpose='default'):
     path = resource_filename(__package__, 'cloud-config/versions.ini')

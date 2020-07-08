@@ -35,7 +35,7 @@ FTP URL pointing to the data release:
 
 .. code-block:: bash
 
-   azanium configure $FTP_URL
+   azanium configure $FTP_URL $RELEASE_TAG
 
 Enabling Slack notifications
 ----------------------------

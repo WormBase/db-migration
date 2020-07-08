@@ -44,9 +44,9 @@ def source_annotated_models_file(context):
 
     Returns the local filename. """
     target_dir = context.base_path
-    version = util.get_data_release_version()
-    annot_file_content = _read_annotated_models(version)
-    am_local_filename = os.path.basename(annot_models_gh_file_path) + '.' + version
+    release_tag = util.ws_release_tag()
+    annot_file_content = _read_annotated_models(release_tag)
+    am_local_filename = os.path.basename(annot_models_gh_file_path) + '.' + release_tag
     am_local_path = os.path.join(target_dir, am_local_filename)
     with open(am_local_path, mode='wb') as fp:
         fp.write(annot_file_content)

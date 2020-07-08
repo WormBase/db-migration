@@ -5,7 +5,8 @@
 0.7.9 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Specify release tag when configuring.
+- Source annotated models from a configured github release tag.
 
 
 0.7.8 (2020-06-23)
