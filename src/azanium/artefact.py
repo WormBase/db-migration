@@ -14,6 +14,7 @@ DOWNLOAD_DIR = '/tmp/downloads'
 
 def prepare(cmd_ctx, func):
     f_name = func.__name__
+    os.makedirs(DOWNLOAD_DIR, exist_ok=True)
     tmpdir = tempfile.mkdtemp(suffix='-db-migration-downloads',
                               dir=DOWNLOAD_DIR)
     download_dir = os.path.join(tmpdir, f_name)
