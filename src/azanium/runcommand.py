@@ -240,6 +240,7 @@ def backup_db(context, db_name=None):
 @util.pass_command_context
 def clean_previous_state(context):
     to_remove = set(installers.commands) | {
+        artefact.DOWNLOAD_DIR,
         'acedb_database',
         'acedb_id_catalog',
         'acedb-dump',

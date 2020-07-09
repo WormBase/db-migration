@@ -83,7 +83,6 @@ def tace(context, afct, url_template=None):
     local_path = downloaded[0]
     with tarfile.open(local_path) as tf:
         tf.extract('./tace', path=afct.install_dir)
-    shutil.rmtree(os.path.dirname(local_path))
     tace_path = os.path.join(afct.install_dir, 'tace')
     util.touch_dir(afct.install_dir)
     util.make_executable(tace_path, logger)
@@ -107,7 +106,6 @@ def datomic_free(context, afct, url_template=None):
     tmpdir = tempfile.mkdtemp()
     with zipfile.ZipFile(util.download(url, download_path)) as zf:
         zf.extractall(tmpdir)
-    shutil.rmtree(os.path.dirname(download_path))
     shutil.rmtree(install_dir)
     shutil.move(os.path.join(tmpdir, fullname), install_dir)
     util.touch_dir(install_dir)
@@ -141,7 +139,6 @@ def pseudoace(context, afct, **kw):
     tempdir = tempfile.mkdtemp()
     with tarfile.open(dl_path) as tf:
         tf.extractall(path=tempdir)
-    shutil.rmtree(os.path.dirname(dl_path))
     archive_filename = os.path.split(dl_path)[-1]
     fullname = archive_filename.rsplit('.', 2)[0]
     tmp_src_path = os.path.join(tempdir, fullname)
