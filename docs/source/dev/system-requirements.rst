@@ -59,3 +59,14 @@ Python3.5 (ubuntu)
 		python3-pip \
 		python3-venv \
 		openjdk-8-jdk-headless
+
+
+TACE
+----
+The command line tool provided by the ACeDB software currently requires the following hack to make it work on the Amazon instance used for the migration:
+
+```bash
+#  Expects libreadline.so.5, which is not available for installation,
+#  but libreadline6 is, and works.
+sudo ln -s /lib64/libreadline.so.6 /lib64/libreadline.so.5
+```
