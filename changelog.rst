@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.7.10 (unreleased)
+0.7.10 (2020-07-09)
 ===================
 
 - Cleanup downloaded artefacts in /tmp
