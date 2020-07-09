@@ -5,7 +5,7 @@
 0.7.10 (unreleased)
 ===================
 
-- Nothing changed yet.
+- Cleanup downloaded artefacts in /tmp
 
 
 0.7.9 (2020-07-08)
