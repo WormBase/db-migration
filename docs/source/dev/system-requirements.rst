@@ -35,6 +35,7 @@ Python3.4 (Amazon AMI)
 
 .. code-block:: bash
 
+   sudo yum update -y
    sudo yum install -y
 		libffi-devel \
   		openssl-devel \
@@ -45,6 +46,12 @@ Python3.4 (Amazon AMI)
 		python34-tools \
 		python34-libs \
 		python34-virtualenv
+   sudo yum groupinstall -y "Development Tools"
+   sudo update-alternatives --set java /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
+   sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
+   sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
+   sudo yum install -y apache-maven
+
 
 Python3.5 (ubuntu)
 ------------------
@@ -58,6 +65,7 @@ Python3.5 (ubuntu)
 		python3-dev \
 		python3-pip \
 		python3-venv \
+                maven \
 		openjdk-8-jdk-headless
 
 
