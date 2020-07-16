@@ -5,6 +5,7 @@ import os
 import git
 import github3
 
+import urllib.parse
 
 from . import config
 
@@ -73,7 +74,7 @@ def download_release_binary(repo_path, tag, to_directory=None, gh=github3):
 def infer_from_local_repo(path=None, gh=github3):
     path = path if path else os.getcwd()
     git_url = git.Repo(path).remotes.origin.url
-    (org, repo_name) = git_url.rsplit(':')[1].rsplit('.')[0].split('/')
+    (org, repo_name) = urllib.parse.urlparse(git_url).path.split('.')[0].split('/')[1:]
     return gh.repository(org, repo_name)
 
 
