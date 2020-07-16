@@ -5,7 +5,7 @@
 0.7.11 (unreleased)
 ===================
 
-- Nothing changed yet.
+- Updated pseudoace dependency version
 
 
 0.7.10 (2020-07-09)
