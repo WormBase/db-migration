@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.7.11 (2020-07-16)
+0.7.11 (unreleased)
 ===================
 
 - Updated pseudoace dependency version
