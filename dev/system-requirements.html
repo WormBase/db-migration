@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>System requirements &mdash; azanium 0.7.10 documentation</title>
+  <title>System requirements &mdash; azanium 0.7.11 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.7.10 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.7.11 documentation" href="../index.html"/>
         <link rel="up" title="Development" href="index.html"/>
         <link rel="next" title="Installation" href="install.html"/>
         <link rel="prev" title="Development" href="index.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.7.10
+                0.7.11
               </div>
             
           
@@ -89,6 +89,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#packages">Packages</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#python3-4-amazon-ami">Python3.4 (Amazon AMI)</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#python3-5-ubuntu">Python3.5 (ubuntu)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tace">TACE</a></li>
 </ul>
 </li>
 </ul>
@@ -175,7 +176,8 @@ verified to work with Python3.4 on Amazon Linux (AWS AMI).</p>
 et al), using Python 3.4:</p>
 <div class="section" id="python3-4-amazon-ami">
 <h3>Python3.4 (Amazon AMI)<a class="headerlink" href="#python3-4-amazon-ami" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>sudo yum install -y
+<div class="highlight-bash"><div class="highlight"><pre><span></span>sudo yum update -y
+sudo yum install -y
              libffi-devel <span class="se">\</span>
              openssl-devel <span class="se">\</span>
              readline-devel <span class="se">\</span>
@@ -185,6 +187,11 @@ et al), using Python 3.4:</p>
              python34-tools <span class="se">\</span>
              python34-libs <span class="se">\</span>
              python34-virtualenv
+sudo yum groupinstall -y <span class="s2">&quot;Development Tools&quot;</span>
+sudo update-alternatives --set java /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
+sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
+sudo sed -i s/<span class="se">\$</span>releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
+sudo yum install -y apache-maven
 </pre></div>
 </div>
 </div>
@@ -197,9 +204,19 @@ et al), using Python 3.4:</p>
              python3-dev <span class="se">\</span>
              python3-pip <span class="se">\</span>
              python3-venv <span class="se">\</span>
+             maven <span class="se">\</span>
              openjdk-8-jdk-headless
 </pre></div>
 </div>
+</div>
+<div class="section" id="tace">
+<h3>TACE<a class="headerlink" href="#tace" title="Permalink to this headline">¶</a></h3>
+<p>The command line tool provided by the ACeDB software currently requires the following hack to make it work on the Amazon instance used for the migration:</p>
+<p><code class="docutils literal"><span class="pre">`bash</span>
+<span class="pre">#</span>&nbsp; <span class="pre">Expects</span> <span class="pre">libreadline.so.5,</span> <span class="pre">which</span> <span class="pre">is</span> <span class="pre">not</span> <span class="pre">available</span> <span class="pre">for</span> <span class="pre">installation,</span>
+<span class="pre">#</span>&nbsp; <span class="pre">but</span> <span class="pre">libreadline6</span> <span class="pre">is,</span> <span class="pre">and</span> <span class="pre">works.</span>
+<span class="pre">sudo</span> <span class="pre">ln</span> <span class="pre">-s</span> <span class="pre">/lib64/libreadline.so.6</span> <span class="pre">/lib64/libreadline.so.5</span>
+<span class="pre">`</span></code></p>
 </div>
 </div>
 </div>
@@ -245,7 +262,7 @@ et al), using Python 3.4:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.7.10',
+            VERSION:'0.7.11',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
