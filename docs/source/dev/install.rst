@@ -23,7 +23,7 @@ Create a virtualenv:
 
 .. code-block:: bash
 
-   VENV_HOME="~/.virtualenv"
+   VENV_HOME="$HOME/.virtualenv"
    mkdir -p "${VENV_HOME}"
    VENV="${VENV_HOME}/azanium"
    python3 -m venv "${VENV}"
