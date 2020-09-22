@@ -223,13 +223,21 @@ def backup_db(context, db_name=None):
     archive_filename = '{}.tar.xz'.format(db_name)
     archive_path = os.path.join(os.path.dirname(local_backup_path),
                                 archive_filename)
+
     if not os.path.isdir(local_backup_path):
+        logger.info('Creating datomic backup for DB {}.', db_name)
         datomic.backup_db(context, local_backup_path, db_name)
+
+    result = None
     if not os.path.isfile(archive_path):
         logger.info('Creating archive {} for upload', archive_path)
         with tarfile.open(archive_path, mode='w:xz') as tf:
             tf.add(local_backup_path, arcname=db_name)
-    result =  'Datomic database compressed to {bp}.'.format(bp=archive_path)
+        result = 'Datomic database compressed to {bp}.'.format(bp=archive_path)
+    else:
+        result = 'Compressed datomic database file {bp} already exists, no changes made.'.format(bp=archive_path)
+        logger.info(result)
+
     click.echo(result)
     return result
 
