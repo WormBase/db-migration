@@ -5,7 +5,9 @@
 0.7.12 (unreleased)
 ===================
 
-- Nothing changed yet.
+- Updated & completed docs
+- Bugfixed migrate-homol DB name and DB backup file generation
+- Minor logging and code improvements
 
 
 0.7.11 (2020-07-16)
