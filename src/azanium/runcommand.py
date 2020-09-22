@@ -58,7 +58,7 @@ def acedb_id_catalog(
         return fp.name
 
 
-@run.command('acedb-database', short_help='Downlaod the ACeDB database release.')
+@run.command('acedb-database', short_help='Download the ACeDB database release.')
 @util.option('--file-selector-regexp',
              default='.*\.tar\.gz$',
              help='File selection regexp')
@@ -418,7 +418,7 @@ def migrate(context):
 def migrate_homol(context):
     """Migrate the homology database."""
     ctx = click.get_current_context()
-    headline_fmt = ''.join(['Migrating ACeDB homology for',
+    headline_fmt = ''.join(['Migrating ACeDB homology for ',
                             '{release} to Datomic, *Step {step}*'])
     release = util.get_data_release_version()
     datomic_path = context.path('datomic_free')
