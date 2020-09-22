@@ -353,7 +353,7 @@ def retries(attempts, callback):
     while attempts > 0:
         try:
             callback()
-        except LocalCommandError as lce:
+        except LocalCommandError:
             attempts -= 1
             click.echo("Retrying %d more times..." % attempts)
         time.sleep(0.5)
