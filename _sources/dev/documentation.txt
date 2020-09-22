@@ -1,9 +1,9 @@
 =============
 Documentation
 =============
-As is common in most Python projects ;-
+As is common in most Python projects:
 
- * Markup is written and  in reStructuredText_ with Sphinx_
+ * Markup is written in reStructuredText_ (and Sphinx_)
  * Output is generated using the Sphinx_ builder.
 
 Generating
@@ -13,22 +13,38 @@ Generating
 
    make docs
 
-The command above builds the documentation in various formats.
-(Currently: *HTML*, *man-page* and *text*)
+The command above builds the documentation in HTML.
+Multiple format-generations are supported: *html*, *man* (man-page) and *text*.
 
-Example 1 - View the generated text documentation for admins:
+To generate docs in any format:
 
 .. code-block:: bash
 
-   less ./docs/build/text/index.txt
+   make -C docs/ <format>
 
-Example 2 - View then generated man page for developers:
+Viewing
+=======
 
-   man -l ./docs/build/man/azanium.1
+To view generated with the steps above
+, use one of the examples below:
 
-Example 3 - Vuew the generated HTML user documentation
+ * text documentation (for admins):
 
-   python -m webbrowser ./docs/build/html/index.html
+   .. code-block:: bash
+
+      less ./docs/build/text/index.txt
+
+ * man page (for developers):
+
+   .. code-block:: bash
+
+      man -l ./docs/build/man/azanium.1
+
+ * HTML user documentation
+
+   .. code-block:: bash
+
+      python -m webbrowser ./docs/build/html/index.html
 
 Distributing
 ============

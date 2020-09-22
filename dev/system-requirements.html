@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>System requirements &mdash; azanium 0.7.11 documentation</title>
+  <title>System requirements &mdash; azanium 0.7.12 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.7.11 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.7.12 documentation" href="../index.html"/>
         <link rel="up" title="Development" href="index.html"/>
         <link rel="next" title="Installation" href="install.html"/>
         <link rel="prev" title="Development" href="index.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.7.11
+                0.7.12
               </div>
             
           
@@ -211,12 +211,13 @@ sudo yum install -y apache-maven
 </div>
 <div class="section" id="tace">
 <h3>TACE<a class="headerlink" href="#tace" title="Permalink to this headline">¶</a></h3>
-<p>The command line tool provided by the ACeDB software currently requires the following hack to make it work on the Amazon instance used for the migration:</p>
-<p><code class="docutils literal"><span class="pre">`bash</span>
-<span class="pre">#</span>&nbsp; <span class="pre">Expects</span> <span class="pre">libreadline.so.5,</span> <span class="pre">which</span> <span class="pre">is</span> <span class="pre">not</span> <span class="pre">available</span> <span class="pre">for</span> <span class="pre">installation,</span>
-<span class="pre">#</span>&nbsp; <span class="pre">but</span> <span class="pre">libreadline6</span> <span class="pre">is,</span> <span class="pre">and</span> <span class="pre">works.</span>
-<span class="pre">sudo</span> <span class="pre">ln</span> <span class="pre">-s</span> <span class="pre">/lib64/libreadline.so.6</span> <span class="pre">/lib64/libreadline.so.5</span>
-<span class="pre">`</span></code></p>
+<p>The command line tool provided by the ACeDB software currently requires the
+following hack to make it work on the Amazon instance used for the migration:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1">#  Expects libreadline.so.5, which is not available for installation,</span>
+<span class="c1">#  but libreadline6 is, and works.</span>
+sudo ln -s /lib64/libreadline.so.6 /lib64/libreadline.so.5
+</pre></div>
+</div>
 </div>
 </div>
 </div>
@@ -240,7 +241,7 @@ sudo yum install -y apache-maven
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Matt Russell.
+        &copy; Copyright 2020, wormbase.org.
 
     </p>
   </div>
@@ -262,7 +263,7 @@ sudo yum install -y apache-maven
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.7.11',
+            VERSION:'0.7.12',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

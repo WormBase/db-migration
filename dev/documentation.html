@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Documentation &mdash; azanium 0.7.11 documentation</title>
+  <title>Documentation &mdash; azanium 0.7.12 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.7.11 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.7.12 documentation" href="../index.html"/>
         <link rel="up" title="Development" href="index.html"/>
         <link rel="next" title="Releases" href="releases.html"/>
         <link rel="prev" title="Coding style" href="coding-style.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.7.11
+                0.7.12
               </div>
             
           
@@ -90,6 +90,7 @@
 <li class="toctree-l2"><a class="reference internal" href="coding-style.html">Coding style</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Documentation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#generating">Generating</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#viewing">Viewing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#distributing">Distributing</a></li>
 </ul>
 </li>
@@ -146,10 +147,10 @@
             
   <div class="section" id="documentation">
 <h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h1>
-<p>As is common in most Python projects ;-</p>
+<p>As is common in most Python projects:</p>
 <blockquote>
 <div><ul class="simple">
-<li>Markup is written and  in <a class="reference external" href="http://www.sphinx-doc.org/en/stable/rest.html">reStructuredText</a> with <a class="reference external" href="http://www.sphinx-doc.org/en/stable/">Sphinx</a></li>
+<li>Markup is written in <a class="reference external" href="http://www.sphinx-doc.org/en/stable/rest.html">reStructuredText</a> (and <a class="reference external" href="http://www.sphinx-doc.org/en/stable/">Sphinx</a>)</li>
 <li>Output is generated using the <a class="reference external" href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> builder.</li>
 </ul>
 </div></blockquote>
@@ -158,18 +159,36 @@
 <div class="highlight-bash"><div class="highlight"><pre><span></span>make docs
 </pre></div>
 </div>
-<p>The command above builds the documentation in various formats.
-(Currently: <em>HTML</em>, <em>man-page</em> and <em>text</em>)</p>
-<p>Example 1 - View the generated text documentation for admins:</p>
+<p>The command above builds the documentation in HTML.
+Multiple format-generations are supported: <em>html</em>, <em>man</em> (man-page) and <em>text</em>.</p>
+<p>To generate docs in any format:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>make -C docs/ &lt;format&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="viewing">
+<h2>Viewing<a class="headerlink" href="#viewing" title="Permalink to this headline">¶</a></h2>
+<p>To view generated with the steps above
+, use one of the examples below:</p>
+<blockquote>
+<div><ul>
+<li><p class="first">text documentation (for admins):</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>less ./docs/build/text/index.txt
 </pre></div>
 </div>
-<p>Example 2 - View then generated man page for developers:</p>
-<blockquote>
-<div>man -l ./docs/build/man/azanium.1</div></blockquote>
-<p>Example 3 - Vuew the generated HTML user documentation</p>
-<blockquote>
-<div>python -m webbrowser ./docs/build/html/index.html</div></blockquote>
+</li>
+<li><p class="first">man page (for developers):</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>man -l ./docs/build/man/azanium.1
+</pre></div>
+</div>
+</li>
+<li><p class="first">HTML user documentation</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>python -m webbrowser ./docs/build/html/index.html
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
 </div>
 <div class="section" id="distributing">
 <h2>Distributing<a class="headerlink" href="#distributing" title="Permalink to this headline">¶</a></h2>
@@ -198,7 +217,7 @@ release is made (push and/or tag made on the <cite>master</cite> branch), via a
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Matt Russell.
+        &copy; Copyright 2020, wormbase.org.
 
     </p>
   </div>
@@ -220,7 +239,7 @@ release is made (push and/or tag made on the <cite>master</cite> branch), via a
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.7.11',
+            VERSION:'0.7.12',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

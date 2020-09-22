@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Releases &mdash; azanium 0.7.11 documentation</title>
+  <title>Releases &mdash; azanium 0.7.12 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.7.11 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.7.12 documentation" href="../index.html"/>
         <link rel="up" title="Development" href="index.html"/>
         <link rel="next" title="Glossary" href="../glossary.html"/>
         <link rel="prev" title="Documentation" href="documentation.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.7.11
+                0.7.12
               </div>
             
           
@@ -89,7 +89,10 @@
 <li class="toctree-l2"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="coding-style.html">Coding style</a></li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Releases</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Releases</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#db-migration-deployment">db-migration deployment</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
@@ -143,11 +146,14 @@
   <div class="section" id="releases">
 <h1>Releases<a class="headerlink" href="#releases" title="Permalink to this headline">¶</a></h1>
 <p>This package uses <a class="reference external" href="https://zestreleaser.readthedocs.io/en/latest">zest.releaser</a> to automate the release process.
-Automatically updates the <cite>changelog.rst</cite>, <cite>setup.py</cite> files and handles
-tagging with <cite>git</cite> and pushing releases to github.</p>
+This automatically updates the <cite>changelog.rst</cite>, <cite>setup.py</cite> files
+and handles tagging with <cite>git</cite> and pushing releases to github.</p>
 <p>Having checked out the master <em>master</em> branch, and merged the
 <em>develop</em> branch in:</p>
 <ol class="arabic">
+<li><p class="first">Ensure the necessary dependencies and versions (particularly <cite>pseudoace</cite>),
+have been updated in the <cite>src/azanium/cloud-config/versions.ini</cite> file.</p>
+</li>
 <li><p class="first">Edit the change-log to say what&#8217;s been changed.
 Leave the header as:</p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>&lt;version-number&gt; (un-released)
@@ -160,11 +166,33 @@ Leave the header as:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>make release
 </pre></div>
 </div>
-<p>Answer yes to most questions unless you are sure that&#8217;s not what
-you want.</p>
-<p>(<em>Typically, it&#8217;s safe to answer &#8220;Yes&#8221; to all questions</em>)</p>
+<p>Accept the default on most questions, unless you are sure
+that&#8217;s not what you want.</p>
+<p>(<em>Typically, it&#8217;s safe to accept the default for all questions</em>)</p>
 </li>
 </ol>
+<div class="section" id="db-migration-deployment">
+<h2>db-migration deployment<a class="headerlink" href="#db-migration-deployment" title="Permalink to this headline">¶</a></h2>
+<p>After creating a new release, deploy the new version
+on the wb-db-migration EC2 instance.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># SSH into the `wb-db-migration` EC2 instance (as `ec2-user`)</span>
+
+<span class="c1">#Switch to datomic_build user (prevent permission problems)</span>
+sudo -u datomic_build -i
+
+<span class="c1">#Check the currently installed azanium version</span>
+pip3 freeze <span class="p">|</span> grep azanium
+
+<span class="c1">#Install the latest azanium version (replace RELEASE_TAG)</span>
+pip3 install --user <span class="s2">&quot;https://github.com/WormBase/db-migration/releases/download/</span><span class="si">${</span><span class="nv">RELEASE_TAG</span><span class="si">}</span><span class="s2">/azanium-</span><span class="si">${</span><span class="nv">RELEASE_TAG</span><span class="si">}</span><span class="s2">-py3-none-any.whl&quot;</span>
+
+<span class="c1">#Check the new azanium version installed correctly</span>
+pip3 freeze <span class="p">|</span> grep azanium
+
+azanium --help
+</pre></div>
+</div>
+</div>
 </div>
 
 
@@ -186,7 +214,7 @@ you want.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Matt Russell.
+        &copy; Copyright 2020, wormbase.org.
 
     </p>
   </div>
@@ -208,7 +236,7 @@ you want.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.7.11',
+            VERSION:'0.7.12',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
