@@ -59,8 +59,8 @@ master_doc = 'index'
 # General information about the project.
 project = _dist.project_name
 now = datetime.datetime.utcnow()
-copyright = '{}, Matt Russell'.format(now.year)
-author = 'Matt Russell <matthew.russell@wormbase.org>'
+copyright = '{}, wormbase.org'.format(now.year)
+author = 'Wormbase developers <dev@wormbase.org>'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
