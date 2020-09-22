@@ -430,7 +430,7 @@ def migrate_homol(context):
                              'Create the homology database')
         notifications.around(partial(ctx.invoke,
                                      backup_db,
-                                     dict(db_name='homol')),
+                                     **dict(db_name='homol')),
                              headline_fmt.format(release=release,
                                                  step=2),
                              'Backup the homology database')
