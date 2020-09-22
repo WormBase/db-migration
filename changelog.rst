@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.7.12 (unreleased)
+0.7.12 (2020-09-22)
 ===================
 
 - Updated & completed docs
