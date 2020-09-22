@@ -124,7 +124,7 @@ The location of the file should be:
    7. Run a QA report on the database
    8. Backup the Datomic database
 
- 4. Run the homology migration
+4. Run the homology migration
 
    Ensure there is enough memory to perform this step.
    The easiest way to ensure this is to reboot the instance before
