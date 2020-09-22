@@ -429,6 +429,7 @@ def migrate_homol(context):
     headline_fmt = ''.join(['Migrating ACeDB homology for ',
                             '{release} to Datomic, *Step {step}*'])
     release = util.get_data_release_version()
+    database_name = release+"-homol"
     datomic_path = context.path('datomic_free')
     datomic.configure_transactor(context, datomic_path)
     with logger:
@@ -438,7 +439,7 @@ def migrate_homol(context):
                              'Create the homology database')
         notifications.around(partial(ctx.invoke,
                                      backup_db,
-                                     **dict(db_name='homol')),
+                                     **dict(db_name=database_name)),
                              headline_fmt.format(release=release,
                                                  step=2),
                              'Backup the homology database')

@@ -125,6 +125,7 @@ def qa_report(context, acedb_id_catalog_path):
 
 
 def homol_import(context):
+    db_name = util.get_data_release_version()+"-homol"
     am_filename = source_annotated_models_file(context)
     acedump_dir = context.path('acedb-dump')
     models_path = os.path.join(context.path('acedb_database'),
@@ -140,7 +141,7 @@ def homol_import(context):
                   '--homol-log-dir=' + homol_logs_dir,
                   '--verbose=true',
                   'homol-import',
-                  db_name='homol')
+                  db_name=db_name)
 
 
 class QADialect(csv.excel):
