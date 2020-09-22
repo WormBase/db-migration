@@ -46,7 +46,7 @@ def preliminary_checks():
             'enable notifications']
         for warning_msg in warning_msgs:
             logger.warn(warning_msgs)
-            util.warn(warning_msgs)
+            util.echo_warning(warning_msg)
 
 
 @root_command.group(chain=True, invoke_without_command=True)
