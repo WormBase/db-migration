@@ -6,6 +6,7 @@
 ===================
 
 - Bumped pseudoace dependency version to bugfix migrate-homol DB naming (mismatch between pseudoace and azanium)
+- Corrected ws_release_tag git tag availability check
 
 
 0.7.12 (2020-09-22)
