@@ -29,7 +29,7 @@ def login(scopes=('user', 'repo')):
         password = _prompt('GitHub password')
         uniq = base64.b64encode(os.urandom(16))[:-2].decode('ascii')
         note = __package__ + ' session ' + uniq
-        auth = github3.authorize(username, password, scopes, note=note)
+        auth = github3.github.GitHub.authorize(username, password, scopes, note=note)
         saved_auth = {'auth.token': auth.token, 'auth.id': auth.id}
         conf[__name__] = saved_auth
         config.write(conf)

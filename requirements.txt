@@ -4,7 +4,7 @@ PyYAML==4.2b2
 awacs==0.6.2
 click==6.7
 docutils==0.13.1
-github3.py==1.0.0a4
+github3.py==1.2.0
 gitdb2==2.0.4
 GitPython==2.1.5
 python-dateutil==2.6.0
