@@ -56,6 +56,7 @@ def configure(ws_release_ftp_url, ws_release_tag, slack_url=None):
 
     az_conf['sources'] = dict(ws_release=ws_release_ftp_url,
                               ws_release_tag=ws_release_tag,
+                              ws_release_name=util.parse_data_release_version(ws_release_tag),
                               is_released=github.is_released(ws_release_tag))
     notifications_key = notifications.__name__
     if slack_url is not None:

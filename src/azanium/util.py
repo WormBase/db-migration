@@ -245,12 +245,24 @@ def get_ftp_url():
     return config.parse().get('sources', {}).get('ws_release')
 
 
-def get_data_release_version(ftp_url=None):
-    if ftp_url is None:
-        ftp_url = get_ftp_url()
-    if not ftp_url:
-        raise ValueError('FTP URL has not been configured.')
-    return split_ftp_url(ftp_url)[-1]
+def get_data_release_version():
+    return config.parse().get('sources', {}).get('ws_release_name')
+
+def parse_data_release_version(release_tag=None):
+    release_name = None
+    if release_tag is None:
+        release_tag = ws_release_tag()
+    if not release_tag:
+        raise ValueError('Release tag has not been configured.')
+
+    regex = re.compile(r'models\.wrm\.(.+)')
+    match = regex.fullmatch(release_tag)
+    if match:
+        release_name = match.group(1)
+    else:
+        raise ValueError('Release tag does not comply to regex r\''+regex.pattern+'\'.')
+
+    return release_name
 
 def ws_release_tag():
     return config.parse().get('sources', {}).get('ws_release_tag')
