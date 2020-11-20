@@ -83,8 +83,9 @@ def publish_release(reporoot, version, bundle_path):
     """A zest.releaser hook for publishing releases to github."""
     with login() as gh:
         repo = infer_from_local_repo(path=reporoot, gh=gh)
-    release = repo.release_from_tag(version)
-    if release.is_null():
+    try:
+        release = repo.release_from_tag(version)
+    except github3.exceptions.NotFoundError:
         release = repo.create_release(version)
     with open(bundle_path, 'rb') as fp:
         filename = os.path.basename(fp.name)
