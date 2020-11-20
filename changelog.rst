@@ -7,6 +7,7 @@
 
 - Bumped pseudoace dependency version to bugfix migrate-homol DB naming (mismatch between pseudoace and azanium)
 - Corrected ws_release_tag git tag availability check
+- Changed WB release name parsing strategy, now tag-based rather than FTP-path based (WormBase/db-migration#41)
 - Github authorization update (fix WormBase/db-migration#40)
 
 
