@@ -242,7 +242,7 @@ def ftp_download(host,
 
 
 def get_ftp_url():
-    return config.parse().get('sources', {}).get('ws_release')
+    return config.parse().get('sources', {}).get('ws_release_ftp')
 
 
 def get_data_release_version():
