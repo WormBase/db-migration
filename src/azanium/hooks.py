@@ -1,5 +1,5 @@
 import os
-import tempfile
+import glob
 
 from . import github
 from . import log
@@ -8,6 +8,23 @@ from . import util
 
 log = log.get_logger(__name__)
 
+
+def build_release_assets(release_data):
+    """Build the assets for a github release and the docs for github-pages.
+
+    ``release_data`` is a dictionary of the release data as passed by
+    ```zest.releaser`.
+
+    :param release_data: A mapping passed by the `zest.releaser` tool.
+    :type release_data: dict
+    """
+    #Build python wheel distribution package
+    util.setup_py('bdist_wheel -d dist/')
+
+    #Build docs
+    util.local('make docs')
+
+    log.info('Created assets for new release {}', release_data['version'])
 
 def deploy_release(release_data):
     """Deploy code to a github release, docs to github-pages.
@@ -18,9 +35,7 @@ def deploy_release(release_data):
     :param release_data: A mapping passed by the `zest.releaser` tool.
     :type release_data: dict
     """
-    tempdir = tempfile.mkdtemp()
-    util.setup_py('bdist_wheel -d ' + tempdir)
-    bundle_path = os.path.join(tempdir, os.listdir(tempdir)[0])
+    bundle_path = glob.glob('dist/azanium-'+release_data['version']+'-*.whl')[0]
     asset = github.publish_release(release_data['reporoot'],
                                    release_data['version'],
                                    bundle_path)
