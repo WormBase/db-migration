@@ -5,6 +5,7 @@ import sys
 
 import git
 import github3
+import getpass
 
 import urllib.parse
 import re
@@ -28,7 +29,7 @@ def login(scopes=('user', 'repo')):
     saved_auth = conf.get(__name__, {})
     if not saved_auth:
         username = _prompt('GitHub username')
-        password = _prompt('GitHub password')
+        password = getpass.getpass(prompt='GitHub password: ')
         uniq = base64.b64encode(os.urandom(16))[:-2].decode('ascii')
         note = __package__ + ' session ' + uniq
         auth = github3.github.GitHub.authorize(username, password, scopes, note=note)
