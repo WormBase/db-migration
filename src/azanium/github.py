@@ -80,7 +80,7 @@ def infer_from_local_repo(path=None, gh=github3):
 
 
 def publish_release(reporoot, version, bundle_path):
-    """A zest.releaser hook for publishing releases to github."""
+    """A function for publishing releases to github, used by a zest.releaser hook."""
     with login() as gh:
         repo = infer_from_local_repo(path=reporoot, gh=gh)
     try:
