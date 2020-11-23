@@ -1,6 +1,7 @@
 import base64
 import contextlib
 import os
+import sys
 
 import git
 import github3
@@ -83,10 +84,16 @@ def push_remote(reporoot):
     """A function for pushing local changes to github, independent from zest.releaser.
        Used by a zest.releaser hook to push code after release tagging but before \
        GH release creation and new development commits."""
-    with login() as gh:
-        repo = get_gh_repo_from_local_remote(path=reporoot, gh=gh)
-        origin = repo.remote(name='origin')
+
+    response = str(input("Azanium: OK to push local changes to remote (Y/n)? ") or "y").lower()
+
+    if response == 'y':
+        repo = git.Repo(reporoot)
+        origin = repo.remotes.origin
         origin.push()
+    else:
+        print("Interrupting on user request...")
+        sys.exit(1)
 
 
 def publish_release(reporoot, version, bundle_path):
