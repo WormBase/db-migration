@@ -72,7 +72,7 @@ def download_release_binary(repo_path, tag, to_directory=None, gh=github3):
     return asset.download(path=local_path)
 
 
-def infer_from_local_repo(path=None, gh=github3):
+def get_gh_repo_from_local_remote(path=None, gh=github3):
     path = path if path else os.getcwd()
     git_url = git.Repo(path).remotes.origin.url
     (org, repo_name) = re.split(r'[:/]', urllib.parse.urlparse(git_url).path.split('.')[-2])[1:]
@@ -82,7 +82,7 @@ def infer_from_local_repo(path=None, gh=github3):
 def publish_release(reporoot, version, bundle_path):
     """A function for publishing releases to github, used by a zest.releaser hook."""
     with login() as gh:
-        repo = infer_from_local_repo(path=reporoot, gh=gh)
+        repo = get_gh_repo_from_local_remote(path=reporoot, gh=gh)
         try:
             release = repo.release_from_tag(version)
         except github3.exceptions.NotFoundError:
