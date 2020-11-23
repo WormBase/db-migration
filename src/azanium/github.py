@@ -79,6 +79,16 @@ def get_gh_repo_from_local_remote(path=None, gh=github3):
     return gh.repository(org, repo_name)
 
 
+def push_remote(reporoot):
+    """A function for pushing local changes to github, independent from zest.releaser.
+       Used by a zest.releaser hook to push code after release tagging but before \
+       GH release creation and new development commits."""
+    with login() as gh:
+        repo = get_gh_repo_from_local_remote(path=reporoot, gh=gh)
+        origin = repo.remote(name='origin')
+        origin.push()
+
+
 def publish_release(reporoot, version, bundle_path):
     """A function for publishing releases to github, used by a zest.releaser hook."""
     with login() as gh:

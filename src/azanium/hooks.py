@@ -35,6 +35,9 @@ def deploy_release(release_data):
     :param release_data: A mapping passed by the `zest.releaser` tool.
     :type release_data: dict
     """
+    #Push code and release tag to github
+    github.push_remote(release_data['reporoot'])
+    #Deploy GH release
     bundle_path = glob.glob('dist/azanium-'+release_data['version']+'-*.whl')[0]
     asset = github.publish_release(release_data['reporoot'],
                                    release_data['version'],

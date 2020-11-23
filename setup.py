@@ -37,7 +37,7 @@ setup(
         'zest.releaser.releaser.middle': [
             'build_github_assets=azanium.hooks:build_release_assets'
         ],
-        'zest.releaser.postreleaser.after': [
+        'zest.releaser.releaser.after': [
             'publish_azanium_docs_and_assets=azanium.hooks:deploy_release'
         ]
     },
