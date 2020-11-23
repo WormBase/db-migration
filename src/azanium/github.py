@@ -83,14 +83,14 @@ def publish_release(reporoot, version, bundle_path):
     """A function for publishing releases to github, used by a zest.releaser hook."""
     with login() as gh:
         repo = infer_from_local_repo(path=reporoot, gh=gh)
-    try:
-        release = repo.release_from_tag(version)
-    except github3.exceptions.NotFoundError:
-        print('WARNING: Release not found on GitHub. Creating new release.')
-        release = repo.create_release(version)
-    with open(bundle_path, 'rb') as fp:
-        filename = os.path.basename(fp.name)
-        asset = release.upload_asset('application/zip', filename, fp)
+        try:
+            release = repo.release_from_tag(version)
+        except github3.exceptions.NotFoundError:
+            print('WARNING: Release not found on GitHub. Creating new release.')
+            release = repo.create_release(version)
+        with open(bundle_path, 'rb') as fp:
+            filename = os.path.basename(fp.name)
+            asset = release.upload_asset('application/zip', filename, fp)
     return asset
 
 
