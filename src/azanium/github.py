@@ -86,6 +86,7 @@ def publish_release(reporoot, version, bundle_path):
     try:
         release = repo.release_from_tag(version)
     except github3.exceptions.NotFoundError:
+        print('WARNING: Release not found on GitHub. Creating new release.')
         release = repo.create_release(version)
     with open(bundle_path, 'rb') as fp:
         filename = os.path.basename(fp.name)
