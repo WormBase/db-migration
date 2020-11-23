@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.7.13 (unreleased)
+0.7.13 (2020-11-23)
 ===================
 
 - Bumped pseudoace dependency version to bugfix migrate-homol DB naming (mismatch between pseudoace and azanium)
