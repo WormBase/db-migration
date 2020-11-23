@@ -9,6 +9,7 @@
 - Corrected ws_release_tag git tag availability check
 - Changed WB release name parsing strategy, now tag-based rather than FTP-path based (WormBase/db-migration#41)
 - Github authorization update (fix WormBase/db-migration#40)
+- Fixed release creation vs tagging mismatch (fix WormBase/db-migration#42)
 
 
 0.7.12 (2020-09-22)
