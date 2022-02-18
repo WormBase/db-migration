@@ -157,7 +157,7 @@ def install(context):
     """Installs all software and data."""
     # Invoke all commands via the install group command chain.
     # This has the same effect as if run on command line, e.g:
-    # azanium install dataomic_free pseudoace acedb_database ..
+    # azanium installers datomic_free pseudoace tace
     preliminary_checks()
     ctx = click.get_current_context()
     install_cmd_names = sorted(installers.commands)
