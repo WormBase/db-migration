@@ -11,6 +11,8 @@ import stat
 import tarfile
 import time
 from functools import partial
+import glob
+import boto3 as aws
 
 import click
 
@@ -443,3 +445,40 @@ def migrate_homol(context):
                              headline_fmt.format(release=release,
                                                  step=2),
                              'Backup the homology database')
+
+@root_command.command('upload-result',
+                      short_help='Upload the result of both migrations to S3, available for the Wormbase web team.')
+@util.pass_command_context
+def upload_result(context):
+    release = util.get_data_release_version()
+
+    # Get local file paths
+    main_db_filename = '{}.tar.xz'.format(release)
+    homol_db_filename = '{}-homol.tar.xz'.format(release)
+    log_filename = 'azanium.log'
+    report_filename = '{}-report.csv'.format(release)
+
+    db_file_path = context.path('datomic-db-backup')
+    main_db_files = glob.glob('{}/*/{}'.format(db_file_path,main_db_filename))
+    homol_db_files = glob.glob('{}/*/{}'.format(db_file_path,homol_db_filename))
+
+    #Ensure exactly 1 db_file is found for each
+    if len(main_db_files) != 1:
+        error('Main migration DB dump file count != 1. Cleanup redundant dumps from {}, or ensure a database dump is available.'.format(db_file_path))
+        click.get_current_context().exit(1)
+    if len(homol_db_files) != 1:
+        error('Main migration DB dump file count != 1. Cleanup redundant dumps from {}, or ensure a database dump is available.'.format(db_file_path))
+        click.get_current_context().exit(1)
+
+    main_db_filepath = main_db_files[0]
+    homol_db_filepath = homol_db_files[0]
+    log_filepath    = os.path.join( context.path('logs'), log_filename)
+    report_filepath = os.path.join( context.base_path, report_filename)
+
+    # Upload to S3
+    s3_filepath = 'db-migration/{}'
+    s3 = aws.client('s3')
+    s3.upload_file(main_db_filepath, 'wormbase', s3_filepath.format(main_db_filename))
+    s3.upload_file(homol_db_filepath, 'wormbase', s3_filepath.format(homol_db_filename))
+    s3.upload_file(log_filepath, 'wormbase', s3_filepath.format('{}-azanium.log'.format(release)))
+    s3.upload_file(report_filepath, 'wormbase', s3_filepath.format(report_filename))
