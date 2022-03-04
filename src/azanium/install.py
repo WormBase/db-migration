@@ -4,7 +4,7 @@ import tarfile
 import tempfile
 import urllib.parse
 import zipfile
-
+import boto3 as aws
 
 import click
 
@@ -90,21 +90,23 @@ def tace(context, afct, url_template=None):
 
 
 @installers.command(short_help='Installs datomic-free')
-@util.option('-t', '--url-template',
-             default='https://my.datomic.com/downloads/free/{version}',
-             help='URL template for Datomic Free version')
+@util.option('-t', '--obj-path-template',
+             default='datomic-free/distro/datomic-free-{version}.zip',
+             help='S3 object path template for Datomic Free version')
 @artefact.prepared
-def datomic_free(context, afct, url_template=None):
+def datomic_free(context, afct, obj_path_template=None):
     """Installs Datomic (free version)."""
     install_dir = afct.install_dir
     version = afct.version
-    url = url_template.format(version=version)
+    obj_path = obj_path_template.format(version=version)
     fullname = 'datomic-free-{version}'.format(version=version)
     local_filename = fullname + '.zip'
     download_path = os.path.join(afct.download_dir, local_filename)
     logger.info('Downloading and extracting {} to {}', fullname, install_dir)
     tmpdir = tempfile.mkdtemp()
-    with zipfile.ZipFile(util.download(url, download_path)) as zf:
+    s3 = aws.client('s3')
+    s3.download_file('wormbase', obj_path, download_path)
+    with zipfile.ZipFile(download_path) as zf:
         zf.extractall(tmpdir)
     shutil.rmtree(install_dir)
     shutil.move(os.path.join(tmpdir, fullname), install_dir)
