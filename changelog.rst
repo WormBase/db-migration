@@ -5,7 +5,9 @@
 0.7.14 (unreleased)
 ===================
 
-- Nothing changed yet.
+- Updated Datomic download source to Wormbase bucket (datomic free download no longer supported by Datomic)
+- Added new upload-result subcommand to upload migration results to the Wormbase S3 bucket (instead of requiring manual upload)
+- Security improvements and dependency bumping
 
 
 0.7.13 (2020-11-23)
