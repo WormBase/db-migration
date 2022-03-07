@@ -464,10 +464,10 @@ def upload_result(context):
 
     #Ensure exactly 1 db_file is found for each
     if len(main_db_files) != 1:
-        error('Main migration DB dump file count != 1. Cleanup redundant dumps from {}, or ensure a database dump is available.'.format(db_file_path))
+        util.echo_error('ERROR: Main migration DB dump file count != 1. Cleanup redundant dumps from {}, or ensure a database dump is available.'.format(db_file_path))
         click.get_current_context().exit(1)
     if len(homol_db_files) != 1:
-        error('Main migration DB dump file count != 1. Cleanup redundant dumps from {}, or ensure a database dump is available.'.format(db_file_path))
+        util.echo_error('ERROR: Main migration DB dump file count != 1. Cleanup redundant dumps from {}, or ensure a database dump is available.'.format(db_file_path))
         click.get_current_context().exit(1)
 
     main_db_filepath = main_db_files[0]
