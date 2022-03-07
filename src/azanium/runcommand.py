@@ -476,9 +476,9 @@ def upload_result(context):
     report_filepath = os.path.join( context.base_path, report_filename)
 
     # Upload to S3
-    s3_filepath = 'db-migration/{}'
+    s3_filepath = 'db-migration/{release}/{{}}'.format(release=release)
     s3 = aws.client('s3')
     s3.upload_file(main_db_filepath, 'wormbase', s3_filepath.format(main_db_filename))
     s3.upload_file(homol_db_filepath, 'wormbase', s3_filepath.format(homol_db_filename))
-    s3.upload_file(log_filepath, 'wormbase', s3_filepath.format('{}-azanium.log'.format(release)))
+    s3.upload_file(log_filepath, 'wormbase', s3_filepath.format(log_filename))
     s3.upload_file(report_filepath, 'wormbase', s3_filepath.format(report_filename))
