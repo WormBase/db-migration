@@ -5,6 +5,15 @@ This package uses `zest.releaser`_ to automate the release process.
 This automatically updates the `changelog.rst`, `setup.py` files
 and handles tagging with `git` and pushing releases to github.
 
+API interactions with Github now require the use of personal access tokens.
+Before your first release creation, `create a personal access token`_ as described in the github docs
+and:
+
+* Set the experiation to "no experiation" to allow it to be saved into your azanium config file for later reuse.
+* Grant user and repo scope permissions.
+
+You will be asked to provide this access token through the CLI during release creation.
+
 Having checked out the master *master* branch, and merged the
 *develop* branch in:
 
@@ -58,3 +67,4 @@ on the wb-db-migration EC2 instance.
 
 
 .. _`zest.releaser`: https://zestreleaser.readthedocs.io/en/latest
+.. _`create a personal access token`: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token

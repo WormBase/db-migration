@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Releases &mdash; azanium 0.7.13 documentation</title>
+  <title>Releases &mdash; azanium 0.7.14 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="azanium 0.7.13 documentation" href="../index.html"/>
+    <link rel="top" title="azanium 0.7.14 documentation" href="../index.html"/>
         <link rel="up" title="Development" href="index.html"/>
         <link rel="next" title="Glossary" href="../glossary.html"/>
         <link rel="prev" title="Documentation" href="documentation.html"/> 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.7.13
+                0.7.14
               </div>
             
           
@@ -148,6 +148,14 @@
 <p>This package uses <a class="reference external" href="https://zestreleaser.readthedocs.io/en/latest">zest.releaser</a> to automate the release process.
 This automatically updates the <cite>changelog.rst</cite>, <cite>setup.py</cite> files
 and handles tagging with <cite>git</cite> and pushing releases to github.</p>
+<p>API interactions with Github now require the use of personal access tokens.
+Before your first release creation, <a class="reference external" href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token">create a personal access token</a> as described in the github docs
+and:</p>
+<ul class="simple">
+<li>Set the experiation to &#8220;no experiation&#8221; to allow it to be saved into your azanium config file for later reuse.</li>
+<li>Grant user and repo scope permissions.</li>
+</ul>
+<p>You will be asked to provide this access token through the CLI during release creation.</p>
 <p>Having checked out the master <em>master</em> branch, and merged the
 <em>develop</em> branch in:</p>
 <ol class="arabic">
@@ -214,7 +222,7 @@ azanium --help
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, wormbase.org.
+        &copy; Copyright 2022, wormbase.org.
 
     </p>
   </div>
@@ -236,7 +244,7 @@ azanium --help
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.7.13',
+            VERSION:'0.7.14',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
