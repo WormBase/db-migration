@@ -24,20 +24,31 @@ def _prompt(question):
 
 
 @contextlib.contextmanager
-def login(scopes=('user', 'repo')):
+def login(reporoot, force_prompt=False):
     conf = config.parse()
     saved_auth = conf.get(__name__, {})
-    if not saved_auth:
-        username = _prompt('GitHub username')
-        password = getpass.getpass(prompt='GitHub password: ')
-        uniq = base64.b64encode(os.urandom(16))[:-2].decode('ascii')
-        note = __package__ + ' session ' + uniq
-        auth = github3.github.GitHub.authorize(username, password, scopes, note=note)
-        saved_auth = {'auth.token': auth.token, 'auth.id': auth.id}
-        conf[__name__] = saved_auth
-        config.write(conf)
-    token = saved_auth['auth.token']
-    gh = github3.login(token=token)
+    gh = None
+
+    while True:
+        if force_prompt or not saved_auth or not saved_auth['auth.pers-token']:
+            username = _prompt('GitHub username')
+            token = getpass.getpass(prompt='GitHub personal access token: ')
+            saved_auth = {'auth.username': username, 'auth.pers-token': token}
+            conf[__name__] = saved_auth
+            config.write(conf)
+        username = saved_auth['auth.username']
+        token = saved_auth['auth.pers-token']
+        gh = github3.login(username = username, token=token)
+
+        (org, repo_name) = parse_local_remote(path=reporoot)
+
+        try:
+            gh.repository(org, repo_name)
+            break
+        except github3.exceptions.AuthenticationFailed:
+            print('WARNING: Github Authentication Failed. Provide a valid username and personal token to try again.')
+            force_prompt = True
+
     yield gh
 
 
@@ -74,10 +85,14 @@ def download_release_binary(repo_path, tag, to_directory=None, gh=github3):
     return asset.download(path=local_path)
 
 
-def get_gh_repo_from_local_remote(path=None, gh=github3):
+def parse_local_remote(path=None):
     path = path if path else os.getcwd()
     git_url = git.Repo(path).remotes.origin.url
     (org, repo_name) = re.split(r'[:/]', urllib.parse.urlparse(git_url).path.split('.')[-2])[1:]
+    return (org, repo_name)
+
+def get_gh_repo_from_local_remote(path=None, gh=github3):
+    (org, repo_name) = parse_local_remote(path=path)
     return gh.repository(org, repo_name)
 
 
@@ -99,7 +114,7 @@ def push_remote(reporoot):
 
 def publish_release(reporoot, version, bundle_path):
     """A function for publishing releases to github, used by a zest.releaser hook."""
-    with login() as gh:
+    with login(reporoot) as gh:
         repo = get_gh_repo_from_local_remote(path=reporoot, gh=gh)
         try:
             release = repo.release_from_tag(version)
