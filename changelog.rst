@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.7.14 (unreleased)
+0.7.14 (2022-03-09)
 ===================
 
 - Updated Datomic download source to Wormbase bucket (datomic free download no longer supported by Datomic)
