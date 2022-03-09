@@ -7,6 +7,7 @@
 
 - Updated Datomic download source to Wormbase bucket (datomic free download no longer supported by Datomic)
 - Added new upload-result subcommand to upload migration results to the Wormbase S3 bucket (instead of requiring manual upload)
+- Updated release process to use GH personal access tokens
 - Security improvements and dependency bumping
 
 
