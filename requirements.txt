@@ -6,7 +6,7 @@ click==6.7
 docutils==0.13.1
 github3.py==1.2.0
 gitdb2==2.0.4
-GitPython==2.1.5
+GitPython==3.1.30
 python-dateutil==2.6.0
 requests>=2.20.0
 setuptools>=18.5
