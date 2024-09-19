@@ -328,9 +328,15 @@ class CommandContext:
             state = self._app_state = app_state()
         return state
 
+    @property
+    def qa_report_path(self):
+        return self.path('{}-report.csv'.format(get_data_release_version()))
 
     def path(self, *args):
         return os.path.join(self.base_path, *args)
+
+    def exists(self, path):
+        return os.path.exists(path)
 
     def datomic_url(self,
                     db_name=None,

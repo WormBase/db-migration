@@ -59,6 +59,17 @@ def acedb_id_catalog(
             fp.write(gz_fp.read())
         return fp.name
 
+@run.command('input-validation', short_help='Perform input validation.')
+@util.pass_command_context
+def input_validation(context):
+    """Performs input validation of the provided configs and input arguments."""
+    if context.exists(context.qa_report_path):
+        # prompt to confirm overwrite is intentional
+        click.confirm(
+            text="QA report for release '{}' already found.\n".format(util.get_data_release_version())+\
+                 'Are you sure you want to rerun (and overwrite) the migration for this release?',
+            abort=True)
+
 
 @run.command('acedb-database', short_help='Download the ACeDB database release.')
 @util.option('--file-selector-regexp',
@@ -286,6 +297,9 @@ def _get_steps(context):
     acedb_dir = context.path('acedb_database')
     acedb_id_catalog_dir = context.path('acedb_id_catalog')
     steps = [
+        Step('Input validation',
+             input_validation,
+             {}),
         Step('Fetch ACeDB data for release',
              acedb_database,
              dict(acedb_dir=acedb_dir,
