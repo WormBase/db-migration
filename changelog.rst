@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.7.15 (unreleased)
+0.7.15 (2024-09-19)
 ===================
 
 - Added prompt to confirm overwrite if qa-report already exists
