@@ -5,7 +5,7 @@
 0.7.15 (unreleased)
 ===================
 
-- Nothing changed yet.
+- Added prompt to confirm overwrite if qa-report already exists
 
 
 0.7.14 (2022-03-09)
