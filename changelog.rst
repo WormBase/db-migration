@@ -5,7 +5,7 @@
 0.7.16 (unreleased)
 ===================
 
-- Nothing changed yet.
+- Fixed circus dependencies
 
 
 0.7.15 (2024-09-19)
