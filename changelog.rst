@@ -2,7 +2,7 @@
  Changelog
 ===========
 
-0.7.16 (unreleased)
+0.7.16 (2024-09-20)
 ===================
 
 - Fixed circus dependencies
